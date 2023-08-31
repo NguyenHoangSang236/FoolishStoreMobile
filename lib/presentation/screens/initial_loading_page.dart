@@ -57,7 +57,7 @@ class _InitialLoadingState extends State<InitialLoadingPage> {
                 children: [
                   SizedBox(
                     height: 130.height,
-                    width: 130.width,
+                    width: 130.height,
                     child: CircularProgressIndicator(
                       color: Colors.orangeAccent,
                       strokeWidth: 6.width,

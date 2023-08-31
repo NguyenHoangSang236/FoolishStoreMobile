@@ -22,18 +22,20 @@ class ProductSearchingBloc
       searchingProductList = [];
 
       try {
-        dynamic response = await _shopRepository.searchProduct(
-            event.productName,
-            page: event.page,
-            limit: event.limit);
+        final response = await _shopRepository.searchProduct(
+          event.productName,
+          page: event.page,
+          limit: event.limit,
+        );
 
-        if (response is List<Product>) {
-          searchingProductList = response;
-          currentSearchingProductListPage = event.page;
-          emit(ProductSearchingListLoadedState(response));
-        } else {
-          emit(ProductSearchingErrorState(response.toString()));
-        }
+        response.fold(
+          (failure) => emit(ProductSearchingErrorState(failure.message)),
+          (list) {
+            searchingProductList = list;
+            currentSearchingProductListPage = event.page;
+            emit(ProductSearchingListLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductSearchingErrorState(e.toString()));

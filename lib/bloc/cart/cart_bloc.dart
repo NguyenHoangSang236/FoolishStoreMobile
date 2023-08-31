@@ -23,17 +23,22 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoadingState());
 
       try {
-        List<CartItem> response =
+        final response =
             await _cartRepository.showFullCart(event.page, event.limit);
 
-        if (event.page != currentPage) {
-          cartItemList = _removeDuplicates([...cartItemList, ...response]);
-          currentPage = event.page;
-        } else {
-          cartItemList = response;
-        }
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (list) {
+            if (event.page != currentPage) {
+              cartItemList = _removeDuplicates([...cartItemList, ...list]);
+              currentPage = event.page;
+            } else {
+              cartItemList = list;
+            }
 
-        emit(AllCartListLoadedState(cartItemList));
+            emit(AllCartListLoadedState(cartItemList));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(CartErrorState(e.toString()));
@@ -50,11 +55,17 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoadingState());
 
       try {
-        String response = await _cartRepository.getTotalCartItemQuantity();
-        int quantity = int.parse(response);
+        final response = await _cartRepository.getTotalCartItemQuantity();
 
-        totalCartItemQuantity = quantity;
-        emit(TotalCartItemQuantityLoadedState(quantity));
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (cartItemQuantity) {
+            int quantity = int.parse(cartItemQuantity);
+
+            totalCartItemQuantity = quantity;
+            emit(TotalCartItemQuantityLoadedState(quantity));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(CartErrorState(e.toString()));
@@ -65,9 +76,17 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoadingState());
 
       try {
-        String response = await _cartRepository.add(
-            event.productId, event.color, event.size, event.quantity);
-        emit(CartAddedState(response));
+        final response = await _cartRepository.add(
+          event.productId,
+          event.color,
+          event.size,
+          event.quantity,
+        );
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (message) => emit(CartAddedState(message)),
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(CartErrorState(e.toString()));
@@ -78,8 +97,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoadingState());
 
       try {
-        String response = await _cartRepository.remove(event.cartIdList);
-        emit(CartRemovedState(response));
+        final response = await _cartRepository.remove(event.cartIdList);
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (message) => emit(CartRemovedState(message)),
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(CartErrorState(e.toString()));
@@ -91,16 +114,24 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(CartLoadingState());
 
         try {
-          String response = await _cartRepository.update(event.cartItemList);
-          emit(CartUpdatedState(response));
+          final response = await _cartRepository.update(event.cartItemList);
+
+          response.fold(
+            (failure) => emit(CartErrorState(failure.message)),
+            (message) => emit(CartUpdatedState(message)),
+          );
         } catch (e) {
           debugPrint(e.toString());
           emit(CartErrorState(e.toString()));
         }
       } else {
         try {
-          String response = await _cartRepository.update(event.cartItemList);
-          emit(CartSelectedState());
+          final response = await _cartRepository.update(event.cartItemList);
+
+          response.fold(
+            (failure) => emit(CartErrorState(failure.message)),
+            (message) => emit(CartSelectedState()),
+          );
         } catch (e) {
           debugPrint(e.toString());
           emit(CartErrorState(e.toString()));
@@ -112,25 +143,35 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoadingState());
 
       try {
-        List<CartItem> response = await _cartRepository.filterCartItems(
-            event.name, event.status, event.brand, event.page, event.limit);
+        final response = await _cartRepository.filterCartItems(
+          event.name,
+          event.status,
+          event.brand,
+          event.page,
+          event.limit,
+        );
 
-        if (event.page != null) {
-          if (event.page != currentPage) {
-            cartItemList = _removeDuplicates([...cartItemList, ...response]);
-            currentPage = event.page ?? currentPage;
-          }
-        } else {
-          cartItemList = response;
-        }
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (list) {
+            if (event.page != null) {
+              if (event.page != currentPage) {
+                cartItemList = _removeDuplicates([...cartItemList, ...list]);
+                currentPage = event.page ?? currentPage;
+              }
+            } else {
+              cartItemList = list;
+            }
 
-        if (event.name == null &&
-            event.brand == null &&
-            event.status == [CartEnum.SELECTED.name]) {
-          emit(CartFilteredToCheckoutState(cartItemList));
-        } else {
-          emit(CartFilteredState(cartItemList));
-        }
+            if (event.name == null &&
+                event.brand == null &&
+                event.status == [CartEnum.SELECTED.name]) {
+              emit(CartFilteredToCheckoutState(cartItemList));
+            } else {
+              emit(CartFilteredState(cartItemList));
+            }
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(CartErrorState(e.toString()));

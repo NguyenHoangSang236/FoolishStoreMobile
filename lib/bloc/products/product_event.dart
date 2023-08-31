@@ -24,13 +24,22 @@ class OnLoadFilterProductListEvent extends ProductEvent {
   final double? maxPrice;
 
   const OnLoadFilterProductListEvent(
-      this.page,
-      this.limit, {
-      this.categoryList,
-      this.brand,
-      this.name,
-      this.minPrice,
-      this.maxPrice});
+    this.page,
+    this.limit, {
+    this.categoryList,
+    this.brand,
+    this.name,
+    this.minPrice,
+    this.maxPrice,
+  });
+}
+
+class OnRateProduct extends ProductEvent {
+  final int productId;
+  final String color;
+  final int overallRating;
+
+  const OnRateProduct(this.productId, this.color, this.overallRating);
 }
 
 class OnLoadHotDiscountProductListEvent extends ProductEvent {

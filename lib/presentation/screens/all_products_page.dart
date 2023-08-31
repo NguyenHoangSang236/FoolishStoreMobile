@@ -64,14 +64,18 @@ class _AllProductsPageState extends State<AllProductsPage> {
           const OnLoadAllProductListEvent(1, 8),
         );
       } else {
-        selectedCategoryIndex = BlocProvider.of<CategoryBloc>(context)
-            .categoryList
-            .indexOf(BlocProvider.of<CategoryBloc>(context)
-                .categoryList
-                .where((element) =>
-                    element.name ==
-                    BlocProvider.of<CategoryBloc>(context).selectedCategoryName)
-                .first);
+        selectedCategoryIndex =
+            BlocProvider.of<CategoryBloc>(context).categoryList.indexOf(
+                  BlocProvider.of<CategoryBloc>(context)
+                      .categoryList
+                      .where(
+                        (element) =>
+                            element.name ==
+                            BlocProvider.of<CategoryBloc>(context)
+                                .selectedCategoryName,
+                      )
+                      .first,
+                );
 
         Future.delayed(const Duration(milliseconds: 500), () {
           _itemScrollController.scrollTo(
@@ -99,7 +103,12 @@ class _AllProductsPageState extends State<AllProductsPage> {
       pageName: 'Clothings',
       hintSearchBarText: 'What product are you looking for?',
       body: RefreshIndicator(
-        onRefresh: () async {},
+        onRefresh: () async => setState(() {
+          selectedCategoryIndex = 0;
+          BlocProvider.of<ProductBloc>(context).add(
+            const OnLoadAllProductListEvent(1, 8),
+          );
+        }),
         color: Colors.orange,
         key: _refreshIndicatorKey,
         child: Column(children: [

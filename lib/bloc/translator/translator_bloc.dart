@@ -20,10 +20,18 @@ class TranslatorBloc extends Bloc<TranslatorEvent, TranslatorState> {
       emit(TranslatorLoadingState());
 
       try {
-        String response = await _translatorRepository.translate(
-            event.text, event.sourceLanguageCode);
-        translatedText = response;
-        emit(TranslatorLoadedState(response));
+        final response = await _translatorRepository.translate(
+          event.text,
+          event.sourceLanguageCode,
+        );
+
+        response.fold(
+          (failure) => emit(TranslatorErrorState(failure.message)),
+          (message) {
+            translatedText = message;
+            emit(TranslatorLoadedState(message));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(TranslatorErrorState(e.toString()));
@@ -34,10 +42,15 @@ class TranslatorBloc extends Bloc<TranslatorEvent, TranslatorState> {
       emit(TranslatorLanguageListLoadingState());
 
       try {
-        List<TranslatorLanguage> list =
-            await _translatorRepository.getAllLanguageList();
-        languageList = list;
-        emit(TranslatorLanguageListLoadedState(list));
+        final response = await _translatorRepository.getAllLanguageList();
+
+        response.fold(
+          (failure) => emit(TranslatorErrorState(failure.message)),
+          (list) {
+            languageList = list;
+            emit(TranslatorLanguageListLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(TranslatorErrorState(e.toString()));

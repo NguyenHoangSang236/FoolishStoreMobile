@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:either_dart/either.dart';
+import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -10,53 +12,41 @@ import '../utils/network/network_service.dart';
 class TranslatorRepository {
   String type = 'translator';
 
-  Future<dynamic> getList(String url, {bool isAuthen = false}) async {
+  Future<Either<Failure, List<TranslatorLanguage>>> getLanguageList(
+    String url, {
+    bool isAuthen = false,
+  }) async {
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
           ValueRender.getUrl(type: type, url: url, isAuthen: isAuthen));
 
-      if (json.decode(jsonEncode(response.result)) == 'success') {
+      if (response.result == 'success') {
         List<dynamic> jsonList = json.decode(jsonEncode(response.content));
-        return jsonList
-            .map((json) => TranslatorLanguage.fromJson(json))
-            .toList();
+        return Right(
+          jsonList.map((json) => TranslatorLanguage.fromJson(json)).toList(),
+        );
       } else {
-        Map<String, dynamic> jsonMap =
-            json.decode(jsonEncode(response.content));
-        return jsonMap.toString();
+        return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
       debugPrint('Caught exception: $e\n$stackTrace');
+      return Left(ApiFailure(e.toString()));
     }
-
-    return [];
   }
 
-  Future<dynamic> sendPostAndGetMessage(
-      String url, Map<String, dynamic> paramBody,
-      {bool isAuthen = false}) async {
-    String message = '';
-
-    try {
-      ApiResponse response = await NetworkService.getDataFromApi(
-          ValueRender.getUrl(type: type, url: url, isAuthen: isAuthen),
-          param: paramBody);
-
-      message = response.content;
-    } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
-      message = e.toString();
-    }
-
-    return message;
-  }
-
-  Future<dynamic> translate(String text, String sourceLanguageCode) {
-    return sendPostAndGetMessage(
-        '/translate', {'text': text, 'sourceLanguageCode': sourceLanguageCode});
+  Future<Either<Failure, String>> translate(
+      String text, String sourceLanguageCode) {
+    return NetworkService.getMessageFromApi(
+      type: type,
+      '/translate',
+      paramBody: {
+        'text': text,
+        'sourceLanguageCode': sourceLanguageCode,
+      },
+    );
   }
 
   Future<dynamic> getAllLanguageList() {
-    return getList('/getAllLanguageList');
+    return getLanguageList('/getAllLanguageList');
   }
 }

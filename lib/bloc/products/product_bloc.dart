@@ -23,20 +23,26 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc(this._shopRepository) : super(ProductInitial()) {
     on<OnLoadAllProductListEvent>((event, emit) async {
       try {
-        List<Product> response =
-            await _shopRepository.getAllProducts(event.page, event.limit);
+        final response = await _shopRepository.getAllProducts(
+          event.page,
+          event.limit,
+        );
 
-        if (response.isNotEmpty) {
-          emit(ProductLoadingState());
-          response = _removeDuplicates([...allProductList, ...response]);
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            if (list.isNotEmpty) {
+              emit(ProductLoadingState());
 
-          currentAllProductListPage = event.page;
-          allProductList = response;
+              currentAllProductListPage = event.page;
+              allProductList = List.of(list);
 
-          emit(ProductAllListLoadedState(response));
-        } else {
-          emit(ProductAllListLoadedState(allProductList ?? []));
-        }
+              emit(ProductAllListLoadedState(list));
+            } else {
+              emit(ProductAllListLoadedState(allProductList));
+            }
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));
@@ -47,15 +53,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoadingState());
 
       try {
-        dynamic response = await _shopRepository
-            .getProductList(ProductListTypeEnum.HOT_DISCOUNT.name);
+        final response = await _shopRepository.getProductListFromApi(
+          ProductListTypeEnum.HOT_DISCOUNT.name,
+        );
 
-        if (response is List<Product>) {
-          hotDiscountProductList = response;
-          emit(ProductHotDiscountListLoadedState(response));
-        } else {
-          emit(ProductErrorState(response.toString()));
-        }
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            hotDiscountProductList = list;
+            emit(ProductHotDiscountListLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));
@@ -66,15 +74,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoadingState());
 
       try {
-        dynamic response = await _shopRepository
-            .getProductList(ProductListTypeEnum.NEW_ARRIVAL.name);
+        final response = await _shopRepository.getProductListFromApi(
+          ProductListTypeEnum.NEW_ARRIVAL.name,
+        );
 
-        if (response is List<Product>) {
-          newArrivalProductList = response;
-          emit(ProductNewArrivalListLoadedState(response));
-        } else {
-          emit(ProductErrorState(response.toString()));
-        }
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            newArrivalProductList = list;
+            emit(ProductNewArrivalListLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));
@@ -85,15 +95,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoadingState());
 
       try {
-        dynamic response = await _shopRepository
-            .getProductList(ProductListTypeEnum.TOP_BEST_SELLERS.name);
+        final response = await _shopRepository.getProductListFromApi(
+          ProductListTypeEnum.TOP_BEST_SELLERS.name,
+        );
 
-        if (response is List<Product>) {
-          top8BestSellerProductList = response;
-          emit(ProductTopBestSellerListLoadedState(response));
-        } else {
-          emit(ProductErrorState(response.toString()));
-        }
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            top8BestSellerProductList = list;
+            emit(ProductTopBestSellerListLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));
@@ -111,15 +123,42 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoadingState());
 
       try {
-        List<Product> response = await _shopRepository.getFilteredProducts(
-            event.page, event.limit,
-            brand: event.brand,
-            maxPrice: event.minPrice,
-            minPrice: event.minPrice,
-            categories: event.categoryList);
+        final response = await _shopRepository.getFilteredProducts(
+          event.page,
+          event.limit,
+          brand: event.brand,
+          maxPrice: event.minPrice,
+          minPrice: event.minPrice,
+          categories: event.categoryList,
+        );
 
-        filteredProductList = response;
-        emit(ProductFilteredListLoadedState(response));
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            hotDiscountProductList = list;
+            emit(ProductFilteredListLoadedState(list));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(ProductErrorState(e.toString()));
+      }
+    });
+
+    on<OnRateProduct>((event, emit) async {
+      emit(ProductLoadingState());
+
+      try {
+        final response = await _shopRepository.rateProduct(
+          event.productId,
+          event.color,
+          event.overallRating,
+        );
+
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (message) => emit(ProductRatedState(message)),
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));

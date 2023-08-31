@@ -59,6 +59,15 @@ class ProductAllListLoadedState extends ProductState {
   List<Object> get props => [productList];
 }
 
+class ProductRatedState extends ProductState {
+  final String message;
+
+  const ProductRatedState(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class ProductErrorState extends ProductState {
   final String message;
 

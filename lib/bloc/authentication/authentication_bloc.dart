@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/user.dart';
 import '../../repository/authentication_repository.dart';
@@ -22,18 +21,18 @@ class AuthenticationBloc
       emit(AuthenticationLoadingState());
 
       try {
-        dynamic response = await _authenticationRepository.login(
+        final response = await _authenticationRepository.login(
           event.userName,
           event.password,
         );
 
-        if (response is User) {
-          currentUser = response;
-          emit(AuthenticationLoggedInState(response));
-        } else {
-          debugPrint(response.toString());
-          emit(AuthenticationErrorState(response.toString()));
-        }
+        response.fold(
+          (failure) => emit(AuthenticationErrorState(failure.message)),
+          (user) {
+            currentUser = user;
+            emit(AuthenticationLoggedInState(user));
+          },
+        );
       } catch (e) {
         emit(AuthenticationErrorState(e.toString()));
       }
@@ -43,7 +42,7 @@ class AuthenticationBloc
       emit(AuthenticationLoadingState());
 
       try {
-        String response = await _authenticationRepository.register(
+        final response = await _authenticationRepository.register(
           event.userName,
           event.password,
           event.name,
@@ -51,13 +50,16 @@ class AuthenticationBloc
           event.phoneNumber,
         );
 
-        if (response == 'Register successfully') {
-          registerMessage = response;
-          emit(AuthenticationRegisteredState(response));
-        } else {
-          registerMessage = response;
-          emit(AuthenticationErrorState(response));
-        }
+        response.fold(
+          (failure) {
+            registerMessage = failure.message;
+            emit(AuthenticationRegisteredState(failure.message));
+          },
+          (success) {
+            registerMessage = success;
+            emit(AuthenticationErrorState(success));
+          },
+        );
       } catch (e) {
         emit(AuthenticationErrorState(e.toString()));
       }
@@ -71,14 +73,18 @@ class AuthenticationBloc
     on<OnLogoutAuthenticationEvent>((event, emit) async {
       emit(AuthenticationLoadingState());
 
-      String response = await _authenticationRepository.logout();
+      final response = await _authenticationRepository.logout();
 
-      if (response == 'Logout successfully') {
-        logoutMessage = response;
-        emit(AuthenticationLoggedOutState(response));
-      } else {
-        emit(AuthenticationErrorState(response));
-      }
+      response.fold(
+        (failure) {
+          registerMessage = failure.message;
+          emit(AuthenticationLoggedOutState(failure.message));
+        },
+        (success) {
+          registerMessage = success;
+          emit(AuthenticationErrorState(success));
+        },
+      );
     });
   }
 }

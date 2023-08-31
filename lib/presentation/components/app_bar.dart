@@ -151,7 +151,7 @@ class _AppBarComponentState extends State<AppBarComponent> {
                               ?.avatar ??
                           '',
                     ),
-                    width: 40.width,
+                    width: 40.height,
                     height: 40.height,
                     borderRadius: BorderRadius.circular(100),
                     margin: EdgeInsets.symmetric(

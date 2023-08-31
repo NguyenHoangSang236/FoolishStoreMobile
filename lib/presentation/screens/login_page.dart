@@ -213,9 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                   listener: (context, authenState) {
                     if (authenState is AuthenticationLoadingState) {
                       UiRender.showLoaderDialog(context);
-                    }
-
-                    if (authenState is AuthenticationRegisteredState) {
+                    } else if (authenState is AuthenticationRegisteredState) {
                       context.router.pop();
                       UiRender.showDialog(context, '', authenState.message)
                           .then((value) {
@@ -225,9 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                           isLogin = true;
                         });
                       });
-                    }
-
-                    if (authenState is AuthenticationErrorState) {
+                    } else if (authenState is AuthenticationErrorState) {
                       context.router.pop();
                       UiRender.showDialog(context, '', authenState.message);
                     }

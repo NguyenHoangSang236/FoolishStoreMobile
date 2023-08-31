@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/dto/api_response.dart';
 import 'package:fashionstore/data/entity/category.dart';
+import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/network/network_service.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +11,8 @@ import 'package:flutter/cupertino.dart';
 class CategoryRepository {
   String type = 'category';
 
-  Future<dynamic> getList(String url, {bool isAuthen = false}) async {
+  Future<Either<Failure, List<Category>>> getCategoryList(String url,
+      {bool isAuthen = false}) async {
     try {
       ApiResponse response =
           await NetworkService.getDataFromApi(ValueRender.getUrl(
@@ -18,24 +21,20 @@ class CategoryRepository {
         isAuthen: isAuthen,
       ));
 
-      if (json.decode(jsonEncode(response.result)) == 'success') {
+      if (response.result == 'success') {
         List<dynamic> jsonList = json.decode(jsonEncode(response.content));
 
-        return jsonList.map((json) => Category.fromJson(json)).toList();
+        return Right(jsonList.map((json) => Category.fromJson(json)).toList());
       } else {
-        Map<String, dynamic> jsonMap =
-            json.decode(jsonEncode(response.content));
-
-        return jsonMap.toString();
+        return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
       debugPrint('Caught exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
     }
-
-    return [];
   }
 
-  Future<dynamic> getAllCategories() async {
-    return getList('/allCategories');
+  Future<Either<Failure, List<Category>>> getAllCategories() async {
+    return getCategoryList('/allCategories');
   }
 }

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/data/entity/translator_language.dart';
+import 'package:fashionstore/presentation/components/rating_popup_dialog.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -285,6 +286,19 @@ class UiRender {
     );
 
     return result ?? false;
+  }
+
+  static Future<int?> showRatingDialog({
+    required BuildContext context,
+    required String title,
+  }) async {
+    return await showCupertinoDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return RatingPopupDialog(title: title);
+      },
+    );
   }
 
   static Widget buildCachedNetworkImage(

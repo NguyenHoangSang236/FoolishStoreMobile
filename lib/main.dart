@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
+import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
 import 'package:fashionstore/repository/authentication_repository.dart';
 import 'package:fashionstore/repository/cart_repository.dart';
 import 'package:fashionstore/repository/category_repository.dart';
+import 'package:fashionstore/repository/comment_repository.dart';
 import 'package:fashionstore/repository/google_drive_repository.dart';
 import 'package:fashionstore/repository/shop_repository.dart';
 import 'package:fashionstore/repository/translator_repository.dart';
@@ -34,6 +36,8 @@ void main() {
       RepositoryProvider<CartRepository>(create: (context) => CartRepository()),
       RepositoryProvider<TranslatorRepository>(
           create: (context) => TranslatorRepository()),
+      RepositoryProvider<CommentRepository>(
+          create: (context) => CommentRepository()),
       RepositoryProvider<GoogleDriveRepository>(
           create: (context) => GoogleDriveRepository()),
     ],
@@ -62,6 +66,9 @@ void main() {
         BlocProvider<TranslatorBloc>(
             create: (context) => TranslatorBloc(
                 RepositoryProvider.of<TranslatorRepository>(context))),
+        BlocProvider<CommentBloc>(
+            create: (context) =>
+                CommentBloc(RepositoryProvider.of<CommentRepository>(context))),
         BlocProvider<UploadFileBloc>(
             create: (context) => UploadFileBloc(
                 RepositoryProvider.of<GoogleDriveRepository>(context))),

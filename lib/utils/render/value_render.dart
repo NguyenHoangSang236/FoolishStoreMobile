@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:fashionstore/data/static/api_authen_type.dart';
 
 import '../../data/entity/cart_item.dart';
@@ -10,8 +11,25 @@ class ValueRender {
     return 'https://drive.google.com/uc?export=view&id=$imageId';
   }
 
-  static String getUrl({bool isAuthen = false, required type, required url}) {
+  static String getUrl(
+      {bool isAuthen = false,
+      required type,
+      required url,
+      Map<String, dynamic>? paramBody}) {
     return '${isAuthen == true ? ApiAuthenType.authenApi : ApiAuthenType.unauthenApi}/$type$url';
+  }
+
+  static FormData buildFormDataParamBody(MultipartFile file, String filePath) {
+    FormData formData = FormData();
+
+    formData.fields.addAll([
+      const MapEntry('shared', 'true'),
+      MapEntry('filePath', filePath),
+    ]);
+
+    formData.files.addAll([MapEntry('fileUpload', file)]);
+
+    return formData;
   }
 
   static String getFileIdFromGoogleDriveViewUrl(String url) {

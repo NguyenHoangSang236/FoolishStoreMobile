@@ -14,16 +14,25 @@ class ProductDetailsBloc
   List<Product> selectedProductDetails = [];
 
   String selectedColor = '';
+  int selectedProductId = 0;
 
   ProductDetailsBloc(this._shopRepository) : super(ProductDetailsInitial()) {
     on<OnSelectProductEvent>((event, emit) async {
       emit(ProductDetailsLoadingState());
 
       try {
-        List<Product> response =
+        selectedProductId = event.productId;
+
+        final response =
             await _shopRepository.getProductDetails(event.productId);
-        selectedProductDetails = response;
-        emit(ProductDetailsLoadedState(response));
+
+        response.fold(
+          (failure) => emit(ProductDetailsErrorState(failure.message)),
+          (list) {
+            selectedProductDetails = list;
+            emit(ProductDetailsLoadedState(list));
+          },
+        );
       } catch (e) {
         debugPrint(e.toString());
         emit(ProductDetailsErrorState(e.toString()));
