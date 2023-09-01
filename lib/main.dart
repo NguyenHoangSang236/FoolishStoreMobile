@@ -15,6 +15,7 @@ import 'package:fashionstore/repository/google_drive_repository.dart';
 import 'package:fashionstore/repository/shop_repository.dart';
 import 'package:fashionstore/repository/translator_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -24,58 +25,69 @@ import 'bloc/products/product_bloc.dart';
 import 'config/app_router/app_router_config.dart';
 import 'config/network/http_client_config.dart';
 
-void main() {
+void main() async {
   HttpOverrides.global = HttpClientConfig();
-  runApp(MultiRepositoryProvider(
-    providers: [
-      RepositoryProvider<CategoryRepository>(
-          create: (context) => CategoryRepository()),
-      RepositoryProvider<ShopRepository>(create: (context) => ShopRepository()),
-      RepositoryProvider<AuthenticationRepository>(
-          create: (context) => AuthenticationRepository()),
-      RepositoryProvider<CartRepository>(create: (context) => CartRepository()),
-      RepositoryProvider<TranslatorRepository>(
-          create: (context) => TranslatorRepository()),
-      RepositoryProvider<CommentRepository>(
-          create: (context) => CommentRepository()),
-      RepositoryProvider<GoogleDriveRepository>(
-          create: (context) => GoogleDriveRepository()),
-    ],
-    child: MultiBlocProvider(
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  runApp(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider<CategoryBloc>(
-            create: (context) => CategoryBloc(
-                RepositoryProvider.of<CategoryRepository>(context))),
-        BlocProvider<ProductBloc>(
-            create: (context) =>
-                ProductBloc(RepositoryProvider.of<ShopRepository>(context))),
-        BlocProvider<ProductSearchingBloc>(
-            create: (context) => ProductSearchingBloc(
-                RepositoryProvider.of<ShopRepository>(context))),
-        BlocProvider<ProductDetailsBloc>(
-            create: (context) => ProductDetailsBloc(
-                RepositoryProvider.of<ShopRepository>(context))),
-        BlocProvider<ProductAddToCartBloc>(
-            create: (context) => ProductAddToCartBloc()),
-        BlocProvider<AuthenticationBloc>(
-            create: (context) => AuthenticationBloc(
-                RepositoryProvider.of<AuthenticationRepository>(context))),
-        BlocProvider<CartBloc>(
-            create: (context) =>
-                CartBloc(RepositoryProvider.of<CartRepository>(context))),
-        BlocProvider<TranslatorBloc>(
-            create: (context) => TranslatorBloc(
-                RepositoryProvider.of<TranslatorRepository>(context))),
-        BlocProvider<CommentBloc>(
-            create: (context) =>
-                CommentBloc(RepositoryProvider.of<CommentRepository>(context))),
-        BlocProvider<UploadFileBloc>(
-            create: (context) => UploadFileBloc(
-                RepositoryProvider.of<GoogleDriveRepository>(context))),
+        RepositoryProvider<CategoryRepository>(
+            create: (context) => CategoryRepository()),
+        RepositoryProvider<ShopRepository>(
+            create: (context) => ShopRepository()),
+        RepositoryProvider<AuthenticationRepository>(
+            create: (context) => AuthenticationRepository()),
+        RepositoryProvider<CartRepository>(
+            create: (context) => CartRepository()),
+        RepositoryProvider<TranslatorRepository>(
+            create: (context) => TranslatorRepository()),
+        RepositoryProvider<CommentRepository>(
+            create: (context) => CommentRepository()),
+        RepositoryProvider<GoogleDriveRepository>(
+            create: (context) => GoogleDriveRepository()),
       ],
-      child: const MyApp(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<CategoryBloc>(
+              create: (context) => CategoryBloc(
+                  RepositoryProvider.of<CategoryRepository>(context))),
+          BlocProvider<ProductBloc>(
+              create: (context) =>
+                  ProductBloc(RepositoryProvider.of<ShopRepository>(context))),
+          BlocProvider<ProductSearchingBloc>(
+              create: (context) => ProductSearchingBloc(
+                  RepositoryProvider.of<ShopRepository>(context))),
+          BlocProvider<ProductDetailsBloc>(
+              create: (context) => ProductDetailsBloc(
+                  RepositoryProvider.of<ShopRepository>(context))),
+          BlocProvider<ProductAddToCartBloc>(
+              create: (context) => ProductAddToCartBloc()),
+          BlocProvider<AuthenticationBloc>(
+              create: (context) => AuthenticationBloc(
+                  RepositoryProvider.of<AuthenticationRepository>(context))),
+          BlocProvider<CartBloc>(
+              create: (context) =>
+                  CartBloc(RepositoryProvider.of<CartRepository>(context))),
+          BlocProvider<TranslatorBloc>(
+              create: (context) => TranslatorBloc(
+                  RepositoryProvider.of<TranslatorRepository>(context))),
+          BlocProvider<CommentBloc>(
+              create: (context) => CommentBloc(
+                  RepositoryProvider.of<CommentRepository>(context))),
+          BlocProvider<UploadFileBloc>(
+              create: (context) => UploadFileBloc(
+                  RepositoryProvider.of<GoogleDriveRepository>(context))),
+        ],
+        child: const MyApp(),
+      ),
     ),
-  ));
+  );
 }
 
 class MyApp extends StatefulWidget {

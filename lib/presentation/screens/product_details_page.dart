@@ -4,6 +4,7 @@ import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
 import 'package:fashionstore/presentation/components/comment_component.dart';
+import 'package:fashionstore/presentation/components/text_sender_component.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
@@ -28,6 +29,8 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   final TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -36,7 +39,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   String selectedColor = '';
   late int selectedProductId;
   List<String> selectedImageUrlList = [];
-  List<Comment> commentList = [];
 
   @override
   void initState() {
@@ -46,8 +48,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
       selectedProductId =
           BlocProvider.of<ProductDetailsBloc>(context).selectedProductId;
-
-      commentList = BlocProvider.of<CommentBloc>(context).commentList;
     });
     super.initState();
   }
@@ -87,9 +87,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ),
               BlocListener<CommentBloc, CommentState>(
                 listener: (context, commentState) {
-                  if (commentState is CommentListLoadedState) {
+                  if (commentState is CommentAddedState) {
+                    UiRender.showDialog(context, '', commentState.message);
+
+                    BlocProvider.of<CommentBloc>(context).add(
+                      OnLoadCommentListEvent(
+                        productColor: selectedColor,
+                        productId: selectedProductId,
+                        replyOn: 0,
+                      ),
+                    );
+
                     setState(() {
-                      commentList = commentState.commentList;
+                      _commentController.clear();
+                      _replyController.clear();
                     });
                   }
                 },
@@ -110,8 +121,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               builder: (context, productState) {
                 List<Product> selectedProductDetails = [];
 
-                if (productState is ProductLoadingState) {
-                  return UiRender.loadingCircle();
+                if (productState is ProductDetailsLoadingState) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: UiRender.loadingCircle(),
+                  );
                 } else if (productState is ProductDetailsLoadedState) {
                   selectedProductDetails = productState.productList;
                 }
@@ -213,13 +227,88 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               color: Colors.black,
             ),
           ),
-          10.verticalSpace,
-          ...List<Widget>.generate(
-            commentList.length,
-            (index) => CommentComponent(
-              comment: commentList[index],
-              needBorder: index == commentList.length - 1 ? false : true,
-            ),
+          15.verticalSpace,
+          BlocBuilder<CommentBloc, CommentState>(
+            builder: (context, commentState) {
+              List<Comment> commentList =
+                  BlocProvider.of<CommentBloc>(context).commentList;
+
+              int selectedId =
+                  BlocProvider.of<CommentBloc>(context).selectedCommentId;
+
+              if (commentState is CommentListLoadedState && selectedId == 0) {
+                commentList = commentState.commentList;
+              } else if (commentState is CommentLoadingState) {
+                return UiRender.loadingCircle();
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      BlocProvider.of<CommentBloc>(context).add(
+                        OnLoadCommentListEvent(
+                          productColor: selectedColor,
+                          productId: selectedProductId,
+                          page: BlocProvider.of<CommentBloc>(context).page + 1,
+                        ),
+                      );
+                    },
+                    child: commentList.isNotEmpty
+                        ? commentList.length % 5 == 0
+                            ? Container(
+                                margin: EdgeInsets.only(left: 7.width),
+                                child: Text(
+                                  'See previous comments',
+                                  style: TextStyle(
+                                    color: const Color(0xFF979797),
+                                    decoration: TextDecoration.underline,
+                                    fontSize: 12.size,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Work Sans',
+                                  ),
+                                ),
+                              )
+                            : const SizedBox()
+                        : Container(
+                            padding: EdgeInsets.only(bottom: 15.height),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'No comment',
+                              style: TextStyle(
+                                color: const Color(0xFF979797),
+                                fontSize: 13.size,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Work Sans',
+                              ),
+                            ),
+                          ),
+                  ),
+                  ...List<Widget>.generate(
+                    commentList.length,
+                    (index) => CommentComponent(
+                      comment: commentList[index],
+                      needBorder:
+                          index == commentList.length - 1 ? false : true,
+                    ),
+                  ),
+                  TextSenderComponent(
+                    sendAction: () {
+                      BlocProvider.of<CommentBloc>(context).add(
+                        OnAddCommentEvent(
+                          _commentController.text,
+                          selectedColor,
+                          selectedProductId,
+                          0,
+                        ),
+                      );
+                    },
+                    controller: _commentController,
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -394,6 +483,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   BlocProvider.of<ProductAddToCartBloc>(context).add(
                     OnSelectProductAddToCartEvent(
                       color: productColorList[index],
+                    ),
+                  );
+
+                  BlocProvider.of<CommentBloc>(context).add(
+                    OnLoadCommentListEvent(
+                      productColor: productColorList[index],
+                      productId: selectedProductId,
                     ),
                   );
 

@@ -17,6 +17,7 @@ Comment _$CommentFromJson(Map<String, dynamic> json) => Comment(
       json['likeQuantity'] as int,
       json['replyOn'] as int,
       DateTime.parse(json['commentDate'] as String),
+      json['replyQuantity'] as int,
     );
 
 Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
@@ -29,5 +30,6 @@ Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
       'commentContent': instance.commentContent,
       'likeQuantity': instance.likeQuantity,
       'replyOn': instance.replyOn,
+      'replyQuantity': instance.replyQuantity,
       'commentDate': instance.commentDate.toIso8601String(),
     };

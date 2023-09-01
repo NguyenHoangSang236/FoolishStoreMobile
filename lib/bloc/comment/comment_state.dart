@@ -14,10 +14,24 @@ class CommentLoadingState extends CommentState {
   List<Object?> get props => [];
 }
 
+class CommentReplyLoadingState extends CommentState {
+  @override
+  List<Object?> get props => [];
+}
+
 class CommentListLoadedState extends CommentState {
   final List<Comment> commentList;
 
   const CommentListLoadedState(this.commentList);
+
+  @override
+  List<Object?> get props => [commentList];
+}
+
+class CommentReplyListLoadedState extends CommentState {
+  final List<Comment> commentList;
+
+  const CommentReplyListLoadedState(this.commentList);
 
   @override
   List<Object?> get props => [commentList];

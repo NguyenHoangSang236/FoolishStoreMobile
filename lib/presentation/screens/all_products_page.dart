@@ -182,11 +182,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
           List.from(BlocProvider.of<CategoryBloc>(context).categoryList);
 
       if (categoryState is CategoryLoadingState) {
-        return const Center(
-          child: CircularProgressIndicator(
-            color: Colors.orange,
-          ),
-        );
+        return UiRender.loadingCircle();
       }
 
       if (categoryState is CategoryLoadedState) {

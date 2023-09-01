@@ -53,8 +53,8 @@ class OnLoadCommentListEvent extends CommentEvent {
   const OnLoadCommentListEvent({
     required this.productColor,
     required this.productId,
-    this.replyOn,
-    this.page,
-    this.limit,
+    this.replyOn = 0,
+    this.page = 1,
+    this.limit = 5,
   });
 }

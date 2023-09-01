@@ -14,6 +14,7 @@ class Comment {
   String commentContent;
   int likeQuantity;
   int replyOn;
+  int replyQuantity;
   DateTime commentDate;
 
   Comment(
@@ -27,6 +28,7 @@ class Comment {
     this.likeQuantity,
     this.replyOn,
     this.commentDate,
+    this.replyQuantity,
   );
 
   factory Comment.fromJson(Map<String, dynamic> json) =>
