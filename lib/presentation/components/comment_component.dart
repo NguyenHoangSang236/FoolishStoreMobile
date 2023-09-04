@@ -14,26 +14,32 @@ class CommentComponent extends StatefulWidget {
     super.key,
     required this.comment,
     required this.needBorder,
-    this.isReply = false,
   });
 
   final Comment comment;
   final bool needBorder;
-  final bool isReply;
 
   @override
   State<StatefulWidget> createState() => _CommentComponentState();
 }
 
 class _CommentComponentState extends State<CommentComponent> {
-  bool reply = false;
+  bool replyButtonPressed = false;
+  int currentPage = 1;
   final TextEditingController controller = TextEditingController();
+  late bool isReply;
+
+  @override
+  void initState() {
+    isReply = widget.comment.replyOn != 0;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: !widget.isReply ? 20.height : 10.height,
+        vertical: !isReply ? 20.height : 10.height,
       ),
       decoration: BoxDecoration(
         border: widget.needBorder
@@ -115,11 +121,11 @@ class _CommentComponentState extends State<CommentComponent> {
                     child: TextButton(
                       onPressed: () {
                         setState(() {
-                          reply = !reply;
+                          replyButtonPressed = !replyButtonPressed;
                         });
                       },
                       child: Text(
-                        !reply ? 'Reply' : 'Not reply',
+                        !replyButtonPressed ? 'Reply' : 'Stop reply',
                         style: TextStyle(
                           color: const Color(0xFF626262),
                           fontSize: 10.size,
@@ -147,25 +153,53 @@ class _CommentComponentState extends State<CommentComponent> {
               ),
             ],
           ),
-          reply
+          replyButtonPressed
               ? TextSenderComponent(
                   controller: controller,
                   sendAction: () {
                     BlocProvider.of<CommentBloc>(context).add(
-                      OnAddCommentEvent(
-                        controller.text,
-                        widget.comment.productColor,
-                        widget.comment.productId,
-                        widget.comment.id,
-                      ),
+                      replyButtonPressed == true
+                          ? OnAddReplyCommentEvent(
+                              controller.text,
+                              widget.comment.productColor,
+                              widget.comment.productId,
+                              widget.comment.id,
+                            )
+                          : OnAddCommentEvent(
+                              controller.text,
+                              widget.comment.productColor,
+                              widget.comment.productId,
+                              widget.comment.id,
+                            ),
                     );
                   },
                 )
               : const SizedBox(),
-          !widget.isReply
+          !isReply
               ? Container(
                   margin: EdgeInsets.only(left: 10.width),
-                  child: BlocBuilder<CommentBloc, CommentState>(
+                  child: BlocConsumer<CommentBloc, CommentState>(
+                    listener:
+                        (BuildContext context, CommentState commentState) {
+                      if (commentState is CommentReplyAddedState) {
+                        if (commentState.replyOn == widget.comment.id) {
+                          UiRender.showDialog(
+                            context,
+                            '',
+                            commentState.message,
+                          );
+
+                          BlocProvider.of<CommentBloc>(context).add(
+                            OnLoadReplyCommentListEvent(
+                              productColor: widget.comment.productColor,
+                              productId: widget.comment.productId,
+                              page: currentPage,
+                              replyOn: widget.comment.id,
+                            ),
+                          );
+                        }
+                      }
+                    },
                     builder: (context, commentState) {
                       List<Comment> repCommentList =
                           BlocProvider.of<CommentBloc>(context)
@@ -177,7 +211,7 @@ class _CommentComponentState extends State<CommentComponent> {
                       int selectedId = BlocProvider.of<CommentBloc>(context)
                           .selectedCommentId;
 
-                      if (commentState is CommentLoadingState &&
+                      if (commentState is CommentReplyLoadingState &&
                           selectedId == widget.comment.id) {
                         return UiRender.loadingCircle();
                       } else if (commentState is CommentReplyListLoadedState &&
@@ -185,14 +219,62 @@ class _CommentComponentState extends State<CommentComponent> {
                         repCommentList = commentState.commentList;
 
                         return Column(
-                          children: List<Widget>.generate(
-                            repCommentList.length,
-                            (index) => CommentComponent(
-                              comment: repCommentList[index],
-                              isReply: true,
-                              needBorder: false,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            5.verticalSpace,
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  currentPage++;
+                                });
+
+                                BlocProvider.of<CommentBloc>(context).add(
+                                  OnLoadReplyCommentListEvent(
+                                    productColor: widget.comment.productColor,
+                                    productId: widget.comment.productId,
+                                    page: currentPage,
+                                    replyOn: widget.comment.id,
+                                  ),
+                                );
+                              },
+                              child: repCommentList.isNotEmpty
+                                  ? repCommentList.length % 5 == 0
+                                      ? Text(
+                                          'See previous replies',
+                                          style: TextStyle(
+                                            color: const Color(0xFF979797),
+                                            decoration:
+                                                TextDecoration.underline,
+                                            fontSize: 12.size,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: 'Work Sans',
+                                          ),
+                                        )
+                                      : const SizedBox()
+                                  : Container(
+                                      padding:
+                                          EdgeInsets.only(bottom: 15.height),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'No comment',
+                                        style: TextStyle(
+                                          color: const Color(0xFF979797),
+                                          fontSize: 13.size,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'Work Sans',
+                                        ),
+                                      ),
+                                    ),
                             ),
-                          ),
+                            5.verticalSpace,
+                            ...List<Widget>.generate(
+                              repCommentList.length,
+                              (index) => CommentComponent(
+                                comment: repCommentList[index],
+                                needBorder: false,
+                              ),
+                            ),
+                          ],
                         );
                       }
 
@@ -200,7 +282,7 @@ class _CommentComponentState extends State<CommentComponent> {
                           ? GestureDetector(
                               onTap: () {
                                 BlocProvider.of<CommentBloc>(context).add(
-                                  OnLoadCommentListEvent(
+                                  OnLoadReplyCommentListEvent(
                                     productColor: widget.comment.productColor,
                                     productId: widget.comment.productId,
                                     replyOn: widget.comment.id,
@@ -213,7 +295,8 @@ class _CommentComponentState extends State<CommentComponent> {
                                     color: const Color(0xFF979797),
                                     size: 15.size,
                                     const AssetImage(
-                                        'assets/icon/reply_icon.png'),
+                                      'assets/icon/reply_icon.png',
+                                    ),
                                   ),
                                   Text(
                                     'See ${widget.comment.replyQuantity} other replies',

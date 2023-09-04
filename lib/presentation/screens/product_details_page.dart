@@ -3,8 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
-import 'package:fashionstore/presentation/components/comment_component.dart';
-import 'package:fashionstore/presentation/components/text_sender_component.dart';
+import 'package:fashionstore/presentation/components/comment_list.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
@@ -15,7 +14,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import '../../bloc/productDetails/product_details_bloc.dart';
-import '../../data/entity/comment.dart';
 import '../../data/entity/product.dart';
 import '../../utils/render/value_render.dart';
 
@@ -38,6 +36,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   String selectedSize = '';
   String selectedColor = '';
   late int selectedProductId;
+  int currentCommentPage = 1;
   List<String> selectedImageUrlList = [];
 
   @override
@@ -95,6 +94,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         productColor: selectedColor,
                         productId: selectedProductId,
                         replyOn: 0,
+                        page: currentCommentPage,
                       ),
                     );
 
@@ -207,111 +207,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   Widget _commentList() {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.height),
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(horizontal: 18.width, vertical: 24.height),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.radius),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Reviews',
-            style: TextStyle(
-              fontFamily: 'Work Sans',
-              fontWeight: FontWeight.w600,
-              fontSize: 16.size,
-              color: Colors.black,
-            ),
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.only(bottom: 12.height),
+          width: MediaQuery.of(context).size.width,
+          padding:
+              EdgeInsets.symmetric(horizontal: 18.width, vertical: 24.height),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.radius),
           ),
-          15.verticalSpace,
-          BlocBuilder<CommentBloc, CommentState>(
-            builder: (context, commentState) {
-              List<Comment> commentList =
-                  BlocProvider.of<CommentBloc>(context).commentList;
-
-              int selectedId =
-                  BlocProvider.of<CommentBloc>(context).selectedCommentId;
-
-              if (commentState is CommentListLoadedState && selectedId == 0) {
-                commentList = commentState.commentList;
-              } else if (commentState is CommentLoadingState) {
-                return UiRender.loadingCircle();
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      BlocProvider.of<CommentBloc>(context).add(
-                        OnLoadCommentListEvent(
-                          productColor: selectedColor,
-                          productId: selectedProductId,
-                          page: BlocProvider.of<CommentBloc>(context).page + 1,
-                        ),
-                      );
-                    },
-                    child: commentList.isNotEmpty
-                        ? commentList.length % 5 == 0
-                            ? Container(
-                                margin: EdgeInsets.only(left: 7.width),
-                                child: Text(
-                                  'See previous comments',
-                                  style: TextStyle(
-                                    color: const Color(0xFF979797),
-                                    decoration: TextDecoration.underline,
-                                    fontSize: 12.size,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'Work Sans',
-                                  ),
-                                ),
-                              )
-                            : const SizedBox()
-                        : Container(
-                            padding: EdgeInsets.only(bottom: 15.height),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'No comment',
-                              style: TextStyle(
-                                color: const Color(0xFF979797),
-                                fontSize: 13.size,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Work Sans',
-                              ),
-                            ),
-                          ),
-                  ),
-                  ...List<Widget>.generate(
-                    commentList.length,
-                    (index) => CommentComponent(
-                      comment: commentList[index],
-                      needBorder:
-                          index == commentList.length - 1 ? false : true,
-                    ),
-                  ),
-                  TextSenderComponent(
-                    sendAction: () {
-                      BlocProvider.of<CommentBloc>(context).add(
-                        OnAddCommentEvent(
-                          _commentController.text,
-                          selectedColor,
-                          selectedProductId,
-                          0,
-                        ),
-                      );
-                    },
-                    controller: _commentController,
-                  ),
-                ],
-              );
-            },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Reviews',
+                style: TextStyle(
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.size,
+                  color: Colors.black,
+                ),
+              ),
+              15.verticalSpace,
+              CommentList(
+                productId: selectedProductId,
+                productColor: selectedColor,
+                replyOn: 0,
+                page: currentCommentPage,
+                controller: _commentController,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

@@ -18,11 +18,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
 
   CommentBloc(this._commentRepository) : super(CommentInitial()) {
     on<OnLoadCommentListEvent>((event, emit) async {
-      emit(
-        event.replyOn != null && event.replyOn == 0
-            ? CommentLoadingState()
-            : CommentReplyLoadingState(),
-      );
+      emit(CommentLoadingState());
 
       try {
         final response = await _commentRepository.getProductComments(
@@ -37,16 +33,38 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           (failure) => emit(CommentErrorState(failure.message)),
           (list) {
             page = event.page ?? 1;
-            selectedCommentId = event.replyOn ?? 0;
-            event.replyOn != null && event.replyOn! > 0
-                ? replyCommentList = List.of(list)
-                : commentList = List.of(list);
+            selectedCommentId = 0;
+            commentList = List.of(list);
 
-            emit(
-              event.replyOn != null && event.replyOn == 0
-                  ? CommentListLoadedState(commentList)
-                  : CommentReplyListLoadedState(replyCommentList),
-            );
+            emit(CommentListLoadedState(commentList));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CommentErrorState(e.toString()));
+      }
+    });
+
+    on<OnLoadReplyCommentListEvent>((event, emit) async {
+      emit(CommentReplyLoadingState());
+
+      try {
+        final response = await _commentRepository.getProductComments(
+          productId: event.productId,
+          productColor: event.productColor,
+          replyOn: event.replyOn,
+          page: event.page ?? 1,
+          limit: event.limit ?? 5,
+        );
+
+        response.fold(
+          (failure) => emit(CommentErrorState(failure.message)),
+          (list) {
+            page = event.page ?? 1;
+            selectedCommentId = event.replyOn;
+            replyCommentList = List.of(list);
+
+            emit(CommentReplyListLoadedState(replyCommentList));
           },
         );
       } catch (e) {
@@ -67,6 +85,25 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         response.fold(
           (failure) => emit(CommentErrorState(failure.message)),
           (message) => emit(CommentAddedState(message)),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CommentErrorState(e.toString()));
+      }
+    });
+
+    on<OnAddReplyCommentEvent>((event, emit) async {
+      try {
+        final response = await _commentRepository.addNewComment(
+          productId: event.productId,
+          productColor: event.productColor,
+          replyOn: event.replyOn,
+          commentContent: event.commentContent,
+        );
+
+        response.fold(
+          (failure) => emit(CommentErrorState(failure.message)),
+          (message) => emit(CommentReplyAddedState(message, event.replyOn)),
         );
       } catch (e) {
         debugPrint(e.toString());

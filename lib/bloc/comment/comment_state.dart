@@ -55,6 +55,16 @@ class CommentAddedState extends CommentState {
   List<Object?> get props => [message];
 }
 
+class CommentReplyAddedState extends CommentState {
+  final int replyOn;
+  final String message;
+
+  const CommentReplyAddedState(this.message, this.replyOn);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class CommentDeletedState extends CommentState {
   final String message;
 
