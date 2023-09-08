@@ -7,6 +7,10 @@ abstract class CommentEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class OnClearCommentEvent extends CommentEvent {
+  const OnClearCommentEvent();
+}
+
 class OnAddCommentEvent extends CommentEvent {
   final String commentContent;
   final String productColor;
@@ -51,10 +55,10 @@ class OnDeleteCommentEvent extends CommentEvent {
   const OnDeleteCommentEvent(this.id);
 }
 
-class OnLikeCommentEvent extends CommentEvent {
+class OnReactCommentEvent extends CommentEvent {
   final int id;
 
-  const OnLikeCommentEvent(this.id);
+  const OnReactCommentEvent(this.id);
 }
 
 class OnLoadCommentListEvent extends CommentEvent {
@@ -86,5 +90,15 @@ class OnLoadReplyCommentListEvent extends CommentEvent {
     required this.replyOn,
     this.page = 1,
     this.limit = 5,
+  });
+}
+
+class OnLoadCommentIdYouLikedListEvent extends CommentEvent {
+  final String productColor;
+  final int productId;
+
+  const OnLoadCommentIdYouLikedListEvent({
+    required this.productColor,
+    required this.productId,
   });
 }

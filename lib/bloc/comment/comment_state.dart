@@ -19,6 +19,11 @@ class CommentReplyLoadingState extends CommentState {
   List<Object?> get props => [];
 }
 
+class CommentYouLikedIdListLoadingState extends CommentState {
+  @override
+  List<Object?> get props => [];
+}
+
 class CommentListLoadedState extends CommentState {
   final List<Comment> commentList;
 
@@ -74,13 +79,31 @@ class CommentDeletedState extends CommentState {
   List<Object?> get props => [message];
 }
 
-class CommentLikedState extends CommentState {
+class CommentReactedState extends CommentState {
   final String message;
 
-  const CommentLikedState(this.message);
+  const CommentReactedState(this.message);
 
   @override
   List<Object?> get props => [message];
+}
+
+class CommentReplyReactedState extends CommentState {
+  final String message;
+
+  const CommentReplyReactedState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class CommentIdYouLikedListLoadedState extends CommentState {
+  final List<int> commentIdList;
+
+  const CommentIdYouLikedListLoadedState(this.commentIdList);
+
+  @override
+  List<Object?> get props => [commentIdList];
 }
 
 class CommentErrorState extends CommentState {

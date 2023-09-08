@@ -8,6 +8,7 @@ import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
+import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -39,6 +40,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   int currentCommentPage = 1;
   List<String> selectedImageUrlList = [];
 
+  void reloadCommentList() {
+    BlocProvider.of<CommentBloc>(context).add(
+      OnLoadCommentListEvent(
+        productColor: selectedColor,
+        productId: selectedProductId,
+        replyOn: 0,
+        page: currentCommentPage,
+      ),
+    );
+  }
+
+  void reloadCommentYouLikeIdList() {
+    BlocProvider.of<CommentBloc>(context).add(
+      OnLoadCommentIdYouLikedListEvent(
+        productColor: selectedColor,
+        productId: selectedProductId,
+      ),
+    );
+  }
+
   @override
   void initState() {
     setState(() {
@@ -58,8 +79,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       needProductDetailsBottomNavBar: true,
       scaffoldKey: _scaffoldKey,
       textEditingController: _textEditingController,
+      onBack: () => BlocProvider.of<ProductBloc>(context).add(
+        OnDeselectProduct(),
+      ),
       body: RefreshIndicator(
-        onRefresh: () async {},
+        onRefresh: () async => LoadingService(context).selectToViewProduct(
+          BlocProvider.of<ProductBloc>(context).selectedProductToView!,
+        ),
         color: Colors.orange,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -89,19 +115,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   if (commentState is CommentAddedState) {
                     UiRender.showDialog(context, '', commentState.message);
 
-                    BlocProvider.of<CommentBloc>(context).add(
-                      OnLoadCommentListEvent(
-                        productColor: selectedColor,
-                        productId: selectedProductId,
-                        replyOn: 0,
-                        page: currentCommentPage,
-                      ),
-                    );
+                    reloadCommentList();
 
                     setState(() {
                       _commentController.clear();
                       _replyController.clear();
                     });
+                  } else if (commentState is CommentReactedState) {
+                    reloadCommentYouLikeIdList();
                   }
                 },
               ),

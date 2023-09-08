@@ -34,6 +34,14 @@ class OnLoadFilterProductListEvent extends ProductEvent {
   });
 }
 
+class OnSelectProduct extends ProductEvent {
+  final Product product;
+
+  const OnSelectProduct(this.product);
+}
+
+class OnDeselectProduct extends ProductEvent {}
+
 class OnRateProduct extends ProductEvent {
   final int productId;
   final String color;

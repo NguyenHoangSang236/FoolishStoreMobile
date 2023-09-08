@@ -17,6 +17,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   List<Product> hotDiscountProductList = [];
   List<Product> top8BestSellerProductList = [];
   List<Product> newArrivalProductList = [];
+  Product? selectedProductToView;
 
   int currentAllProductListPage = 1;
 
@@ -163,6 +164,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         debugPrint(e.toString());
         emit(ProductErrorState(e.toString()));
       }
+    });
+
+    on<OnSelectProduct>((event, emit) async {
+      selectedProductToView = event.product;
+    });
+
+    on<OnDeselectProduct>((event, emit) async {
+      selectedProductToView = null;
     });
   }
 

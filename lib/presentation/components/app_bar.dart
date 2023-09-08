@@ -35,7 +35,7 @@ class AppBarComponent extends StatefulWidget {
   final bool isSearchable;
   final TextEditingController? textEditingController;
   final TextEditingController? translatorEditingController;
-  final void Function()? onBack;
+  final Function? onBack;
   final void Function(String text)? onSearch;
   final String? hintSearchBarText;
 
@@ -98,11 +98,8 @@ class _AppBarComponentState extends State<AppBarComponent> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        if (widget.onBack != null) {
-                          widget.onBack!();
-                        } else {
-                          context.router.pop();
-                        }
+                        widget.onBack?.call();
+                        context.router.pop();
                       },
                     )
                   : IconButton(

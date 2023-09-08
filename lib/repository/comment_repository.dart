@@ -40,6 +40,34 @@ class CommentRepository {
     }
   }
 
+  Future<Either<Failure, List<int>>> getCommentIdList(
+    String url, {
+    Map<String, dynamic>? paramBody,
+    bool isAuthen = false,
+  }) async {
+    try {
+      ApiResponse response = await NetworkService.getDataFromApi(
+        ValueRender.getUrl(
+          type: type,
+          url: url,
+          isAuthen: isAuthen,
+        ),
+        param: paramBody,
+      );
+
+      if (response.result == 'success') {
+        List<dynamic> jsonList = json.decode(jsonEncode(response.content));
+
+        return Right(jsonList.map((elem) => elem as int).toList());
+      } else {
+        return Left(ApiFailure(response.content));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
+  }
+
   Future<Either<Failure, String>> addNewComment({
     required int productId,
     required String productColor,
@@ -82,9 +110,9 @@ class CommentRepository {
     );
   }
 
-  Future<Either<Failure, String>> likeComment(int id) async {
+  Future<Either<Failure, String>> reactComment(int id) async {
     return NetworkService.getMessageFromApi(
-      '/like_comment_id=$id',
+      '/react_comment_id=$id',
       type: type,
       isAuthen: true,
     );
@@ -110,6 +138,20 @@ class CommentRepository {
           'limit': limit,
         }
       },
+    );
+  }
+
+  Future<Either<Failure, List<int>>> getCommentIdYouLiked({
+    required int productId,
+    required String productColor,
+  }) async {
+    return getCommentIdList(
+      '/commentsYouLiked',
+      paramBody: {
+        'productId': productId,
+        'productColor': productColor,
+      },
+      isAuthen: true,
     );
   }
 }

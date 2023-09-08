@@ -29,23 +29,30 @@ class LoadingService {
   }
 
   void selectToViewProduct(Product product) {
+    BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
     BlocProvider.of<ProductDetailsBloc>(context).add(
       OnSelectProductEvent(product.productId),
     );
     BlocProvider.of<ProductDetailsBloc>(context).add(
       OnSelectProductColorEvent(product.color),
     );
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentListEvent(
-        productColor: product.color,
-        productId: product.id,
-      ),
-    );
     BlocProvider.of<ProductAddToCartBloc>(context).add(
       OnSelectProductAddToCartEvent(
         productName: product.name,
         color: product.color,
         size: product.size.toLowerCase() == 'none' ? product.size : '',
+      ),
+    );
+    BlocProvider.of<CommentBloc>(context).add(
+      OnLoadCommentIdYouLikedListEvent(
+        productColor: product.color,
+        productId: product.id,
+      ),
+    );
+    BlocProvider.of<CommentBloc>(context).add(
+      OnLoadCommentListEvent(
+        productColor: product.color,
+        productId: product.id,
       ),
     );
   }

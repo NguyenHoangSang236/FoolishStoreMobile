@@ -42,13 +42,18 @@ class _CommentList extends State<CommentList> {
   Widget build(BuildContext context) {
     return BlocBuilder<CommentBloc, CommentState>(
       builder: (context, commentState) {
+        List<int> commentYouLikedIdList =
+            BlocProvider.of<CommentBloc>(context).commentYouLikedIdList;
+
         List<Comment> commentList =
             BlocProvider.of<CommentBloc>(context).commentList;
 
         int selectedId =
             BlocProvider.of<CommentBloc>(context).selectedCommentId;
 
-        if (commentState is CommentListLoadedState && selectedId == 0) {
+        if (commentState is CommentIdYouLikedListLoadedState) {
+          commentYouLikedIdList = commentState.commentIdList;
+        } else if (commentState is CommentListLoadedState && selectedId == 0) {
           commentList = commentState.commentList;
         } else if (commentState is CommentLoadingState) {
           return UiRender.loadingCircle();
@@ -105,6 +110,10 @@ class _CommentList extends State<CommentList> {
               commentList.length,
               (index) => CommentComponent(
                 comment: commentList[index],
+                isLiked: commentYouLikedIdList.indexWhere(
+                      (element) => element == commentList[index].id,
+                    ) >=
+                    0,
                 needBorder: index == commentList.length - 1 ? false : true,
               ),
             ),

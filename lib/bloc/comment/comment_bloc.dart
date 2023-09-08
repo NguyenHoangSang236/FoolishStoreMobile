@@ -15,6 +15,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   int selectedCommentId = 0;
   List<Comment> commentList = [];
   List<Comment> replyCommentList = [];
+  List<int> commentYouLikedIdList = [];
 
   CommentBloc(this._commentRepository) : super(CommentInitial()) {
     on<OnLoadCommentListEvent>((event, emit) async {
@@ -45,6 +46,29 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       }
     });
 
+    on<OnLoadCommentIdYouLikedListEvent>((event, emit) async {
+      emit(CommentYouLikedIdListLoadingState());
+
+      try {
+        final response = await _commentRepository.getCommentIdYouLiked(
+          productId: event.productId,
+          productColor: event.productColor,
+        );
+
+        response.fold(
+          (failure) => emit(CommentErrorState(failure.message)),
+          (list) {
+            commentYouLikedIdList = List.of(list);
+
+            emit(CommentIdYouLikedListLoadedState(list));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CommentErrorState(e.toString()));
+      }
+    });
+
     on<OnLoadReplyCommentListEvent>((event, emit) async {
       emit(CommentReplyLoadingState());
 
@@ -62,9 +86,9 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           (list) {
             page = event.page ?? 1;
             selectedCommentId = event.replyOn;
-            replyCommentList = List.of(list);
+            replyCommentList = _removeDuplicates(replyCommentList, list);
 
-            emit(CommentReplyListLoadedState(replyCommentList));
+            emit(CommentReplyListLoadedState(list));
           },
         );
       } catch (e) {
@@ -110,12 +134,36 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         emit(CommentErrorState(e.toString()));
       }
     });
+
+    on<OnReactCommentEvent>((event, emit) async {
+      try {
+        final response = await _commentRepository.reactComment(event.id);
+
+        response.fold(
+          (failure) => emit(CommentErrorState(failure.message)),
+          (message) => emit(CommentReactedState(message)),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CommentErrorState(e.toString()));
+      }
+    });
+
+    on<OnClearCommentEvent>((event, emit) async {
+      page = 1;
+      selectedCommentId = 0;
+      commentList = [];
+      replyCommentList = [];
+      commentYouLikedIdList = [];
+    });
   }
 
-  List<Comment> _removeDuplicates(List<Comment> list) {
+  List<Comment> _removeDuplicates(
+      List<Comment> oldList, List<Comment> newList) {
     Set<int> set = {};
+    List<Comment> combineList = [...newList, ...oldList];
     List<Comment> uniqueList =
-        list.where((element) => set.add(element.id)).toList();
+        combineList.where((element) => set.add(element.id)).toList();
 
     return uniqueList;
   }
