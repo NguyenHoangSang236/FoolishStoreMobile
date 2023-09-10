@@ -57,6 +57,28 @@ class _AllProductsPageState extends State<AllProductsPage> {
     }
   }
 
+  void _reloadPage() {
+    setState(() {
+      String currentCateName =
+          BlocProvider.of<CategoryBloc>(context).selectedCategoryName;
+
+      if (currentCateName == "All") {
+        selectedCategoryIndex = 0;
+        BlocProvider.of<ProductBloc>(context).add(
+          const OnLoadAllProductListEvent(1, 8),
+        );
+      } else {
+        selectedCategoryIndex = BlocProvider.of<CategoryBloc>(context)
+            .categoryList
+            .indexWhere((element) => element.name == currentCateName);
+
+        BlocProvider.of<ProductBloc>(context).add(
+          OnLoadFilterProductListEvent(1, 8, categoryList: [currentCateName]),
+        );
+      }
+    });
+  }
+
   @override
   void initState() {
     GlobalVariable.currentNavBarPage = NavigationNameEnum.CLOTHINGS.name;
@@ -111,12 +133,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
       pageName: 'Clothings',
       hintSearchBarText: 'What product are you looking for?',
       body: RefreshIndicator(
-        onRefresh: () async => setState(() {
-          selectedCategoryIndex = 0;
-          BlocProvider.of<ProductBloc>(context).add(
-            const OnLoadAllProductListEvent(1, 8),
-          );
-        }),
+        onRefresh: () async {
+          _reloadPage();
+        },
         color: Colors.orange,
         key: _refreshIndicatorKey,
         child: Column(children: [
