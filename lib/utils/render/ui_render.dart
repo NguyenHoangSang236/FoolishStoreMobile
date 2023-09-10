@@ -51,7 +51,7 @@ class UiRender {
             // The "Yes" button
             CupertinoDialogAction(
               onPressed: () {
-                context.router.pop();
+                context.router.pop(true);
               },
               isDefaultAction: true,
               child: Text(
@@ -214,7 +214,7 @@ class UiRender {
                                         fontSize: 17.size,
                                         color: const Color(0xff8D8D8C),
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),

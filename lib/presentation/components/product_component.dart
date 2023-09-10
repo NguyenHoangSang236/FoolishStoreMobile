@@ -120,7 +120,7 @@ class _ProductComponentState extends State<ProductComponent> {
                         gradient: UiRender.generalLinearGradient(),
                       ),
                       child: Text(
-                        '-${widget.product.discount}%',
+                        '-${widget.product.discount.format}%',
                         style: TextStyle(
                           fontFamily: 'Sen',
                           fontWeight: FontWeight.w700,

@@ -33,10 +33,12 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           (failure) => emit(ProductErrorState(failure.message)),
           (list) {
             if (list.isNotEmpty) {
-              emit(ProductLoadingState());
+              currentAllProductListPage =
+                  list.isNotEmpty && event.page > currentAllProductListPage
+                      ? event.page
+                      : currentAllProductListPage;
 
-              currentAllProductListPage = event.page;
-              allProductList = List.of(list);
+              allProductList = _removeDuplicates([...allProductList, ...list]);
 
               emit(ProductAllListLoadedState(list));
             } else {
@@ -121,8 +123,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     });
 
     on<OnLoadFilterProductListEvent>((event, emit) async {
-      emit(ProductLoadingState());
-
       try {
         final response = await _shopRepository.getFilteredProducts(
           event.page,
@@ -136,8 +136,19 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         response.fold(
           (failure) => emit(ProductErrorState(failure.message)),
           (list) {
-            hotDiscountProductList = list;
-            emit(ProductFilteredListLoadedState(list));
+            if (list.isNotEmpty) {
+              currentAllProductListPage =
+                  list.isNotEmpty && event.page > currentAllProductListPage
+                      ? event.page
+                      : currentAllProductListPage;
+
+              filteredProductList =
+                  _removeDuplicates([...filteredProductList, ...list]);
+
+              emit(ProductFilteredListLoadedState(list));
+            } else {
+              emit(ProductFilteredListLoadedState(filteredProductList));
+            }
           },
         );
       } catch (e) {

@@ -16,22 +16,32 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   List<CartItem> cartItemList = [];
   int currentPage = 1;
   int totalCartItemQuantity = 0;
+  bool isFiltered = false;
   List<int> removalCartIdList = [];
+  List<String> currentFilterOption = [];
+  String currentBrandFilter = '';
+  String currentNameFilter = '';
 
   CartBloc(this._cartRepository) : super(CartInitial()) {
     on<OnLoadAllCartListEvent>((event, emit) async {
       emit(CartLoadingState());
 
       try {
-        final response =
-            await _cartRepository.showFullCart(event.page, event.limit);
+        final response = await _cartRepository.showFullCart(
+          event.page,
+          event.limit,
+        );
 
         response.fold(
           (failure) => emit(CartErrorState(failure.message)),
           (list) {
             if (event.page != currentPage) {
               cartItemList = _removeDuplicates([...cartItemList, ...list]);
-              currentPage = event.page;
+              currentPage = list.isNotEmpty ? event.page : currentPage;
+              isFiltered = false;
+              currentBrandFilter = '';
+              currentNameFilter = '';
+              currentFilterOption.clear();
             } else {
               cartItemList = list;
             }
@@ -49,6 +59,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       cartItemList = [];
       removalCartIdList = [];
       totalCartItemQuantity = 0;
+      isFiltered = false;
+      currentBrandFilter = '';
+      currentNameFilter = '';
+      currentFilterOption.clear();
     });
 
     on<OnLoadTotalCartItemQuantityEvent>((event, emit) async {
@@ -157,11 +171,16 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             if (event.page != null) {
               if (event.page != currentPage) {
                 cartItemList = _removeDuplicates([...cartItemList, ...list]);
-                currentPage = event.page ?? currentPage;
+                currentPage = list.isNotEmpty ? event.page ?? 1 : currentPage;
+                isFiltered = true;
               }
             } else {
               cartItemList = list;
             }
+
+            currentBrandFilter = event.brand ?? '';
+            currentNameFilter = event.name ?? '';
+            currentFilterOption = event.status ?? [];
 
             if (event.name == null &&
                 event.brand == null &&

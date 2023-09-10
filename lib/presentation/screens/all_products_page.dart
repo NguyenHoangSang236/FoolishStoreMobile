@@ -4,7 +4,6 @@ import 'package:fashionstore/data/enum/navigation_name_enum.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -38,15 +37,21 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
   void _scrollListener() {
     if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
+        _scrollController.position.maxScrollExtent) {
       if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName ==
           'All') {
-        BlocProvider.of<ProductBloc>(context).add(
-          OnLoadAllProductListEvent(
-            BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
-            8,
-          ),
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          () {
+            BlocProvider.of<ProductBloc>(context).add(
+              OnLoadAllProductListEvent(
+                BlocProvider.of<ProductBloc>(context)
+                        .currentAllProductListPage +
+                    1,
+                8,
+              ),
+            );
+          },
         );
       }
     }
@@ -56,9 +61,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void initState() {
     GlobalVariable.currentNavBarPage = NavigationNameEnum.CLOTHINGS.name;
 
-    _scrollController.addListener(_scrollListener);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.addListener(_scrollListener);
+
       if (widget.isFromCategoryPage == false) {
         BlocProvider.of<ProductBloc>(context).add(
           const OnLoadAllProductListEvent(1, 8),
@@ -77,11 +82,14 @@ class _AllProductsPageState extends State<AllProductsPage> {
                       .first,
                 );
 
-        Future.delayed(const Duration(milliseconds: 500), () {
-          _itemScrollController.scrollTo(
-              index: selectedCategoryIndex,
-              duration: const Duration(milliseconds: 1000));
-        });
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          () {
+            _itemScrollController.scrollTo(
+                index: selectedCategoryIndex,
+                duration: const Duration(milliseconds: 1000));
+          },
+        );
       }
     });
 
@@ -139,8 +147,10 @@ class _AllProductsPageState extends State<AllProductsPage> {
           BlocProvider.of<ProductBloc>(context)
               .add(const OnLoadAllProductListEvent(1, 8));
         } else {
-          BlocProvider.of<ProductBloc>(context)
-              .add(OnLoadFilterProductListEvent(1, 8, categoryList: [name]));
+          BlocProvider.of<ProductBloc>(context).add(OnClearProductListEvent());
+          BlocProvider.of<ProductBloc>(context).add(
+            OnLoadFilterProductListEvent(1, 8, categoryList: [name]),
+          );
         }
       },
       child: Container(
@@ -213,43 +223,46 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
   Widget _productsList() {
     return BlocBuilder<ProductBloc, ProductState>(
-        builder: (context, productState) {
-      List<Product> productList = [];
+      builder: (context, productState) {
+        List<Product> productList = [];
 
-      if (productState is ProductAllListLoadedState) {
-        productList = productState.productList;
-      } else if (productState is ProductFilteredListLoadedState) {
-        productList = productState.productList;
-      }
+        if (productState is ProductAllListLoadedState) {
+          productList = BlocProvider.of<ProductBloc>(context).allProductList;
+        } else if (productState is ProductFilteredListLoadedState) {
+          productList =
+              BlocProvider.of<ProductBloc>(context).filteredProductList;
+        }
 
-      if (productList.isNotEmpty) {
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: productList.length,
-          dragStartBehavior: DragStartBehavior.down,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 0.65,
-            crossAxisCount: 2,
-            crossAxisSpacing: 20.height,
-            mainAxisSpacing: 25.width,
-          ),
-          itemBuilder: (context, index) {
-            return ProductComponent(
-              product: productList[index],
-              onClick: () {
-                LoadingService(context).selectToViewProduct(productList[index]);
+        if (productList.isNotEmpty) {
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: productList.length,
+            // dragStartBehavior: DragStartBehavior.down,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 0.65,
+              crossAxisCount: 2,
+              crossAxisSpacing: 20.height,
+              mainAxisSpacing: 25.width,
+            ),
+            itemBuilder: (context, index) {
+              return ProductComponent(
+                product: productList[index],
+                onClick: () {
+                  LoadingService(context)
+                      .selectToViewProduct(productList[index]);
 
-                context.router.pushNamed(AppRouterPath.productDetails);
-              },
-            );
-          },
-        );
-      } else {
-        return const Center(
-          child: Text('NOT AVAILABLE!!'),
-        );
-      }
-    });
+                  context.router.pushNamed(AppRouterPath.productDetails);
+                },
+              );
+            },
+          );
+        } else {
+          return const Center(
+            child: Text('NOT AVAILABLE!!'),
+          );
+        }
+      },
+    );
   }
 }

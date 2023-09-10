@@ -3,6 +3,7 @@ import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
 import 'package:fashionstore/data/enum/cart_enum.dart';
+import 'package:fashionstore/presentation/components/cart_filter.dart';
 import 'package:fashionstore/presentation/components/cart_item_component.dart';
 import 'package:fashionstore/presentation/components/cart_item_details.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
@@ -11,6 +12,7 @@ import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 import '../../config/app_router/app_router_path.dart';
 import '../../data/enum/navigation_name_enum.dart';
@@ -35,6 +37,43 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
       GlobalKey<RefreshIndicatorState>();
   late AnimationController _bottomSheetAnimation;
 
+  void onPressCheckoutButton() {
+    BlocProvider.of<CartBloc>(context).add(
+      OnFilterCartEvent(status: [CartEnum.SELECTED.name]),
+    );
+  }
+
+  void onPressCartItem(CartItem cartItem) {
+    setState(
+      () {
+        BlocProvider.of<ProductDetailsBloc>(context).add(
+          OnSelectProductEvent(cartItem.productId),
+        );
+
+        initAnimationController();
+
+        showModalBottomSheet(
+          transitionAnimationController: _bottomSheetAnimation,
+          isScrollControlled: true,
+          context: context,
+          builder: (context) {
+            return CartItemDetails(
+              selectedCartItem: cartItem,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void onPressFilterButton() {
+    SideSheet.left(
+      context: context,
+      width: MediaQuery.of(context).size.width * 3 / 5,
+      body: const CartFilter(),
+    );
+  }
+
   @override
   void dispose() {
     _bottomSheetAnimation.dispose();
@@ -47,6 +86,37 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       LoadingService(context).reloadCartPage();
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.maxScrollExtent ==
+              _scrollController.offset &&
+          !_scrollController.position.outOfRange) {
+        List<String> filterOptions =
+            BlocProvider.of<CartBloc>(context).currentFilterOption;
+        String filterBrand =
+            BlocProvider.of<CartBloc>(context).currentBrandFilter;
+        String filterName =
+            BlocProvider.of<CartBloc>(context).currentNameFilter;
+        int currentPage = BlocProvider.of<CartBloc>(context).currentPage;
+
+        Future.delayed(
+          const Duration(milliseconds: 300),
+          () {
+            BlocProvider.of<CartBloc>(context).add(
+              filterOptions.isEmpty && filterBrand.isEmpty && filterName.isEmpty
+                  ? OnLoadAllCartListEvent(currentPage + 1, 10)
+                  : OnFilterCartEvent(
+                      page: currentPage + 1,
+                      limit: 10,
+                      status: filterOptions,
+                      brand: filterBrand,
+                      name: filterName,
+                    ),
+            );
+          },
+        );
+      }
     });
 
     super.initState();
@@ -105,22 +175,17 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
               ),
               Center(
                 child: GradientElevatedButton(
-                    buttonMargin: EdgeInsets.symmetric(vertical: 5.height),
-                    borderRadiusIndex: 20.radius,
-                    borderColor: Colors.transparent,
-                    text: 'Check out',
-                    textWeight: FontWeight.w600,
-                    buttonWidth: 200.width,
-                    buttonHeight: 45.height,
-                    beginColor: Colors.black,
-                    endColor: const Color(0xff727272),
-                    textColor: Colors.white,
-                    textSize: 16.size,
-                    onPress: () {
-                      BlocProvider.of<CartBloc>(context).add(
-                        OnFilterCartEvent(status: [CartEnum.SELECTED.name]),
-                      );
-                    }),
+                  buttonMargin: EdgeInsets.symmetric(vertical: 5.height),
+                  borderRadiusIndex: 20.radius,
+                  borderColor: Colors.transparent,
+                  text: 'Check out',
+                  textWeight: FontWeight.w600,
+                  buttonWidth: 200.width,
+                  buttonHeight: 45.height,
+                  textColor: Colors.white,
+                  textSize: 16.size,
+                  onPress: onPressCheckoutButton,
+                ),
               ),
             ],
           ),
@@ -130,53 +195,72 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   Widget _totalCartPriceComponent() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25.width, vertical: 15.height),
-      height: 50.height,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Total cart price: ',
-            style: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              color: const Color(0xff464646),
-              fontFamily: 'Work Sans',
-              fontWeight: FontWeight.w500,
-              fontSize: 16.size,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          onPressed: onPressFilterButton,
+          icon: ImageIcon(
+            const AssetImage(
+              'assets/icon/filter_icon.png',
             ),
+            color: const Color(0xff626262),
+            size: 20.size,
           ),
-          BlocBuilder<CartBloc, CartState>(builder: (context, cartState) {
-            List<CartItem> cartItemList =
-                BlocProvider.of<CartBloc>(context).cartItemList;
-
-            if (cartState is CartLoadingState) {
-              return SizedBox(
-                height: 10.height,
-                width: 10.width,
-                child: CircularProgressIndicator(
-                  color: Colors.orange,
-                  strokeWidth: 2.width,
+        ),
+        Container(
+          padding: EdgeInsets.fromLTRB(
+            5.width,
+            15.height,
+            25.width,
+            15.height,
+          ),
+          height: 50.height,
+          child: Row(
+            children: [
+              Text(
+                'Total cart price: ',
+                style: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  color: const Color(0xff464646),
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16.size,
                 ),
-              );
-            }
-
-            if (cartState is AllCartListLoadedState) {
-              cartItemList = cartState.cartItemList;
-            }
-
-            return Text(
-              ValueRender.totalCartPrice(cartItemList).format.dollar,
-              style: TextStyle(
-                fontFamily: 'Sen',
-                fontWeight: FontWeight.w700,
-                fontSize: 16.size,
-                color: Colors.orange,
               ),
-            );
-          })
-        ],
-      ),
+              BlocBuilder<CartBloc, CartState>(builder: (context, cartState) {
+                List<CartItem> cartItemList =
+                    BlocProvider.of<CartBloc>(context).cartItemList;
+
+                if (cartState is CartLoadingState) {
+                  return SizedBox(
+                    height: 10.height,
+                    width: 10.width,
+                    child: CircularProgressIndicator(
+                      color: Colors.orange,
+                      strokeWidth: 2.width,
+                    ),
+                  );
+                }
+
+                if (cartState is AllCartListLoadedState) {
+                  cartItemList = cartState.cartItemList;
+                }
+
+                return Text(
+                  ValueRender.totalCartPrice(cartItemList).format.dollar,
+                  style: TextStyle(
+                    fontFamily: 'Sen',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16.size,
+                    color: Colors.orange,
+                  ),
+                );
+              })
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -195,6 +279,14 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
         if (cartState is CartErrorState) {
           UiRender.showDialog(context, '', cartState.message);
+        }
+
+        if (cartState is AllCartListLoadedState) {
+          _scrollController.animateTo(
+            _scrollController.offset,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+          );
         }
       },
       builder: (context, cartState) {
@@ -216,26 +308,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           itemBuilder: (context, index) {
             return CartItemComponent(
               cartItem: cartItemList[index],
-              onTap: () {
-                setState(
-                  () {
-                    BlocProvider.of<ProductDetailsBloc>(context).add(
-                        OnSelectProductEvent(cartItemList[index].productId));
-
-                    initAnimationController();
-
-                    showModalBottomSheet(
-                      transitionAnimationController: _bottomSheetAnimation,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) {
-                        return CartItemDetails(
-                            selectedCartItem: cartItemList[index]);
-                      },
-                    );
-                  },
-                );
-              },
+              onTap: () => onPressCartItem(cartItemList[index]),
             );
           },
         );

@@ -25,6 +25,76 @@ class ProductDetailsBottomNavigationBarComponent extends StatefulWidget {
 
 class _ProductDetailsBottomNavigationBarComponentState
     extends State<ProductDetailsBottomNavigationBarComponent> {
+  void onPressAddToCartButton() {
+    String color = BlocProvider.of<ProductAddToCartBloc>(context).color;
+    String productName =
+        BlocProvider.of<ProductAddToCartBloc>(context).productName;
+    int productId = BlocProvider.of<ProductDetailsBloc>(context)
+        .selectedProductDetails
+        .first
+        .productId;
+    String size = BlocProvider.of<ProductAddToCartBloc>(context).size;
+    int quantity = BlocProvider.of<ProductAddToCartBloc>(context).quantity;
+
+    if (color != '' && productName != '' && size != '' && quantity > 0) {
+      UiRender.showConfirmDialog(
+        context,
+        needCenterMessage: false,
+        '',
+        ValueRender.getAddToCartPopupContent(
+          productName,
+          color,
+          size,
+          quantity,
+        ),
+      ).then((value) {
+        if (value == true) {
+          BlocProvider.of<CartBloc>(context).add(
+            OnAddCartItemEvent(productId, color, size, quantity),
+          );
+        }
+      });
+    } else {
+      UiRender.showDialog(
+        context,
+        '',
+        'Please check color, quantity and size again!',
+      );
+    }
+  }
+
+  void onPressQuantityButton() {
+    UiRender.showSingleTextFieldDialog(
+      context,
+      hintText: 'Your quantity...',
+      needCenterText: true,
+      title: 'Input the quantity you want to purchase!',
+      widget.textEditingController,
+    ).then((value) {
+      if (value) {
+        try {
+          if (int.parse(widget.textEditingController?.text ?? '0') > 0) {
+            BlocProvider.of<ProductAddToCartBloc>(context).add(
+              OnSelectProductAddToCartEvent(
+                quantity: int.parse(widget.textEditingController?.text ?? '0'),
+              ),
+            );
+          } else {
+            UiRender.showDialog(
+              context,
+              '',
+              'Must be higher than 0!',
+            );
+            widget.textEditingController?.text = '';
+          }
+        } catch (e) {
+          UiRender.showDialog(context, '', 'Not accepted!');
+          widget.textEditingController?.text = '';
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,48 +138,7 @@ class _ProductDetailsBottomNavigationBarComponentState
             textSize: 16.size,
             borderRadiusIndex: 5.radius,
             buttonMargin: EdgeInsets.zero,
-            onPress: () {
-              String color =
-                  BlocProvider.of<ProductAddToCartBloc>(context).color;
-              String productName =
-                  BlocProvider.of<ProductAddToCartBloc>(context).productName;
-              int productId = BlocProvider.of<ProductDetailsBloc>(context)
-                  .selectedProductDetails
-                  .first
-                  .productId;
-              String size = BlocProvider.of<ProductAddToCartBloc>(context).size;
-              int quantity =
-                  BlocProvider.of<ProductAddToCartBloc>(context).quantity;
-
-              if (color != '' &&
-                  productName != '' &&
-                  size != '' &&
-                  quantity > 0) {
-                UiRender.showConfirmDialog(
-                  context,
-                  needCenterMessage: false,
-                  '',
-                  ValueRender.getAddToCartPopupContent(
-                    productName,
-                    color,
-                    size,
-                    quantity,
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    BlocProvider.of<CartBloc>(context).add(
-                      OnAddCartItemEvent(productId, color, size, quantity),
-                    );
-                  }
-                });
-              } else {
-                UiRender.showDialog(
-                  context,
-                  '',
-                  'Please check color, quantity and size again!',
-                );
-              }
-            },
+            onPress: onPressAddToCartButton,
           ),
           GradientElevatedButton(
             text: widget.textEditingController?.text != ''
@@ -121,39 +150,7 @@ class _ProductDetailsBottomNavigationBarComponentState
             borderRadiusIndex: 5.radius,
             buttonMargin: EdgeInsets.zero,
             textColor: Colors.white,
-            onPress: () {
-              UiRender.showSingleTextFieldDialog(
-                context,
-                hintText: 'Your quantity...',
-                needCenterText: true,
-                title: 'Input the quantity you want to purchase!',
-                widget.textEditingController,
-              ).then((value) {
-                if (value) {
-                  try {
-                    if (int.parse(widget.textEditingController?.text ?? '0') >
-                        0) {
-                      BlocProvider.of<ProductAddToCartBloc>(context).add(
-                        OnSelectProductAddToCartEvent(
-                          quantity: int.parse(
-                              widget.textEditingController?.text ?? '0'),
-                        ),
-                      );
-                    } else {
-                      UiRender.showDialog(
-                        context,
-                        '',
-                        'Must be higher than 0!',
-                      );
-                      widget.textEditingController?.text = '';
-                    }
-                  } catch (e) {
-                    UiRender.showDialog(context, '', 'Not accepted!');
-                    widget.textEditingController?.text = '';
-                  }
-                }
-              });
-            },
+            onPress: onPressQuantityButton,
           )
         ],
       ),

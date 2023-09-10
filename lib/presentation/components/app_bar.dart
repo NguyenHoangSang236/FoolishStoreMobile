@@ -105,14 +105,16 @@ class _AppBarComponentState extends State<AppBarComponent> {
                   : IconButton(
                       onPressed: () {
                         SideSheet.left(
-                            context: context,
-                            body: SingleChildScrollView(
-                              child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    return null;
-                                  }),
-                            ));
+                          context: context,
+                          body: SingleChildScrollView(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return null;
+                              },
+                            ),
+                          ),
+                        );
                       },
                       icon: ImageIcon(
                         const AssetImage('assets/icon/option_icon.png'),
