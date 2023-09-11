@@ -23,6 +23,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   ProductBloc(this._shopRepository) : super(ProductInitial()) {
     on<OnLoadAllProductListEvent>((event, emit) async {
+      emit(ProductLoadingState());
+
       try {
         final response = await _shopRepository.getAllProducts(
           event.page,
@@ -33,17 +35,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           (failure) => emit(ProductErrorState(failure.message)),
           (list) {
             if (list.isNotEmpty) {
-              currentAllProductListPage =
-                  list.isNotEmpty && event.page > currentAllProductListPage
-                      ? event.page
-                      : currentAllProductListPage;
-
-              allProductList = _removeDuplicates([...allProductList, ...list]);
-
-              emit(ProductAllListLoadedState(list));
-            } else {
-              emit(ProductAllListLoadedState(allProductList));
+              if (event.page >= currentAllProductListPage) {
+                currentAllProductListPage = event.page;
+                allProductList =
+                    _removeDuplicates([...allProductList, ...list]);
+              }
             }
+
+            emit(ProductAllListLoadedState(allProductList));
           },
         );
       } catch (e) {
@@ -116,13 +115,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     });
 
     on<OnClearProductListEvent>((event, emit) {
-      allProductList = [];
+      filteredProductList = [];
       hotDiscountProductList = [];
       top8BestSellerProductList = [];
       newArrivalProductList = [];
     });
 
     on<OnLoadFilterProductListEvent>((event, emit) async {
+      emit(ProductLoadingState());
+
       try {
         final response = await _shopRepository.getFilteredProducts(
           event.page,
@@ -138,12 +139,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           (list) {
             if (list.isNotEmpty) {
               currentAllProductListPage =
-                  list.isNotEmpty && event.page > currentAllProductListPage
+                  (list.isNotEmpty && event.page > currentAllProductListPage) ||
+                          (list.isEmpty && event.page == 1)
                       ? event.page
                       : currentAllProductListPage;
 
-              filteredProductList =
-                  _removeDuplicates([...filteredProductList, ...list]);
+              filteredProductList = currentAllProductListPage > 1
+                  ? _removeDuplicates([...filteredProductList, ...list])
+                  : List.of(list);
 
               emit(ProductFilteredListLoadedState(list));
             } else {
