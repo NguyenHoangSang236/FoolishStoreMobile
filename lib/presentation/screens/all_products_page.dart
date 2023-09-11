@@ -40,45 +40,38 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void _scrollListener() {
     if (_scrollController.offset >=
         _scrollController.position.maxScrollExtent) {
-      setState(() {
-        isLoaded = false;
-      });
+      if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName ==
+              'All' &&
+          isLoaded == false) {
+        setState(() {
+          isLoaded = true;
+          currentOffset = _scrollController.offset;
+        });
 
-      loadPaginationProcess();
-    }
-  }
+        BlocProvider.of<ProductBloc>(context).add(
+          OnLoadAllProductListEvent(
+            BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
+            8,
+          ),
+        );
+      } else if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName !=
+              'All' &&
+          isLoaded == false) {
+        setState(() {
+          isLoaded = true;
+          currentOffset = _scrollController.offset;
+        });
 
-  void loadPaginationProcess() {
-    if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName == 'All' &&
-        isLoaded == false) {
-      BlocProvider.of<ProductBloc>(context).add(
-        OnLoadAllProductListEvent(
-          BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
-          8,
-        ),
-      );
-
-      setState(() {
-        isLoaded = true;
-        currentOffset = _scrollController.offset;
-      });
-    } else if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName !=
-            'All' &&
-        isLoaded == false) {
-      BlocProvider.of<ProductBloc>(context).add(
-        OnLoadFilterProductListEvent(
-          BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
-          8,
-          categoryList: [
-            BlocProvider.of<CategoryBloc>(context).selectedCategoryName
-          ],
-        ),
-      );
-
-      setState(() {
-        isLoaded = true;
-        currentOffset = _scrollController.offset;
-      });
+        BlocProvider.of<ProductBloc>(context).add(
+          OnLoadFilterProductListEvent(
+            BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
+            8,
+            categoryList: [
+              BlocProvider.of<CategoryBloc>(context).selectedCategoryName
+            ],
+          ),
+        );
+      }
     }
   }
 
@@ -189,6 +182,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
           _categoryList(),
           Expanded(
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               controller: _scrollController,
               child: Padding(
                 padding: EdgeInsets.all(20.size),
@@ -282,6 +276,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
           _scrollController.jumpTo(currentOffset);
         } else if (productState is ProductFilteredListLoadedState) {
           context.router.pop();
+          _scrollController.jumpTo(currentOffset);
         }
       },
       builder: (context, productState) {
