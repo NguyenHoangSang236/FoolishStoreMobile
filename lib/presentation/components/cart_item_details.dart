@@ -394,6 +394,7 @@ class _CartItemDetailsState extends State<CartItemDetails> {
             enableInteractiveSelection: false,
             controller: quantityController,
             textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
             style: TextStyle(
               fontFamily: 'Work Sans',
               fontWeight: FontWeight.w500,

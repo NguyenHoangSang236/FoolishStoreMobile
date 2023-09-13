@@ -1,0 +1,4 @@
+enum DeliveryEnum {
+  EXPRESS_DELIVERY,
+  NORMAL_DELIVERY,
+}

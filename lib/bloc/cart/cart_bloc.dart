@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fashionstore/data/dto/cart_checkout.dart';
 import 'package:fashionstore/data/enum/cart_enum.dart';
+import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/cart_item.dart';
@@ -19,6 +21,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   bool isFiltered = false;
   List<int> removalCartIdList = [];
   List<String> currentFilterOption = [];
+  CartCheckout? currentCheckout;
   String currentBrandFilter = '';
   String currentNameFilter = '';
 
@@ -57,6 +60,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     on<OnClearCartEvent>((event, emit) {
       cartItemList = [];
+      currentCheckout = null;
       removalCartIdList = [];
       totalCartItemQuantity = 0;
       isFiltered = false;
@@ -189,6 +193,26 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             } else {
               emit(CartFilteredState(cartItemList));
             }
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartErrorState(e.toString()));
+      }
+    });
+
+    on<OnCheckoutEvent>((event, emit) async {
+      emit(CartCheckoutLoadingState());
+
+      try {
+        final response = await _cartRepository.checkout(event.deliveryType);
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (cartCheckout) {
+            currentCheckout = cartCheckout;
+
+            emit(CartCheckoutState(cartCheckout));
           },
         );
       } catch (e) {

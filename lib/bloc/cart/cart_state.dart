@@ -14,6 +14,11 @@ class CartLoadingState extends CartState {
   List<Object> get props => [];
 }
 
+class CartCheckoutLoadingState extends CartState {
+  @override
+  List<Object> get props => [];
+}
+
 class AllCartListLoadedState extends CartState {
   final List<CartItem> cartItemList;
 
@@ -30,6 +35,15 @@ class CartFilteredState extends CartState {
 
   @override
   List<Object> get props => [cartItemList];
+}
+
+class CartCheckoutState extends CartState {
+  final CartCheckout cartCheckout;
+
+  const CartCheckoutState(this.cartCheckout);
+
+  @override
+  List<Object> get props => [cartCheckout];
 }
 
 class CartFilteredToCheckoutState extends CartState {

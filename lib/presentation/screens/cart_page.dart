@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
-import 'package:fashionstore/data/enum/cart_enum.dart';
+import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:fashionstore/presentation/components/cart_filter.dart';
 import 'package:fashionstore/presentation/components/cart_item_component.dart';
 import 'package:fashionstore/presentation/components/cart_item_details.dart';
@@ -12,6 +12,7 @@ import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:side_sheet/side_sheet.dart';
 
 import '../../config/app_router/app_router_path.dart';
@@ -36,10 +37,30 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
   late AnimationController _bottomSheetAnimation;
+  double currentOffset = 0;
+  final List<Widget> _paymentImageIconList = [
+    Image.asset('assets/icon/master_card_icon.png'),
+    Image.asset('assets/icon/momo_icon.png'),
+    Image.asset('assets/icon/paypal_icon.png'),
+    Image.asset('assets/icon/cod_icon.png'),
+  ];
+  final List<DeliveryEnum> _deliveryTypeList = [
+    DeliveryEnum.NORMAL_DELIVERY,
+    DeliveryEnum.EXPRESS_DELIVERY,
+  ];
+  late Widget _selectedPaymentMethodIcon;
+  late DeliveryEnum _selectedDeliveryType;
+
+  void resetCheckoutInfo() {
+    setState(() {
+      _selectedPaymentMethodIcon = _paymentImageIconList.first;
+      _selectedDeliveryType = _deliveryTypeList.first;
+    });
+  }
 
   void onPressCheckoutButton() {
     BlocProvider.of<CartBloc>(context).add(
-      OnFilterCartEvent(status: [CartEnum.SELECTED.name]),
+      OnCheckoutEvent(_selectedDeliveryType),
     );
   }
 
@@ -50,9 +71,13 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           OnSelectProductEvent(cartItem.productId),
         );
 
-        initAnimationController();
-
         showModalBottomSheet(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(15.radius),
+              topLeft: Radius.circular(15.radius),
+            ),
+          ),
           transitionAnimationController: _bottomSheetAnimation,
           isScrollControlled: true,
           context: context,
@@ -74,6 +99,57 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
+  void onPressCheckoutCancelButton() {
+    resetCheckoutInfo();
+    context.router.pop();
+  }
+
+  void onSelectDeliveryType() {}
+
+  void onSelectPaymentMethod() {}
+
+  String renderDeliveryEnum(DeliveryEnum deliveryEnum) {
+    return deliveryEnum == DeliveryEnum.EXPRESS_DELIVERY
+        ? 'Express delivery'
+        : deliveryEnum == DeliveryEnum.NORMAL_DELIVERY
+            ? 'Normal delivery'
+            : 'Undefined';
+  }
+
+  void paginationScrollEvent() {
+    if (_scrollController.position.maxScrollExtent ==
+            _scrollController.offset &&
+        !_scrollController.position.outOfRange) {
+      setState(() {
+        currentOffset = _scrollController.offset;
+      });
+
+      List<String> filterOptions =
+          BlocProvider.of<CartBloc>(context).currentFilterOption;
+      String filterBrand =
+          BlocProvider.of<CartBloc>(context).currentBrandFilter;
+      String filterName = BlocProvider.of<CartBloc>(context).currentNameFilter;
+      int currentPage = BlocProvider.of<CartBloc>(context).currentPage;
+
+      Future.delayed(
+        const Duration(milliseconds: 300),
+        () {
+          BlocProvider.of<CartBloc>(context).add(
+            filterOptions.isEmpty && filterBrand.isEmpty && filterName.isEmpty
+                ? OnLoadAllCartListEvent(currentPage + 1, 10)
+                : OnFilterCartEvent(
+                    page: currentPage + 1,
+                    limit: 10,
+                    status: filterOptions,
+                    brand: filterBrand,
+                    name: filterName,
+                  ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   void dispose() {
     _bottomSheetAnimation.dispose();
@@ -83,40 +159,14 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   @override
   void initState() {
     GlobalVariable.currentNavBarPage = NavigationNameEnum.CART.name;
+    _selectedPaymentMethodIcon = _paymentImageIconList.first;
+    _selectedDeliveryType = _deliveryTypeList.first;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      initAnimationController();
+      _scrollController.addListener(paginationScrollEvent);
+
       LoadingService(context).reloadCartPage();
-    });
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.maxScrollExtent ==
-              _scrollController.offset &&
-          !_scrollController.position.outOfRange) {
-        List<String> filterOptions =
-            BlocProvider.of<CartBloc>(context).currentFilterOption;
-        String filterBrand =
-            BlocProvider.of<CartBloc>(context).currentBrandFilter;
-        String filterName =
-            BlocProvider.of<CartBloc>(context).currentNameFilter;
-        int currentPage = BlocProvider.of<CartBloc>(context).currentPage;
-
-        Future.delayed(
-          const Duration(milliseconds: 300),
-          () {
-            BlocProvider.of<CartBloc>(context).add(
-              filterOptions.isEmpty && filterBrand.isEmpty && filterName.isEmpty
-                  ? OnLoadAllCartListEvent(currentPage + 1, 10)
-                  : OnFilterCartEvent(
-                      page: currentPage + 1,
-                      limit: 10,
-                      status: filterOptions,
-                      brand: filterBrand,
-                      name: filterName,
-                    ),
-            );
-          },
-        );
-      }
     });
 
     super.initState();
@@ -124,8 +174,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   void initAnimationController() {
     _bottomSheetAnimation = BottomSheet.createAnimationController(this);
-    _bottomSheetAnimation.duration = const Duration(seconds: 1);
-    _bottomSheetAnimation.reverseDuration = const Duration(seconds: 1);
+    _bottomSheetAnimation.duration = const Duration(milliseconds: 700);
+    _bottomSheetAnimation.reverseDuration = const Duration(milliseconds: 700);
   }
 
   @override
@@ -149,6 +199,32 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
               if (cartState.cartItemList.isNotEmpty) {
                 context.router.pushNamed(AppRouterPath.checkout);
               }
+            } else if (cartState is AllCartListLoadedState ||
+                cartState is CartFilteredState) {
+              _scrollController.jumpTo(currentOffset);
+            } else if (cartState is CartCheckoutLoadingState) {
+              UiRender.showLoaderDialog(context);
+            } else if (cartState is CartCheckoutState) {
+              context.router.pop().then(
+                    (value) => showModalBottomSheet(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height,
+                        minHeight: MediaQuery.of(context).size.height / 4,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(15.radius),
+                          topLeft: Radius.circular(15.radius),
+                        ),
+                      ),
+                      transitionAnimationController: _bottomSheetAnimation,
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) {
+                        return _checkoutBottomSheet();
+                      },
+                    ),
+                  );
             }
           },
           child: Column(
@@ -178,7 +254,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                   buttonMargin: EdgeInsets.symmetric(vertical: 5.height),
                   borderRadiusIndex: 20.radius,
                   borderColor: Colors.transparent,
-                  text: 'Check out',
+                  text: 'Checkout',
                   textWeight: FontWeight.w600,
                   buttonWidth: 200.width,
                   buttonHeight: 45.height,
@@ -313,6 +389,154 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           },
         );
       },
+    );
+  }
+
+  Widget _checkoutBottomSheet() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 25.width,
+          vertical: 30.height,
+        ),
+        child: BlocConsumer<CartBloc, CartState>(
+          listener: (context, state) {
+            if (state is CartErrorState) {
+              UiRender.showDialog(context, '', state.message);
+            }
+          },
+          builder: (context, state) {
+            if (state is CartCheckoutState) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 30.height),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Checkout',
+                          style: TextStyle(
+                            fontFamily: 'Work Sans',
+                            fontSize: 18.size,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: onPressCheckoutCancelButton,
+                          child: Image.asset(
+                            'assets/icon/x_icon.png',
+                            width: 32.size,
+                            height: 32.size,
+                            color: const Color(0xFFA1A1A1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _checkoutOptionLine(
+                    title: 'Delivery',
+                    content: renderDeliveryEnum(_selectedDeliveryType),
+                    onPress: onSelectDeliveryType,
+                  ),
+                  _checkoutOptionLine(
+                    title: 'Payment Method',
+                    onPress: onSelectPaymentMethod,
+                    isPayment: true,
+                  ),
+                  _checkoutOptionLine(
+                    title: 'Subtotal',
+                    content: '222',
+                  ),
+                  _checkoutOptionLine(
+                    title: 'Delivery Fee',
+                    content: '22',
+                  ),
+                  _checkoutOptionLine(
+                    title: 'Total',
+                    content: '2222',
+                  ),
+                ],
+              );
+            }
+
+            return SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: UiRender.loadingCircle(),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _checkoutOptionLine({
+    required String title,
+    String? content,
+    bool isPayment = false,
+    void Function()? onPress,
+  }) {
+    return Material(
+      child: InkWell(
+        splashColor: Colors.orange,
+        onTap: onPress,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.height),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'Work Sans',
+                  fontSize: 14.size,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onPress == null
+                  ? Text(
+                      content!.dollar,
+                      style: TextStyle(
+                        fontFamily: 'Work Sans',
+                        fontSize: 14.size,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        isPayment
+                            ? SizedBox(
+                                height: 19.height,
+                                width: 25.width,
+                                child: _selectedPaymentMethodIcon,
+                              )
+                            : Text(
+                                content!,
+                                style: TextStyle(
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 14.size,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                        15.horizontalSpace,
+                        SizedBox(
+                          height: 21.height,
+                          width: 15.width,
+                          child: Image.asset(
+                            'assets/icon/right_dash_arrow_icon.png',
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

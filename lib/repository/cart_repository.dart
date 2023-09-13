@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:either_dart/either.dart';
+import 'package:fashionstore/data/dto/cart_checkout.dart';
+import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,6 +32,29 @@ class CartRepository {
         List<dynamic> jsonList = json.decode(jsonEncode(response.content));
 
         return Right(jsonList.map((json) => CartItem.fromJson(json)).toList());
+      } else {
+        return Left(ApiFailure(response.content));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, CartCheckout>> getCartCheckout(
+    String url,
+  ) async {
+    try {
+      ApiResponse response = await NetworkService.getDataFromApi(
+        ValueRender.getUrl(
+          type: type,
+          url: url,
+          isAuthen: true,
+        ),
+      );
+
+      if (response.result == 'success') {
+        return Right(CartCheckout.fromJson(response.content));
       } else {
         return Left(ApiFailure(response.content));
       }
@@ -117,5 +142,9 @@ class CartRepository {
         }
       },
     );
+  }
+
+  Future<Either<Failure, CartCheckout>> checkout(DeliveryEnum deliveryEnum) {
+    return getCartCheckout('/checkout?delivery_type=${deliveryEnum.name}');
   }
 }

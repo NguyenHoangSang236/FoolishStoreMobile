@@ -7,13 +7,19 @@ abstract class CartEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class OnClearCartEvent extends CartEvent{}
+class OnClearCartEvent extends CartEvent {}
 
 class OnLoadAllCartListEvent extends CartEvent {
   final int page;
   final int limit;
 
   const OnLoadAllCartListEvent(this.page, this.limit);
+}
+
+class OnCheckoutEvent extends CartEvent {
+  final DeliveryEnum deliveryType;
+
+  const OnCheckoutEvent(this.deliveryType);
 }
 
 class OnLoadTotalCartItemQuantityEvent extends CartEvent {}
@@ -32,7 +38,8 @@ class OnFilterCartEvent extends CartEvent {
   final int? page;
   final int? limit;
 
-  const OnFilterCartEvent({this.name, this.status, this.brand, this.page, this.limit});
+  const OnFilterCartEvent(
+      {this.name, this.status, this.brand, this.page, this.limit});
 }
 
 class OnRemoveCartItemEvent extends CartEvent {
@@ -47,5 +54,6 @@ class OnAddCartItemEvent extends CartEvent {
   final String size;
   final int quantity;
 
-  const OnAddCartItemEvent(this.productId, this.color, this.size, this.quantity);
+  const OnAddCartItemEvent(
+      this.productId, this.color, this.size, this.quantity);
 }
