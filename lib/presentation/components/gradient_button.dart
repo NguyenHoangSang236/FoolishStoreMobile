@@ -23,6 +23,7 @@ class GradientElevatedButton extends StatefulWidget {
     this.begin = Alignment.centerRight,
     this.end = Alignment.centerLeft,
     this.border,
+    this.splashColor,
   }) : super(key: key);
 
   final Color textColor;
@@ -44,6 +45,7 @@ class GradientElevatedButton extends StatefulWidget {
   final Alignment end;
   final void Function() onPress;
   final BoxBorder? border;
+  final Color? splashColor;
 
   @override
   State<StatefulWidget> createState() => _GradientElevatedButtonState();
@@ -53,69 +55,53 @@ class _GradientElevatedButtonState extends State<GradientElevatedButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: widget.buttonMargin,
-      width: widget.buttonWidth,
-      decoration: BoxDecoration(
+        alignment: Alignment.center,
+        height: widget.buttonHeight,
+        width: widget.buttonWidth,
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(widget.borderRadiusIndex),
           border: Border.all(
             color: widget.borderColor,
             width: widget.borderWidth,
-          )),
-      child: SizedBox(
-        height: widget.buttonHeight,
+          ),
+          gradient: LinearGradient(
+            begin: widget.begin,
+            end: widget.end,
+            colors: [
+              widget.beginColor,
+              widget.endColor,
+            ],
+          ),
+        ),
         child: ElevatedButton(
           onPressed: widget.onPress,
           style: ElevatedButton.styleFrom(
-            elevation: widget.buttonElevation,
-            splashFactory: InkRipple.splashFactory,
+            foregroundColor: widget.splashColor,
+            backgroundColor: Colors.transparent,
+            fixedSize: Size(widget.buttonWidth, widget.buttonHeight),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(widget.borderRadiusIndex),
             ),
-            padding: EdgeInsets.zero,
           ),
-          child: InkWell(
-            overlayColor:
-                MaterialStateColor.resolveWith((states) => Colors.orange),
-            child: Container(
-              height: widget.buttonHeight,
-              decoration: BoxDecoration(
-                border: widget.border,
-                borderRadius: BorderRadius.circular(widget.borderRadiusIndex),
-                gradient: LinearGradient(
-                  begin: widget.begin,
-                  end: widget.end,
-                  colors: [
-                    widget.beginColor,
-                    widget.endColor,
-                  ],
+          child: widget.isLoading
+              ? SizedBox(
+                  height: 20.height,
+                  width: 20.width,
+                  child: CircularProgressIndicator(
+                    color: widget.textColor,
+                  ),
+                )
+              : Text(
+                  widget.text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Be Vietnam Pro',
+                    color: widget.textColor,
+                    fontSize: widget.textSize,
+                    fontWeight: widget.textWeight,
+                    fontStyle: widget.textFontStyle,
+                  ),
                 ),
-              ),
-              child: Container(
-                alignment: Alignment.center,
-                height: widget.buttonHeight,
-                child: widget.isLoading
-                    ? SizedBox(
-                        height: 20.height,
-                        width: 20.width,
-                        child: CircularProgressIndicator(
-                          color: widget.textColor,
-                        ),
-                      )
-                    : Text(
-                        widget.text,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: 'Be Vietnam Pro',
-                            color: widget.textColor,
-                            fontSize: widget.textSize,
-                            fontWeight: widget.textWeight,
-                            fontStyle: widget.textFontStyle),
-                      ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+        ));
   }
 }

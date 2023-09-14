@@ -19,7 +19,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   int currentPage = 1;
   int totalCartItemQuantity = 0;
   bool isFiltered = false;
-  List<int> removalCartIdList = [];
   List<String> currentFilterOption = [];
   CartCheckout? currentCheckout;
   String currentBrandFilter = '';
@@ -61,7 +60,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<OnClearCartEvent>((event, emit) {
       cartItemList = [];
       currentCheckout = null;
-      removalCartIdList = [];
       totalCartItemQuantity = 0;
       isFiltered = false;
       currentBrandFilter = '';

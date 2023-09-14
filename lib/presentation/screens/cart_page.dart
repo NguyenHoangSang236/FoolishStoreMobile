@@ -10,6 +10,7 @@ import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/service/loading_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,6 +18,7 @@ import 'package:side_sheet/side_sheet.dart';
 
 import '../../config/app_router/app_router_path.dart';
 import '../../data/enum/navigation_name_enum.dart';
+import '../../data/enum/payment_enum.dart';
 import '../../data/static/global_variables.dart';
 import '../../utils/render/value_render.dart';
 import '../components/gradient_button.dart';
@@ -44,17 +46,25 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     Image.asset('assets/icon/paypal_icon.png'),
     Image.asset('assets/icon/cod_icon.png'),
   ];
+  final List<PaymentEnum> _paymentMethodList = [
+    PaymentEnum.BANK_TRANSFER,
+    PaymentEnum.MOMO,
+    PaymentEnum.PAYPAL,
+    PaymentEnum.COD,
+  ];
   final List<DeliveryEnum> _deliveryTypeList = [
     DeliveryEnum.NORMAL_DELIVERY,
     DeliveryEnum.EXPRESS_DELIVERY,
   ];
   late Widget _selectedPaymentMethodIcon;
   late DeliveryEnum _selectedDeliveryType;
+  late PaymentEnum _selectedPaymentMethod;
 
   void resetCheckoutInfo() {
     setState(() {
       _selectedPaymentMethodIcon = _paymentImageIconList.first;
       _selectedDeliveryType = _deliveryTypeList.first;
+      _selectedPaymentMethod = _paymentMethodList.first;
     });
   }
 
@@ -62,6 +72,27 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     BlocProvider.of<CartBloc>(context).add(
       OnCheckoutEvent(_selectedDeliveryType),
     );
+
+    context.router.pop().then(
+          (value) => showModalBottomSheet(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height,
+              minHeight: MediaQuery.of(context).size.height / 4,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(15.radius),
+                topLeft: Radius.circular(15.radius),
+              ),
+            ),
+            transitionAnimationController: _bottomSheetAnimation,
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return _checkoutBottomSheet();
+            },
+          ),
+        );
   }
 
   void onPressCartItem(CartItem cartItem) {
@@ -104,16 +135,34 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     context.router.pop();
   }
 
-  void onSelectDeliveryType() {}
+  void onSelectDeliveryType() {
+    showCupertinoDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text(
+            'Choose delivery service type',
+          ),
+          content: _checkoutPopupContent(),
+        );
+      },
+    );
+  }
 
-  void onSelectPaymentMethod() {}
-
-  String renderDeliveryEnum(DeliveryEnum deliveryEnum) {
-    return deliveryEnum == DeliveryEnum.EXPRESS_DELIVERY
-        ? 'Express delivery'
-        : deliveryEnum == DeliveryEnum.NORMAL_DELIVERY
-            ? 'Normal delivery'
-            : 'Undefined';
+  void onSelectPaymentMethod({bool isDeliveryType = true}) {
+    showCupertinoDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text(
+            'Choose delivery payment method',
+          ),
+          content: _checkoutPopupContent(isDeliveryType: isDeliveryType),
+        );
+      },
+    );
   }
 
   void paginationScrollEvent() {
@@ -150,6 +199,34 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     }
   }
 
+  void onPressDeliveryTypeRadioButton(DeliveryEnum? deliveryEnum) {
+    context.router.pop();
+
+    BlocProvider.of<CartBloc>(context).add(
+      OnCheckoutEvent(deliveryEnum!),
+    );
+
+    setState(() {
+      _selectedDeliveryType = deliveryEnum;
+    });
+  }
+
+  void onPressPaymentMethodRadioButton(
+    PaymentEnum? paymentEnum,
+    Widget paymentIcon,
+  ) {
+    context.router.pop();
+
+    BlocProvider.of<CartBloc>(context).add(
+      OnCheckoutEvent(_selectedDeliveryType),
+    );
+
+    setState(() {
+      _selectedPaymentMethod = paymentEnum!;
+      _selectedPaymentMethodIcon = paymentIcon;
+    });
+  }
+
   @override
   void dispose() {
     _bottomSheetAnimation.dispose();
@@ -161,12 +238,15 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     GlobalVariable.currentNavBarPage = NavigationNameEnum.CART.name;
     _selectedPaymentMethodIcon = _paymentImageIconList.first;
     _selectedDeliveryType = _deliveryTypeList.first;
+    _selectedPaymentMethod = _paymentMethodList.first;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initAnimationController();
       _scrollController.addListener(paginationScrollEvent);
 
-      LoadingService(context).reloadCartPage();
+      if (BlocProvider.of<CartBloc>(context).cartItemList.isEmpty) {
+        LoadingService(context).reloadCartPage();
+      }
     });
 
     super.initState();
@@ -199,32 +279,11 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
               if (cartState.cartItemList.isNotEmpty) {
                 context.router.pushNamed(AppRouterPath.checkout);
               }
+            } else if (cartState is CartErrorState) {
+              UiRender.showDialog(context, '', cartState.message);
             } else if (cartState is AllCartListLoadedState ||
                 cartState is CartFilteredState) {
               _scrollController.jumpTo(currentOffset);
-            } else if (cartState is CartCheckoutLoadingState) {
-              UiRender.showLoaderDialog(context);
-            } else if (cartState is CartCheckoutState) {
-              context.router.pop().then(
-                    (value) => showModalBottomSheet(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height,
-                        minHeight: MediaQuery.of(context).size.height / 4,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(15.radius),
-                          topLeft: Radius.circular(15.radius),
-                        ),
-                      ),
-                      transitionAnimationController: _bottomSheetAnimation,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) {
-                        return _checkoutBottomSheet();
-                      },
-                    ),
-                  );
             }
           },
           child: Column(
@@ -346,18 +405,10 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         if (cartState is CartRemovedState) {
           UiRender.showDialog(context, '', cartState.message);
           LoadingService(context).reloadCartPage();
-        }
-
-        if (cartState is CartUpdatedState) {
+        } else if (cartState is CartUpdatedState) {
           UiRender.showDialog(context, '', cartState.message);
           LoadingService(context).reloadCartPage();
-        }
-
-        if (cartState is CartErrorState) {
-          UiRender.showDialog(context, '', cartState.message);
-        }
-
-        if (cartState is AllCartListLoadedState) {
+        } else if (cartState is AllCartListLoadedState) {
           _scrollController.animateTo(
             _scrollController.offset,
             duration: const Duration(milliseconds: 500),
@@ -435,35 +486,88 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  _checkoutOptionLine(
-                    title: 'Delivery',
-                    content: renderDeliveryEnum(_selectedDeliveryType),
+                  _checkoutBottomSheetContent(
+                    title: 'Delivery type',
+                    content: ValueRender.getDeliveryTypeFromEnum(
+                        _selectedDeliveryType),
                     onPress: onSelectDeliveryType,
                   ),
-                  _checkoutOptionLine(
+                  _checkoutBottomSheetContent(
                     title: 'Payment Method',
-                    onPress: onSelectPaymentMethod,
+                    onPress: () => onSelectPaymentMethod(isDeliveryType: false),
                     isPayment: true,
                   ),
-                  _checkoutOptionLine(
+                  _checkoutBottomSheetContent(
                     title: 'Subtotal',
-                    content: '222',
+                    content: state.cartCheckout.subtotal.format,
                   ),
-                  _checkoutOptionLine(
+                  _checkoutBottomSheetContent(
                     title: 'Delivery Fee',
-                    content: '22',
+                    content: state.cartCheckout.shippingFee.format,
                   ),
-                  _checkoutOptionLine(
+                  _checkoutBottomSheetContent(
                     title: 'Total',
-                    content: '2222',
+                    content: state.cartCheckout.total.format,
+                  ),
+                  20.verticalSpace,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'By placing an order you agree to our',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Work Sans',
+                          fontSize: 10.size,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFFA1A1A1),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'Terms and Conditions',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Work Sans',
+                            fontSize: 10.size,
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFFA1A1A1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  20.verticalSpace,
+                  GradientElevatedButton(
+                    text: 'Place Order',
+                    textSize: 15.size,
+                    textWeight: FontWeight.w700,
+                    buttonMargin: EdgeInsets.zero,
+                    buttonWidth: MediaQuery.of(context).size.width,
+                    buttonHeight: 50.height,
+                    onPress: () {},
                   ),
                 ],
               );
             }
 
             return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: UiRender.loadingCircle(),
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              child: Center(
+                child: Container(
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator(
+                    color: Colors.orange,
+                  ),
+                ),
+              ),
             );
           },
         ),
@@ -471,7 +575,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _checkoutOptionLine({
+  Widget _checkoutBottomSheetContent({
     required String title,
     String? content,
     bool isPayment = false,
@@ -509,8 +613,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                       children: [
                         isPayment
                             ? SizedBox(
-                                height: 19.height,
-                                width: 25.width,
+                                height: 23.height,
+                                width: 35.width,
                                 child: _selectedPaymentMethodIcon,
                               )
                             : Text(
@@ -536,6 +640,67 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _paymentMethodOption(
+    PaymentEnum paymentEnum,
+    Widget paymentMethodIcon,
+  ) {
+    return RadioListTile(
+      title: Row(
+        children: [
+          SizedBox(
+            height: 33.height,
+            width: 50.width,
+            child: paymentMethodIcon,
+          ),
+          7.horizontalSpace,
+          Text(ValueRender.getPaymentMethodFromEnum(paymentEnum)),
+        ],
+      ),
+      value: paymentEnum,
+      groupValue: _selectedPaymentMethod,
+      activeColor: Colors.orange,
+      onChanged: (value) => onPressPaymentMethodRadioButton(
+        value,
+        paymentMethodIcon,
+      ),
+    );
+  }
+
+  Widget _deliveryTypeOption(DeliveryEnum deliveryEnum) {
+    return RadioListTile(
+      title: Text(ValueRender.getDeliveryTypeFromEnum(deliveryEnum)),
+      value: deliveryEnum,
+      groupValue: _selectedDeliveryType,
+      activeColor: Colors.orange,
+      onChanged: onPressDeliveryTypeRadioButton,
+    );
+  }
+
+  Widget _checkoutPopupContent({bool isDeliveryType = true}) {
+    return Material(
+      color: Colors.transparent,
+      child: Column(
+        children: [
+          if (isDeliveryType)
+            ...List<Widget>.generate(
+              _deliveryTypeList.length,
+              (index) => _deliveryTypeOption(
+                _deliveryTypeList[index],
+              ),
+            )
+          else
+            ...List<Widget>.generate(
+              _paymentMethodList.length,
+              (index) => _paymentMethodOption(
+                _paymentMethodList[index],
+                _paymentImageIconList[index],
+              ),
+            )
+        ],
       ),
     );
   }
