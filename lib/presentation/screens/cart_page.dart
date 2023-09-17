@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
+import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
 import 'package:fashionstore/data/enum/delivery_enum.dart';
@@ -16,7 +17,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:side_sheet/side_sheet.dart';
 
-import '../../config/app_router/app_router_path.dart';
 import '../../data/enum/navigation_name_enum.dart';
 import '../../data/enum/payment_enum.dart';
 import '../../data/static/global_variables.dart';
@@ -150,6 +150,16 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
+  void onPressPlaceOrderButton() {
+    // context.router.pushNamed(AppRouterPath.onlinePaymentReceiverInfo);
+    BlocProvider.of<InvoiceBloc>(context).add(
+      OnAddNewOrderEvent(
+        _selectedPaymentMethod.name,
+        _selectedDeliveryType.name,
+      ),
+    );
+  }
+
   void onSelectPaymentMethod({bool isDeliveryType = true}) {
     showCupertinoDialog(
       barrierDismissible: true,
@@ -168,7 +178,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   void paginationScrollEvent() {
     if (_scrollController.position.maxScrollExtent ==
             _scrollController.offset &&
-        !_scrollController.position.outOfRange) {
+        !_scrollController.position.outOfRange &&
+        BlocProvider.of<CartBloc>(context).cartItemList.length <
+            BlocProvider.of<CartBloc>(context).totalCartItemQuantity) {
       setState(() {
         currentOffset = _scrollController.offset;
       });
@@ -275,11 +287,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         },
         child: BlocListener<CartBloc, CartState>(
           listener: (context, cartState) {
-            if (cartState is CartFilteredToCheckoutState) {
-              if (cartState.cartItemList.isNotEmpty) {
-                context.router.pushNamed(AppRouterPath.checkout);
-              }
-            } else if (cartState is CartErrorState) {
+            if (cartState is CartErrorState) {
               UiRender.showDialog(context, '', cartState.message);
             } else if (cartState is AllCartListLoadedState ||
                 cartState is CartFilteredState) {
@@ -551,7 +559,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                     buttonMargin: EdgeInsets.zero,
                     buttonWidth: MediaQuery.of(context).size.width,
                     buttonHeight: 50.height,
-                    onPress: () {},
+                    onPress: onPressPlaceOrderButton,
                   ),
                 ],
               );

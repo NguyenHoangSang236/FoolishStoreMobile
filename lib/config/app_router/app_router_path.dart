@@ -2,7 +2,7 @@ class AppRouterPath {
   static String allCategories = '/allCategories';
   static String allProducts = '/allProducts';
   static String cart = '/cart';
-  static String checkout = '/checkout';
+  static String onlinePaymentReceiverInfo = '/onlinePaymentReceiverInfo';
   static String index = '/index';
   static String initialLoading = '/initialLoading';
   static String login = '/login';

@@ -1,22 +1,17 @@
 import 'package:auto_route/annotations.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../bloc/cart/cart_bloc.dart';
-import '../../data/entity/cart_item.dart';
-import '../../utils/service/loading_service.dart';
 
 @RoutePage()
-class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+class OnlinePaymentReceiverInfoPage extends StatefulWidget {
+  const OnlinePaymentReceiverInfoPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CheckoutPageState();
+  State<StatefulWidget> createState() => _OnlinePaymentReceiverInfoPageState();
 }
 
-class _CheckoutPageState extends State<CheckoutPage> {
-  List<CartItem> _selectedCartItemList = [];
+class _OnlinePaymentReceiverInfoPageState
+    extends State<OnlinePaymentReceiverInfoPage> {
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -25,8 +20,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   void initState() {
-    _selectedCartItemList = CartItem.getSelectedCartItemList(
-        BlocProvider.of<CartBloc>(context).cartItemList);
     super.initState();
   }
 
@@ -36,14 +29,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       scaffoldKey: _scaffoldKey,
       forceCanNotBack: false,
       textEditingController: _textEditingController,
-      pageName: 'Check Out',
+      pageName: 'Online Payment',
       needSearchBar: false,
       body: RefreshIndicator(
         color: Colors.orange,
         key: _refreshIndicatorKey,
-        onRefresh: () async {
-          LoadingService(context).reloadCartPage();
-        },
+        onRefresh: () async {},
         child: SingleChildScrollView(
           controller: _scrollController,
           child: const Column(

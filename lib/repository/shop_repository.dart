@@ -35,7 +35,7 @@ class ShopRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ExceptionFailure(e.toString()));
     }
   }
@@ -48,7 +48,12 @@ class ShopRepository {
 
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
-          ValueRender.getUrl(isAuthen: isAuthen, type: type, url: url));
+        ValueRender.getUrl(
+          isAuthen: isAuthen,
+          type: type,
+          url: url,
+        ),
+      );
 
       if (response.result == 'success') {
         jsonMap = json.decode(jsonEncode(response.content));
@@ -58,7 +63,7 @@ class ShopRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ExceptionFailure(e.toString()));
     }
   }

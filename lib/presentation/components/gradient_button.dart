@@ -1,4 +1,3 @@
-import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/material.dart';
 
 class GradientElevatedButton extends StatefulWidget {
@@ -24,13 +23,14 @@ class GradientElevatedButton extends StatefulWidget {
     this.end = Alignment.centerLeft,
     this.border,
     this.splashColor,
+    this.backgroundColor,
   }) : super(key: key);
 
   final Color textColor;
   final FontWeight textWeight;
   final double textSize;
-  final Color beginColor;
-  final Color endColor;
+  final Color? beginColor;
+  final Color? endColor;
   final Color borderColor;
   final String text;
   final double borderRadiusIndex;
@@ -46,6 +46,7 @@ class GradientElevatedButton extends StatefulWidget {
   final void Function() onPress;
   final BoxBorder? border;
   final Color? splashColor;
+  final Color? backgroundColor;
 
   @override
   State<StatefulWidget> createState() => _GradientElevatedButtonState();
@@ -58,26 +59,31 @@ class _GradientElevatedButtonState extends State<GradientElevatedButton> {
         alignment: Alignment.center,
         height: widget.buttonHeight,
         width: widget.buttonWidth,
+        margin: widget.buttonMargin,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(widget.borderRadiusIndex),
           border: Border.all(
             color: widget.borderColor,
             width: widget.borderWidth,
           ),
-          gradient: LinearGradient(
-            begin: widget.begin,
-            end: widget.end,
-            colors: [
-              widget.beginColor,
-              widget.endColor,
-            ],
-          ),
+          color: widget.backgroundColor,
+          gradient: widget.backgroundColor == null
+              ? LinearGradient(
+                  begin: widget.begin,
+                  end: widget.end,
+                  colors: [
+                    widget.beginColor ?? Colors.white,
+                    widget.endColor ?? Colors.white,
+                  ],
+                )
+              : null,
         ),
         child: ElevatedButton(
           onPressed: widget.onPress,
           style: ElevatedButton.styleFrom(
             foregroundColor: widget.splashColor,
-            backgroundColor: Colors.transparent,
+            backgroundColor: widget.backgroundColor ?? Colors.transparent,
+            padding: EdgeInsets.zero,
             fixedSize: Size(widget.buttonWidth, widget.buttonHeight),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(widget.borderRadiusIndex),
@@ -85,8 +91,8 @@ class _GradientElevatedButtonState extends State<GradientElevatedButton> {
           ),
           child: widget.isLoading
               ? SizedBox(
-                  height: 20.height,
-                  width: 20.width,
+                  height: widget.buttonHeight,
+                  width: widget.buttonWidth,
                   child: CircularProgressIndicator(
                     color: widget.textColor,
                   ),
@@ -94,6 +100,7 @@ class _GradientElevatedButtonState extends State<GradientElevatedButton> {
               : Text(
                   widget.text,
                   textAlign: TextAlign.center,
+                  maxLines: 2,
                   style: TextStyle(
                     fontFamily: 'Be Vietnam Pro',
                     color: widget.textColor,

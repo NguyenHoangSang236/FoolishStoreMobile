@@ -20,22 +20,21 @@ class LoadingService {
   void reloadIndexPage() {
     BlocProvider.of<CategoryBloc>(context).add(OnLoadCategoryEvent());
     BlocProvider.of<ProductBloc>(context)
-        .add(const OnLoadNewArrivalProductListEvent());
-    BlocProvider.of<ProductBloc>(context)
-        .add(const OnLoadTopBestSellerProductListEvent());
-    BlocProvider.of<ProductBloc>(context)
-        .add(const OnLoadHotDiscountProductListEvent());
+      ..add(const OnLoadNewArrivalProductListEvent())
+      ..add(const OnLoadTopBestSellerProductListEvent())
+      ..add(const OnLoadHotDiscountProductListEvent());
     BlocProvider.of<CartBloc>(context).add(OnLoadTotalCartItemQuantityEvent());
   }
 
   void selectToViewProduct(Product product) {
     BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
-    BlocProvider.of<ProductDetailsBloc>(context).add(
-      OnSelectProductEvent(product.productId),
-    );
-    BlocProvider.of<ProductDetailsBloc>(context).add(
-      OnSelectProductColorEvent(product.color),
-    );
+    BlocProvider.of<ProductDetailsBloc>(context)
+      ..add(
+        OnSelectProductEvent(product.productId),
+      )
+      ..add(
+        OnSelectProductColorEvent(product.color),
+      );
     BlocProvider.of<ProductAddToCartBloc>(context).add(
       OnSelectProductAddToCartEvent(
         productName: product.name,
@@ -43,23 +42,25 @@ class LoadingService {
         size: product.size.toLowerCase() == 'none' ? product.size : '',
       ),
     );
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentIdYouLikedListEvent(
-        productColor: product.color,
-        productId: product.id,
-      ),
-    );
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentListEvent(
-        productColor: product.color,
-        productId: product.id,
-      ),
-    );
+    BlocProvider.of<CommentBloc>(context)
+      ..add(
+        OnLoadCommentIdYouLikedListEvent(
+          productColor: product.color,
+          productId: product.id,
+        ),
+      )
+      ..add(
+        OnLoadCommentListEvent(
+          productColor: product.color,
+          productId: product.id,
+        ),
+      );
   }
 
   void reloadCartPage() {
-    BlocProvider.of<CartBloc>(context).add(const OnLoadAllCartListEvent(1, 10));
-    BlocProvider.of<CartBloc>(context).add(OnLoadTotalCartItemQuantityEvent());
+    BlocProvider.of<CartBloc>(context)
+      ..add(const OnLoadAllCartListEvent(1, 10))
+      ..add(OnLoadTotalCartItemQuantityEvent());
   }
 
   void selectCategory(Category category) {

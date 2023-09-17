@@ -29,7 +29,7 @@ class TranslatorRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ApiFailure(e.toString()));
     }
   }

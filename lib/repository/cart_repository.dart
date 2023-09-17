@@ -16,8 +16,10 @@ class CartRepository {
   String type = 'cart';
 
   Future<Either<Failure, List<CartItem>>> sendPostAndGetCartItemList(
-      String url, Map<String, dynamic> paramBody,
-      {bool isAuthen = false}) async {
+    String url,
+    Map<String, dynamic> paramBody, {
+    bool isAuthen = false,
+  }) async {
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
         ValueRender.getUrl(
@@ -36,7 +38,7 @@ class CartRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ExceptionFailure(e.toString()));
     }
   }
@@ -59,7 +61,7 @@ class CartRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ExceptionFailure(e.toString()));
     }
   }

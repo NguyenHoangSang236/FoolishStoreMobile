@@ -12,6 +12,7 @@ import 'package:fashionstore/repository/cart_repository.dart';
 import 'package:fashionstore/repository/category_repository.dart';
 import 'package:fashionstore/repository/comment_repository.dart';
 import 'package:fashionstore/repository/google_drive_repository.dart';
+import 'package:fashionstore/repository/invoice_repository.dart';
 import 'package:fashionstore/repository/shop_repository.dart';
 import 'package:fashionstore/repository/translator_repository.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'bloc/invoice/invoice_bloc.dart';
 import 'bloc/productDetails/product_details_bloc.dart';
 import 'bloc/productSearching/product_searching_bloc.dart';
 import 'bloc/products/product_bloc.dart';
@@ -51,6 +53,8 @@ void main() async {
             create: (context) => CommentRepository()),
         RepositoryProvider<GoogleDriveRepository>(
             create: (context) => GoogleDriveRepository()),
+        RepositoryProvider<InvoiceRepository>(
+            create: (context) => InvoiceRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -83,12 +87,17 @@ void main() async {
           BlocProvider<UploadFileBloc>(
               create: (context) => UploadFileBloc(
                   RepositoryProvider.of<GoogleDriveRepository>(context))),
+          BlocProvider<InvoiceBloc>(
+              create: (context) => InvoiceBloc(
+                  RepositoryProvider.of<InvoiceRepository>(context))),
         ],
         child: const MyApp(),
       ),
     ),
   );
 }
+
+final appRouter = AppRouter();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -98,8 +107,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _appRouter = AppRouter();
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -108,7 +115,7 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp.router(
-          routerConfig: _appRouter.config(),
+          routerConfig: appRouter.config(),
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primarySwatch: Colors.blue,

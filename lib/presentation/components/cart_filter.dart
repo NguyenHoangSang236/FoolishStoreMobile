@@ -1,4 +1,5 @@
 import 'package:fashionstore/utils/extension/number_extension.dart';
+import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,7 +45,7 @@ class _CartFilterState extends State<CartFilter> {
       brandFilterController.clear();
       checkBoxValueList = [false, false];
     });
-    BlocProvider.of<CartBloc>(context).add(const OnLoadAllCartListEvent(1, 10));
+    LoadingService(context).reloadCartPage();
   }
 
   @override
@@ -126,8 +127,8 @@ class _CartFilterState extends State<CartFilter> {
           ),
           GradientElevatedButton(
             border: Border.all(color: Colors.orange),
-            endColor: Colors.white,
-            beginColor: Colors.white,
+            borderColor: Colors.orange,
+            backgroundColor: Colors.white,
             text: 'Clear filter',
             textColor: Colors.orange,
             onPress: onPressClearFilterButton,

@@ -37,18 +37,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         response.fold(
           (failure) => emit(CartErrorState(failure.message)),
           (list) {
-            if (event.page != currentPage) {
+            if (event.page != currentPage && list.isNotEmpty) {
               cartItemList = _removeDuplicates([...cartItemList, ...list]);
               currentPage = list.isNotEmpty ? event.page : currentPage;
               isFiltered = false;
               currentBrandFilter = '';
               currentNameFilter = '';
               currentFilterOption.clear();
+
+              emit(AllCartListLoadedState(cartItemList));
             } else {
               cartItemList = list;
             }
-
-            emit(AllCartListLoadedState(cartItemList));
           },
         );
       } catch (e) {

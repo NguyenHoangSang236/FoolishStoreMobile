@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/enum/local_storage_key_enum.dart';
 import 'package:fashionstore/utils/local_storage/local_storage_service.dart';
@@ -36,7 +34,7 @@ class AuthenticationRepository {
         return Left(ApiFailure(response.content));
       }
     } catch (e, stackTrace) {
-      debugPrint('Caught exception: $e\n$stackTrace');
+      debugPrint('Caught Exception: $e\n$stackTrace');
       return Left(ExceptionFailure(e.toString()));
     }
   }

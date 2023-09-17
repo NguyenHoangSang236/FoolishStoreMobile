@@ -10,7 +10,6 @@
 part of 'app_router_config.dart';
 
 abstract class _$AppRouter extends RootStackRouter {
-  // ignore: unused_element
   _$AppRouter({super.navigatorKey});
 
   @override
@@ -38,12 +37,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const CartPage(),
       );
     },
-    CheckoutRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const CheckoutPage(),
-      );
-    },
     IndexRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -60,6 +53,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const LoginPage(),
+      );
+    },
+    OnlinePaymentReceiverInfoRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const OnlinePaymentReceiverInfoPage(),
       );
     },
     ProductDetailsRoute.name: (routeData) {
@@ -150,20 +149,6 @@ class CartRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [CheckoutPage]
-class CheckoutRoute extends PageRouteInfo<void> {
-  const CheckoutRoute({List<PageRouteInfo>? children})
-      : super(
-          CheckoutRoute.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'CheckoutRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
 /// [IndexPage]
 class IndexRoute extends PageRouteInfo<void> {
   const IndexRoute({List<PageRouteInfo>? children})
@@ -201,6 +186,20 @@ class LoginRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'LoginRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [OnlinePaymentReceiverInfoPage]
+class OnlinePaymentReceiverInfoRoute extends PageRouteInfo<void> {
+  const OnlinePaymentReceiverInfoRoute({List<PageRouteInfo>? children})
+      : super(
+          OnlinePaymentReceiverInfoRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'OnlinePaymentReceiverInfoRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
