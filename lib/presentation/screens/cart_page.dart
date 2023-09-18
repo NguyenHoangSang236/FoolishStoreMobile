@@ -312,6 +312,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                           _selectedPaymentMethod.name,
                         ),
                       ),
+                      context.router.pop(),
                     },
                   );
                 } else if (invoiceState
