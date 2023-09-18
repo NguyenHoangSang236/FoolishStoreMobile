@@ -72,8 +72,10 @@ class _CartItemComponentState extends State<CartItemComponent> {
             clipBehavior: Clip.none,
             children: [
               Container(
+                constraints: BoxConstraints(
+                  maxHeight: 150.height,
+                ),
                 width: MediaQuery.of(context).size.width - 50.width,
-                height: 100.height,
                 margin: EdgeInsets.fromLTRB(8.width, 12.height, 0, 12.height),
                 padding: EdgeInsets.all(10.size),
                 decoration: BoxDecoration(
@@ -92,47 +94,43 @@ class _CartItemComponentState extends State<CartItemComponent> {
                     ),
                     Expanded(
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    widget.cartItem.name +
-                                        (widget.cartItem.size.toLowerCase() !=
-                                                'none'
-                                            ? ' - Size: ${widget.cartItem.size.toUpperCase()} '
-                                            : ''),
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      color: const Color(0xff626262),
-                                      fontFamily: 'Work Sans',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16.size,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  widget.cartItem.brand.toUpperCase(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.cartItem.name +
+                                    (widget.cartItem.size.toLowerCase() !=
+                                            'none'
+                                        ? ' - Size: ${widget.cartItem.size.toUpperCase()} '
+                                        : ''),
+                                maxLines: 2,
+                                style: TextStyle(
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: const Color(0xff868686),
-                                    fontFamily: 'Work Sans',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 13.size,
-                                    height: 1.5.height,
-                                  ),
+                                  color: const Color(0xff626262),
+                                  fontFamily: 'Work Sans',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16.size,
                                 ),
-                              ],
-                            ),
+                              ),
+                              Text(
+                                widget.cartItem.brand.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(0xff868686),
+                                  fontFamily: 'Work Sans',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13.size,
+                                  height: 1.5.height,
+                                ),
+                              ),
+                            ],
                           ),
-                          Expanded(
-                            flex: 1,
+                          SizedBox(
+                            height: 27.height,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

@@ -11,6 +11,11 @@ part 'invoice_state.dart';
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
   final InvoiceRepository _invoiceRepository;
 
+  OnlinePaymentInfo? currentOnlinePaymentInfo;
+  int currentAddedInvoiceId = 0;
+  String currentPaymentMethod = '';
+  String currentDeliveryType = '';
+
   InvoiceBloc(this._invoiceRepository) : super(InvoiceInitial()) {
     on<OnAddNewOrderEvent>((event, emit) async {
       emit(InvoiceLoadingState());
@@ -23,7 +28,14 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
 
         response.fold(
           (failure) => emit(InvoiceErrorState(failure.message)),
-          (message) => emit(InvoiceAddedState(message)),
+          (message) {
+            String invoiceIdFromMsg = message.substring(
+                message.indexOf('ID') + 3, message.indexOf('has'));
+
+            currentAddedInvoiceId = int.parse(invoiceIdFromMsg);
+
+            emit(InvoiceAddedState(message));
+          },
         );
       } catch (e) {
         debugPrint(e.toString());
@@ -42,9 +54,14 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
 
         response.fold(
           (failure) => emit(InvoiceErrorState(failure.message)),
-          (onlinePaymentInfo) => emit(
-            InvoiceOnlinePaymentInfoLoadedState(onlinePaymentInfo),
-          ),
+          (onlinePaymentInfo) {
+            currentPaymentMethod = event.paymentMethod;
+            currentOnlinePaymentInfo = onlinePaymentInfo;
+
+            emit(
+              InvoiceOnlinePaymentInfoLoadedState(onlinePaymentInfo),
+            );
+          },
         );
       } catch (e) {
         debugPrint(e.toString());

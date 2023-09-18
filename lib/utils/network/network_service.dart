@@ -11,7 +11,7 @@ import '../render/value_render.dart';
 import 'failure.dart';
 
 class NetworkService {
-  static String domain = 'https://192.168.1.8:8080';
+  static String domain = 'https://192.168.1.9:8080';
 
   const NetworkService._();
 
@@ -30,6 +30,12 @@ class NetworkService {
         // ..add(CookieManager(cookieJar))
         .add(
       InterceptorsWrapper(
+        // onRequest: (options, handler) {
+        //   handler.next(options);
+        // },
+        // onResponse: (response, handler) {
+        //   handler.next(response);
+        // },
         onError: (DioException e, ErrorInterceptorHandler handler) {
           if (e.response!.statusCode == 401 || e.response!.statusCode == 403) {
             debugPrint('You need to login');
@@ -60,6 +66,14 @@ class NetworkService {
         ? await dio.get(domain + url)
         : await dio.post(domain + url, data: formDataParam ?? param);
 
+    debugPrint(domain + url);
+    debugPrint('request: ${param ?? formDataParam.toString()}');
+    debugPrint('header: ${response.headers}');
+    debugPrint('statusCode: ${response.statusCode}');
+    debugPrint('response: ${response.data}');
+    debugPrint(
+        '\n\n---------------------------------END-------------------------------------\n\n');
+
     if (url.contains('/logout')) {
       LocalStorageService.removeLocalStorageData(
         LocalStorageKeyEnum.SAVED_JWT.name,
@@ -79,14 +93,6 @@ class NetworkService {
 
       appRouter.replaceAll([const LoginRoute()]);
     }
-
-    debugPrint(domain + url);
-    debugPrint('request: ${param ?? formDataParam.toString()}');
-    debugPrint('header: ${response.headers}');
-    debugPrint('statusCode: ${response.statusCode}');
-    debugPrint('response: ${response.data}');
-    debugPrint(
-        '\n\n---------------------------------END-------------------------------------\n\n');
 
     final ApiResponse responseModel = ApiResponse.fromJson(response.data);
 

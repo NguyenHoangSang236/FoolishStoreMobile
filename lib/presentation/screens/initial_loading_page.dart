@@ -52,32 +52,36 @@ class _InitialLoadingState extends State<InitialLoadingPage> {
                   context.router.replaceNamed(AppRouterPath.login);
                 }
               },
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  SizedBox(
-                    height: 130.height,
-                    width: 130.height,
-                    child: CircularProgressIndicator(
-                      color: Colors.orangeAccent,
-                      strokeWidth: 6.width,
-                    ),
-                  ),
-                  Positioned(
-                    top: 42.height,
-                    left: 24.width,
-                    child: Text(
-                      'Foolish',
-                      style: TextStyle(
-                        fontFamily: 'Trebuchet MS',
-                        fontWeight: FontWeight.w900,
-                        fontSize: 25.size,
-                        height: 1.5.height,
-                        color: const Color(0xffff8401),
+              child: SizedBox(
+                height: 130.size,
+                width: 130.size,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Center(
+                      child: SizedBox(
+                        height: 130.size,
+                        width: 130.size,
+                        child: CircularProgressIndicator(
+                          color: Colors.orangeAccent,
+                          strokeWidth: 6.width,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    Center(
+                      child: Text(
+                        'Foolish',
+                        style: TextStyle(
+                          fontFamily: 'Trebuchet MS',
+                          fontWeight: FontWeight.w900,
+                          fontSize: 25.size,
+                          height: 1.5.height,
+                          color: const Color(0xffff8401),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

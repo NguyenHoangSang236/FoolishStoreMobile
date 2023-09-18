@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
+import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
 import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:fashionstore/presentation/components/cart_filter.dart';
@@ -285,15 +286,45 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         onRefresh: () async {
           LoadingService(context).reloadCartPage();
         },
-        child: BlocListener<CartBloc, CartState>(
-          listener: (context, cartState) {
-            if (cartState is CartErrorState) {
-              UiRender.showDialog(context, '', cartState.message);
-            } else if (cartState is AllCartListLoadedState ||
-                cartState is CartFilteredState) {
-              _scrollController.jumpTo(currentOffset);
-            }
-          },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<CartBloc, CartState>(
+              listener: (context, cartState) {
+                if (cartState is CartErrorState) {
+                  UiRender.showDialog(context, '', cartState.message);
+                } else if (cartState is AllCartListLoadedState ||
+                    cartState is CartFilteredState) {
+                  _scrollController.jumpTo(currentOffset);
+                }
+              },
+            ),
+            BlocListener<InvoiceBloc, InvoiceState>(
+              listener: (context, invoiceState) {
+                if (invoiceState is InvoiceErrorState) {
+                  UiRender.showDialog(context, '', invoiceState.message);
+                } else if (invoiceState is InvoiceAddedState) {
+                  UiRender.showDialog(context, '', invoiceState.message).then(
+                    (value) => {
+                      BlocProvider.of<InvoiceBloc>(context).add(
+                        OnLoadOnlinePaymentInfoEvent(
+                          BlocProvider.of<InvoiceBloc>(context)
+                              .currentAddedInvoiceId,
+                          _selectedPaymentMethod.name,
+                        ),
+                      ),
+                    },
+                  );
+                } else if (invoiceState
+                    is InvoiceOnlinePaymentInfoLoadedState) {
+                  context.router.pushNamed(
+                    AppRouterPath.onlinePaymentReceiverInfo,
+                  );
+
+                  LoadingService(context).reloadCartPage();
+                }
+              },
+            ),
+          ],
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

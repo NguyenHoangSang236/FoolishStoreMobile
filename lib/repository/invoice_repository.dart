@@ -20,8 +20,8 @@ class InvoiceRepository {
           type: type,
           url: url,
           isAuthen: true,
-          paramBody: param,
         ),
+        param: param,
       );
 
       if (response.result == 'success') {

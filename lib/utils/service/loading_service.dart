@@ -27,49 +27,64 @@ class LoadingService {
   }
 
   void selectToViewProduct(Product product) {
-    BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
-    BlocProvider.of<ProductDetailsBloc>(context)
-      ..add(
-        OnSelectProductEvent(product.productId),
-      )
-      ..add(
-        OnSelectProductColorEvent(product.color),
-      );
-    BlocProvider.of<ProductAddToCartBloc>(context).add(
-      OnSelectProductAddToCartEvent(
-        productName: product.name,
-        color: product.color,
-        size: product.size.toLowerCase() == 'none' ? product.size : '',
-      ),
+    Future.delayed(
+      const Duration(milliseconds: 200),
+      () {
+        BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
+        BlocProvider.of<ProductDetailsBloc>(context)
+          ..add(
+            OnSelectProductEvent(product.productId),
+          )
+          ..add(
+            OnSelectProductColorEvent(product.color),
+          );
+        BlocProvider.of<ProductAddToCartBloc>(context).add(
+          OnSelectProductAddToCartEvent(
+            productName: product.name,
+            color: product.color,
+            size: product.size.toLowerCase() == 'none' ? product.size : '',
+          ),
+        );
+        BlocProvider.of<CommentBloc>(context)
+          ..add(
+            OnLoadCommentIdYouLikedListEvent(
+              productColor: product.color,
+              productId: product.id,
+            ),
+          )
+          ..add(
+            OnLoadCommentListEvent(
+              productColor: product.color,
+              productId: product.id,
+            ),
+          );
+      },
     );
-    BlocProvider.of<CommentBloc>(context)
-      ..add(
-        OnLoadCommentIdYouLikedListEvent(
-          productColor: product.color,
-          productId: product.id,
-        ),
-      )
-      ..add(
-        OnLoadCommentListEvent(
-          productColor: product.color,
-          productId: product.id,
-        ),
-      );
   }
 
   void reloadCartPage() {
-    BlocProvider.of<CartBloc>(context)
-      ..add(const OnLoadAllCartListEvent(1, 10))
-      ..add(OnLoadTotalCartItemQuantityEvent());
+    Future.delayed(
+      const Duration(milliseconds: 200),
+      () {
+        BlocProvider.of<CartBloc>(context)
+          ..add(const OnLoadAllCartListEvent(1, 10))
+          ..add(OnLoadTotalCartItemQuantityEvent());
+      },
+    );
   }
 
   void selectCategory(Category category) {
-    BlocProvider.of<ProductBloc>(context)
-        .add(OnLoadFilterProductListEvent(1, 8, categoryList: [category.name]));
+    Future.delayed(
+      const Duration(milliseconds: 200),
+      () {
+        BlocProvider.of<ProductBloc>(context).add(
+            OnLoadFilterProductListEvent(1, 8, categoryList: [category.name]));
 
-    BlocProvider.of<CategoryBloc>(context)
-        .add(OnSelectedCategoryEvent(category.name));
+        BlocProvider.of<CategoryBloc>(context)
+            .add(OnSelectedCategoryEvent(category.name));
 
-    context.router.replaceNamed(AppRouterPath.allProducts);
+        context.router.replaceNamed(AppRouterPath.allProducts);
+      },
+    );
   }
 }
