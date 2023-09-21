@@ -9,4 +9,5 @@ class AppRouterPath {
   static String productDetails = '/productDetails';
   static String profile = '/profile';
   static String searching = '/searching';
+  static String purchaseHistory = '/purchaseHistory';
 }

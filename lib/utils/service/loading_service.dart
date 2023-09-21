@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
+import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
+import 'package:fashionstore/data/dto/invoice_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +30,7 @@ class LoadingService {
 
   void selectToViewProduct(Product product) {
     Future.delayed(
-      const Duration(milliseconds: 200),
+      const Duration(milliseconds: 150),
       () {
         BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
         BlocProvider.of<ProductDetailsBloc>(context)
@@ -64,7 +66,7 @@ class LoadingService {
 
   void reloadCartPage() {
     Future.delayed(
-      const Duration(milliseconds: 200),
+      const Duration(milliseconds: 150),
       () {
         BlocProvider.of<CartBloc>(context)
           ..add(const OnLoadAllCartListEvent(1, 10))
@@ -73,15 +75,35 @@ class LoadingService {
     );
   }
 
+  void reloadAndClearPurchaseHistoryPage() {
+    Future.delayed(
+      const Duration(milliseconds: 150),
+      () {
+        BlocProvider.of<InvoiceBloc>(context).add(
+          const OnFilterInvoiceEvent(
+            InvoiceFilter(
+              page: 1,
+              limit: 10,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void selectCategory(Category category) {
     Future.delayed(
-      const Duration(milliseconds: 200),
+      const Duration(milliseconds: 150),
       () {
-        BlocProvider.of<ProductBloc>(context).add(
-            OnLoadFilterProductListEvent(1, 8, categoryList: [category.name]));
+        BlocProvider.of<ProductBloc>(context).add(OnLoadFilterProductListEvent(
+          1,
+          8,
+          categoryList: [category.name],
+        ));
 
-        BlocProvider.of<CategoryBloc>(context)
-            .add(OnSelectedCategoryEvent(category.name));
+        BlocProvider.of<CategoryBloc>(context).add(
+          OnSelectedCategoryEvent(category.name),
+        );
 
         context.router.replaceNamed(AppRouterPath.allProducts);
       },

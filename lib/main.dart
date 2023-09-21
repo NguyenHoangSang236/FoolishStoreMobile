@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
+import 'package:fashionstore/config/network/dio_config.dart';
 import 'package:fashionstore/repository/authentication_repository.dart';
 import 'package:fashionstore/repository/cart_repository.dart';
 import 'package:fashionstore/repository/category_repository.dart';
@@ -27,8 +29,14 @@ import 'bloc/products/product_bloc.dart';
 import 'config/app_router/app_router_config.dart';
 import 'config/network/http_client_config.dart';
 
+final appRouter = AppRouter();
+final Dio dio = Dio();
+
 void main() async {
   HttpOverrides.global = HttpClientConfig();
+
+  DioConfig.configBasicOptions(dio);
+  DioConfig.configInterceptors(dio);
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -96,8 +104,6 @@ void main() async {
     ),
   );
 }
-
-final appRouter = AppRouter();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

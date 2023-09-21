@@ -249,12 +249,13 @@ class _AllProductsPageState extends State<AllProductsPage> {
       }
 
       return Container(
-        height: 25.height,
+        constraints: BoxConstraints(
+          maxHeight: 30.height,
+        ),
         margin: EdgeInsets.only(bottom: 20.height, top: 15.height),
         padding: EdgeInsets.symmetric(horizontal: 20.width),
         child: ScrollablePositionedList.builder(
           itemScrollController: _itemScrollController,
-          shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemCount: categoryList.length,

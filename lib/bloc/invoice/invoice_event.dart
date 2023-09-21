@@ -32,3 +32,17 @@ class OnLoadOnlinePaymentInfoEvent extends InvoiceEvent {
 
   const OnLoadOnlinePaymentInfoEvent(this.id, this.paymentMethod);
 }
+
+class OnFilterInvoiceEvent extends InvoiceEvent {
+  final InvoiceFilter invoiceFilter;
+
+  const OnFilterInvoiceEvent(this.invoiceFilter);
+}
+
+class OnLoadNextPageEvent extends InvoiceEvent {
+  const OnLoadNextPageEvent();
+}
+
+class OnClearInvoiceFilterEvent extends InvoiceEvent {
+  const OnClearInvoiceFilterEvent();
+}

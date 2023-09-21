@@ -11,6 +11,7 @@ import '../../presentation/screens/login_page.dart';
 import '../../presentation/screens/online_payment_receiver_info_page.dart';
 import '../../presentation/screens/product_details_page.dart';
 import '../../presentation/screens/profile_page.dart';
+import '../../presentation/screens/purchase_history_page.dart';
 import '../../presentation/screens/searching_page.dart';
 
 part 'app_router_config.gr.dart';
@@ -61,6 +62,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: OnlinePaymentReceiverInfoRoute.page,
           path: AppRouterPath.onlinePaymentReceiverInfo,
+        ),
+        AutoRoute(
+          page: PurchaseHistoryRoute.page,
+          path: AppRouterPath.purchaseHistory,
         ),
       ];
 }

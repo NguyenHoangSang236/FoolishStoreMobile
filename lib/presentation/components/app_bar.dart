@@ -4,6 +4,7 @@ import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/enum/navigation_name_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
+import 'package:fashionstore/presentation/components/side_sheet.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
@@ -46,6 +47,14 @@ class AppBarComponent extends StatefulWidget {
 class _AppBarComponentState extends State<AppBarComponent> {
   final List<Widget> _dropdownMenuList = [];
 
+  void showSideSheet() {
+    SideSheet.left(
+      width: MediaQuery.of(context).size.width * 2 / 3,
+      context: context,
+      body: const SideSheetContent(),
+    );
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,7 +63,6 @@ class _AppBarComponentState extends State<AppBarComponent> {
         GlobalVariable.currentNavBarPage = NavigationNameEnum.PROFILE.name;
         context.router.replaceNamed(AppRouterPath.profile);
       }));
-      _dropdownMenuList.add(_dropdownItem('Purchase history', () {}));
       _dropdownMenuList.add(_dropdownItem('Log out', () {
         BlocProvider.of<AuthenticationBloc>(context).add(
           OnLogoutAuthenticationEvent(),
@@ -103,19 +111,7 @@ class _AppBarComponentState extends State<AppBarComponent> {
                       },
                     )
                   : IconButton(
-                      onPressed: () {
-                        SideSheet.left(
-                          context: context,
-                          body: SingleChildScrollView(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                return null;
-                              },
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: showSideSheet,
                       icon: ImageIcon(
                         const AssetImage('assets/icon/option_icon.png'),
                         size: 27.size,

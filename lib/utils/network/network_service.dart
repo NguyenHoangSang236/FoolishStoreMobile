@@ -19,40 +19,48 @@ class NetworkService {
   static Map<String, String> headers = {'Content-Type': 'application/json'};
 
   // static CookieJar cookieJar = CookieJar();
-  static Dio dio = Dio();
+  // static Dio dio = Dio();
 
   static Future<ApiResponse> getDataFromApi(
     String url, {
     Map<String, dynamic>? param,
     FormData? formDataParam,
   }) async {
-    dio.interceptors
-        // ..add(CookieManager(cookieJar))
-        .add(
-      InterceptorsWrapper(
-        // onRequest: (options, handler) {
-        //   handler.next(options);
-        // },
-        // onResponse: (response, handler) {
-        //   handler.next(response);
-        // },
-        onError: (DioException e, ErrorInterceptorHandler handler) {
-          if (e.response!.statusCode == 401 || e.response!.statusCode == 403) {
-            debugPrint('You need to login');
-            appRouter.replaceAll([const LoginRoute()]);
-          }
-
-          return handler.next(e);
-        },
-      ),
-    );
-    dio.options = BaseOptions(
-      baseUrl: domain,
-      receiveDataWhenStatusError: true,
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    );
+    // dio.interceptors
+    //   // ..add(CookieManager(cookieJar))
+    //   ..add(
+    //     InterceptorsWrapper(
+    //       onError: (DioException e, ErrorInterceptorHandler handler) {
+    //         if (e.response!.statusCode == 401 ||
+    //             e.response!.statusCode == 403) {
+    //           debugPrint('You need to login');
+    //           appRouter.replaceAll([const LoginRoute()]);
+    //         }
+    //
+    //         return handler.next(e);
+    //       },
+    //     ),
+    //   )
+    //   ..add(
+    //     LogInterceptor(
+    //       requestBody: true,
+    //       responseBody: true,
+    //       requestHeader: true,
+    //     ),
+    //   )
+    //   ..add(
+    //     CurlLoggerDioInterceptor(
+    //       printOnSuccess: true,
+    //       convertFormData: true,
+    //     ),
+    //   );
+    // dio.options = BaseOptions(
+    //   baseUrl: domain,
+    //   receiveDataWhenStatusError: true,
+    //   validateStatus: (status) {
+    //     return status! < 500;
+    //   },
+    // );
 
     if (url.contains('/authen')) {
       String jwtFromStorage = await LocalStorageService.getLocalStorageData(
@@ -66,13 +74,13 @@ class NetworkService {
         ? await dio.get(domain + url)
         : await dio.post(domain + url, data: formDataParam ?? param);
 
-    debugPrint(domain + url);
-    debugPrint('request: ${param ?? formDataParam.toString()}');
-    debugPrint('header: ${response.headers}');
-    debugPrint('statusCode: ${response.statusCode}');
-    debugPrint('response: ${response.data}');
-    debugPrint(
-        '\n\n---------------------------------END-------------------------------------\n\n');
+    // debugPrint(domain + url);
+    // debugPrint('request: ${param ?? formDataParam.toString()}');
+    // debugPrint('header: ${response.headers}');
+    // debugPrint('statusCode: ${response.statusCode}');
+    // debugPrint('response: ${response.data}');
+    // debugPrint(
+    //     '\n\n---------------------------------END-------------------------------------\n\n');
 
     if (url.contains('/logout')) {
       LocalStorageService.removeLocalStorageData(

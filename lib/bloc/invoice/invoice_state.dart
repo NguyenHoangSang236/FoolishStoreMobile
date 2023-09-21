@@ -32,6 +32,24 @@ class InvoiceOnlinePaymentInfoLoadedState extends InvoiceState {
   List<Object> get props => [onlinePaymentInfo];
 }
 
+class InvoiceListFilteredState extends InvoiceState {
+  final List<Invoice> invoiceList;
+
+  const InvoiceListFilteredState(this.invoiceList);
+
+  @override
+  List<Object> get props => [invoiceList];
+}
+
+class InvoiceFilterClearedState extends InvoiceState {
+  final String message;
+
+  const InvoiceFilterClearedState(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class InvoiceErrorState extends InvoiceState {
   final String message;
 
