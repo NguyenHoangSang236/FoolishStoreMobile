@@ -64,6 +64,8 @@ dependencies:
   intl: ^0.18.1
   either_dart: ^1.0.0
   curl_logger_dio_interceptor: ^1.0.0
+  web_socket_channel: ^2.4.0
+  stomp_dart_client: ^1.0.0
 
 dev_dependencies:
   flutter_test:

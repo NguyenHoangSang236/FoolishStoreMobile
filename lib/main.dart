@@ -9,6 +9,7 @@ import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
 import 'package:fashionstore/config/network/dio_config.dart';
+import 'package:fashionstore/config/network/web_socket_config.dart';
 import 'package:fashionstore/repository/authentication_repository.dart';
 import 'package:fashionstore/repository/cart_repository.dart';
 import 'package:fashionstore/repository/category_repository.dart';
@@ -21,6 +22,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stomp_dart_client/stomp.dart';
+import 'package:stomp_dart_client/stomp_config.dart';
 
 import 'bloc/invoice/invoice_bloc.dart';
 import 'bloc/productDetails/product_details_bloc.dart';
@@ -31,12 +34,21 @@ import 'config/network/http_client_config.dart';
 
 final appRouter = AppRouter();
 final Dio dio = Dio();
+const String domain = '192.168.1.22';
+final StompClient stompClient = StompClient(
+  config: StompConfig.sockJS(
+    url: 'wss://$domain:8080/wsNotificationEndPoint',
+    onConnect: WebSocketConfig.onConnect,
+  ),
+);
 
 void main() async {
   HttpOverrides.global = HttpClientConfig();
 
   DioConfig.configBasicOptions(dio);
   DioConfig.configInterceptors(dio);
+
+  stompClient.activate();
 
   WidgetsFlutterBinding.ensureInitialized();
 

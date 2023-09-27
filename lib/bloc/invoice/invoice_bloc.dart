@@ -125,7 +125,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       }
     });
 
-    on<OnLoadNextPageEvent>((event, emit) async {
+    on<OnClearInvoiceFilterEvent>((event, emit) async {
       currentOnlinePaymentInfo = null;
       currentInvoiceList = [];
       currentInvoiceFilter = null;

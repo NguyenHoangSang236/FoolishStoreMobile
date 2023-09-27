@@ -11,7 +11,7 @@ import '../render/value_render.dart';
 import 'failure.dart';
 
 class NetworkService {
-  static String domain = 'https://192.168.1.9:8080';
+  static String baseUrl = 'https://$domain:8080';
 
   const NetworkService._();
 
@@ -71,8 +71,8 @@ class NetworkService {
     }
 
     final Response response = (param == null && formDataParam == null)
-        ? await dio.get(domain + url)
-        : await dio.post(domain + url, data: formDataParam ?? param);
+        ? await dio.get(baseUrl + url)
+        : await dio.post(baseUrl + url, data: formDataParam ?? param);
 
     // debugPrint(domain + url);
     // debugPrint('request: ${param ?? formDataParam.toString()}');
