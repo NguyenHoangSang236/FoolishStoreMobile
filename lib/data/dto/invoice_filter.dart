@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class InvoiceFilter extends Equatable {
-  final String? adminAcceptance;
-  final String? paymentMethod;
-  final String? paymentStatus;
-  final String? deliveryStatus;
-  final DateTime? startInvoiceDate;
-  final DateTime? endInvoiceDate;
-  final int? page;
-  final int? limit;
+  String? adminAcceptance;
+  String? paymentMethod;
+  String? paymentStatus;
+  String? deliveryStatus;
+  DateTime? startInvoiceDate;
+  DateTime? endInvoiceDate;
+  int? page;
+  int? limit;
 
-  const InvoiceFilter({
+  InvoiceFilter({
     this.adminAcceptance,
     this.paymentMethod,
     this.paymentStatus,
@@ -21,8 +21,25 @@ class InvoiceFilter extends Equatable {
     this.limit,
   });
 
+  InvoiceFilter get copyValues => InvoiceFilter(
+        adminAcceptance: adminAcceptance,
+        paymentMethod: paymentMethod,
+        paymentStatus: paymentStatus,
+        deliveryStatus: deliveryStatus,
+        startInvoiceDate: startInvoiceDate,
+        endInvoiceDate: endInvoiceDate,
+        page: page,
+        limit: limit,
+      );
+
+  bool isClear() {
+    return adminAcceptance == null &&
+        paymentMethod == null &&
+        paymentStatus == null &&
+        deliveryStatus == null;
+  }
+
   @override
-  // TODO: implement props
   List<Object?> get props => [
         adminAcceptance,
         paymentMethod,

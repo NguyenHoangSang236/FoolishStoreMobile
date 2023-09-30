@@ -44,7 +44,8 @@ class _LoginPageState extends State<LoginPage> {
             LocalStorageKeyEnum.SAVED_USER_NAME.name) as String;
     _passwordTextEditingController.text =
         await LocalStorageService.getLocalStorageData(
-            LocalStorageKeyEnum.SAVED_PASSWORD.name) as String;
+      LocalStorageKeyEnum.SAVED_PASSWORD.name,
+    ) as String;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {

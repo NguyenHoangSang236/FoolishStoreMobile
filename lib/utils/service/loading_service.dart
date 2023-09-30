@@ -79,13 +79,15 @@ class LoadingService {
     Future.delayed(
       const Duration(milliseconds: 150),
       () {
+        InvoiceFilter invoiceFilter = BlocProvider.of<InvoiceBloc>(context)
+            .currentInvoiceFilter
+            .copyValues;
+
+        invoiceFilter.page = 1;
+        invoiceFilter.limit = 10;
+
         BlocProvider.of<InvoiceBloc>(context).add(
-          const OnFilterInvoiceEvent(
-            InvoiceFilter(
-              page: 1,
-              limit: 10,
-            ),
-          ),
+          OnFilterInvoiceEvent(invoiceFilter),
         );
       },
     );

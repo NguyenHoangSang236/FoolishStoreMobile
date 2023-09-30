@@ -5,7 +5,7 @@ import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
 import 'package:fashionstore/data/enum/delivery_enum.dart';
-import 'package:fashionstore/presentation/components/cart_filter.dart';
+import 'package:fashionstore/presentation/components/cart_filter_component.dart';
 import 'package:fashionstore/presentation/components/cart_item_component.dart';
 import 'package:fashionstore/presentation/components/cart_item_details.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
@@ -47,11 +47,11 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     Image.asset('assets/icon/paypal_icon.png'),
     Image.asset('assets/icon/cod_icon.png'),
   ];
-  final List<PaymentEnum> _paymentMethodList = [
-    PaymentEnum.BANK_TRANSFER,
-    PaymentEnum.MOMO,
-    PaymentEnum.PAYPAL,
-    PaymentEnum.COD,
+  final List<PaymentMethodEnum> _paymentMethodList = [
+    PaymentMethodEnum.BANK_TRANSFER,
+    PaymentMethodEnum.MOMO,
+    PaymentMethodEnum.PAYPAL,
+    PaymentMethodEnum.COD,
   ];
   final List<DeliveryEnum> _deliveryTypeList = [
     DeliveryEnum.NORMAL_DELIVERY,
@@ -59,7 +59,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   ];
   late Widget _selectedPaymentMethodIcon;
   late DeliveryEnum _selectedDeliveryType;
-  late PaymentEnum _selectedPaymentMethod;
+  late PaymentMethodEnum _selectedPaymentMethod;
 
   void resetCheckoutInfo() {
     setState(() {
@@ -127,7 +127,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     SideSheet.left(
       context: context,
       width: MediaQuery.of(context).size.width * 3 / 5,
-      body: const CartFilter(),
+      body: const CartFilterComponent(),
     );
   }
 
@@ -225,7 +225,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressPaymentMethodRadioButton(
-    PaymentEnum? paymentEnum,
+    PaymentMethodEnum? paymentEnum,
     Widget paymentIcon,
   ) {
     context.router.pop();
@@ -253,13 +253,13 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     _selectedDeliveryType = _deliveryTypeList.first;
     _selectedPaymentMethod = _paymentMethodList.first;
 
+    if (BlocProvider.of<CartBloc>(context).cartItemList.isEmpty) {
+      LoadingService(context).reloadCartPage();
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initAnimationController();
       _scrollController.addListener(paginationScrollEvent);
-
-      if (BlocProvider.of<CartBloc>(context).cartItemList.isEmpty) {
-        LoadingService(context).reloadCartPage();
-      }
     });
 
     super.initState();
@@ -462,9 +462,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
         if (cartState is CartLoadingState) {
           return UiRender.loadingCircle();
-        }
-
-        if (cartState is AllCartListLoadedState) {
+        } else if (cartState is AllCartListLoadedState) {
           cartItemList = List.from(cartState.cartItemList);
         }
 
@@ -528,8 +526,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                   ),
                   _checkoutBottomSheetContent(
                     title: 'Delivery type',
-                    content: ValueRender.getDeliveryTypeFromEnum(
-                        _selectedDeliveryType),
+                    content: _selectedDeliveryType
+                        .name.formatEnumToUppercaseFirstLetter,
                     onPress: onSelectDeliveryType,
                   ),
                   _checkoutBottomSheetContent(
@@ -685,7 +683,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   Widget _paymentMethodOption(
-    PaymentEnum paymentEnum,
+    PaymentMethodEnum paymentEnum,
     Widget paymentMethodIcon,
   ) {
     return RadioListTile(
@@ -697,7 +695,12 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
             child: paymentMethodIcon,
           ),
           7.horizontalSpace,
-          Text(ValueRender.getPaymentMethodFromEnum(paymentEnum)),
+          Expanded(
+            child: Text(
+              paymentEnum.name.formatEnumToUppercaseFirstLetter,
+              maxLines: 2,
+            ),
+          ),
         ],
       ),
       value: paymentEnum,
@@ -712,7 +715,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   Widget _deliveryTypeOption(DeliveryEnum deliveryEnum) {
     return RadioListTile(
-      title: Text(ValueRender.getDeliveryTypeFromEnum(deliveryEnum)),
+      title: Text(deliveryEnum.name.formatEnumToUppercaseFirstLetter),
       value: deliveryEnum,
       groupValue: _selectedDeliveryType,
       activeColor: Colors.orange,

@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/cart_item.dart';
 import '../../data/entity/product.dart';
-import '../../data/enum/delivery_enum.dart';
 import '../../data/enum/payment_enum.dart';
 
 class ValueRender {
@@ -141,35 +140,15 @@ class ValueRender {
     return double.parse(result.toStringAsFixed(2));
   }
 
-  static String getDeliveryTypeFromEnum(DeliveryEnum deliveryEnum) {
-    return deliveryEnum == DeliveryEnum.EXPRESS_DELIVERY
-        ? 'Express delivery'
-        : deliveryEnum == DeliveryEnum.NORMAL_DELIVERY
-            ? 'Normal delivery'
-            : 'Undefined';
-  }
-
-  static String getPaymentMethodFromEnum(PaymentEnum paymentEnum) {
-    return paymentEnum == PaymentEnum.PAYPAL
-        ? 'Paypal'
-        : paymentEnum == PaymentEnum.MOMO
-            ? 'Momo'
-            : paymentEnum == PaymentEnum.COD
-                ? 'COD'
-                : paymentEnum == PaymentEnum.BANK_TRANSFER
-                    ? 'Master card'
-                    : 'Undefined';
-  }
-
-  static Widget getPaymentMethodIconFromEnum(PaymentEnum paymentEnum) {
+  static Widget getPaymentMethodIconFromEnum(PaymentMethodEnum paymentEnum) {
     return Image.asset(
-      paymentEnum == PaymentEnum.BANK_TRANSFER
+      paymentEnum == PaymentMethodEnum.BANK_TRANSFER
           ? 'assets/icon/master_card_icon.png'
-          : paymentEnum == PaymentEnum.PAYPAL
+          : paymentEnum == PaymentMethodEnum.PAYPAL
               ? 'assets/icon/paypal_icon.png'
-              : paymentEnum == PaymentEnum.COD
+              : paymentEnum == PaymentMethodEnum.COD
                   ? 'assets/icon/cod_icon.png'
-                  : paymentEnum == PaymentEnum.MOMO
+                  : paymentEnum == PaymentMethodEnum.MOMO
                       ? 'assets/icon/momo_icon.png'
                       : 'assets/icon/x_icon.png',
     );

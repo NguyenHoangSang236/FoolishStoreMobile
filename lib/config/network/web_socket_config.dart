@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:fashionstore/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
 class WebSocketConfig {
   static void onConnect(StompFrame frame) {
     stompClient.subscribe(
-      destination: '/unauthen/notification/showAllNotifications',
+      destination: '/authen/notification/filterNotifications',
       callback: (frame) {
-        print('subscribe');
-        print(frame.body);
+        debugPrint('subscribe');
+        debugPrint(frame.body);
       },
     );
 
@@ -19,5 +20,19 @@ class WebSocketConfig {
         body: '',
       );
     });
+  }
+
+  static Future<void> beforeConnect() async {}
+
+  static void onStompError(StompFrame frame) {
+    debugPrint('Catch Stomp error: ${frame.body}');
+  }
+
+  static void onWebSocketDone() {
+    debugPrint('Connected to Web socket!');
+  }
+
+  static void onWebSocketError(dynamic error) {
+    debugPrint('Can not to Web Socket, catch: $error');
   }
 }

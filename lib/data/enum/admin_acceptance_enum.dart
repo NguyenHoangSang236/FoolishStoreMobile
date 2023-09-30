@@ -1,4 +1,4 @@
-enum AdminAcceptance {
+enum AdminAcceptanceEnum {
   ACCEPTED,
   WAITING,
   REFUSED,

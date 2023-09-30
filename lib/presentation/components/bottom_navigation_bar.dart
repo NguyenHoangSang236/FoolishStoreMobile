@@ -27,9 +27,9 @@ class _BottomNavigationBarComponentState
   int _selectedNavIndex = 0;
   final List<String> _navNameList = [
     NavigationNameEnum.HOME.name,
-    NavigationNameEnum.CATEGORIES.name,
+    NavigationNameEnum.NOTIFICATION.name,
     NavigationNameEnum.CLOTHINGS.name,
-    NavigationNameEnum.PROFILE.name
+    NavigationNameEnum.CATEGORIES.name,
   ];
   late List<Widget> _navList;
 
@@ -40,8 +40,7 @@ class _BottomNavigationBarComponentState
         'assets/icon/home_icon.png',
         'Home',
         onTap: () {
-          if (GlobalVariable.currentNavBarPage !=
-              NavigationNameEnum.HOME.name) {
+          if (context.router.current.name != AppRouterPath.index) {
             context.router.replaceNamed(AppRouterPath.index);
 
             GlobalVariable.currentNavBarPage = NavigationNameEnum.HOME.name;
@@ -49,15 +48,14 @@ class _BottomNavigationBarComponentState
         },
       ),
       _navBarButton(
-        'assets/icon/category_icon.png',
-        'Categories',
+        'assets/icon/notification_icon.png',
+        'Notification',
         onTap: () {
-          if (GlobalVariable.currentNavBarPage !=
-              NavigationNameEnum.CATEGORIES.name) {
-            context.router.replaceNamed(AppRouterPath.allCategories);
+          if (context.router.current.name != AppRouterPath.notification) {
+            context.router.replaceNamed(AppRouterPath.notification);
 
             GlobalVariable.currentNavBarPage =
-                NavigationNameEnum.CATEGORIES.name;
+                NavigationNameEnum.NOTIFICATION.name;
           }
         },
       ),
@@ -65,26 +63,26 @@ class _BottomNavigationBarComponentState
         'assets/icon/clothing_icon.png',
         'Clothings',
         onTap: () {
-          if (GlobalVariable.currentNavBarPage !=
-              NavigationNameEnum.CLOTHINGS.name) {
+          if (context.router.current.name != AppRouterPath.allProducts) {
             context.router.replaceNamed(AppRouterPath.allProducts);
 
             GlobalVariable.currentNavBarPage =
                 NavigationNameEnum.CLOTHINGS.name;
-            BlocProvider.of<CategoryBloc>(context)
-                .add(const OnSelectedCategoryEvent('All'));
+            BlocProvider.of<CategoryBloc>(context).add(
+              const OnSelectedCategoryEvent('All'),
+            );
           }
         },
       ),
       _navBarButton(
-        'assets/icon/account_icon.png',
-        'Profile',
+        'assets/icon/category_icon.png',
+        'Categories',
         onTap: () {
-          if (GlobalVariable.currentNavBarPage !=
-              NavigationNameEnum.PROFILE.name) {
-            context.router.replaceNamed(AppRouterPath.profile);
+          if (context.router.current.name != AppRouterPath.allCategories) {
+            context.router.replaceNamed(AppRouterPath.allCategories);
 
-            GlobalVariable.currentNavBarPage = NavigationNameEnum.PROFILE.name;
+            GlobalVariable.currentNavBarPage =
+                NavigationNameEnum.CATEGORIES.name;
           }
         },
       ),
@@ -143,8 +141,7 @@ class _BottomNavigationBarComponentState
           right: 0,
           child: _cartButton(
             onTap: () {
-              if (GlobalVariable.currentNavBarPage !=
-                  NavigationNameEnum.CART.name) {
+              if (context.router.current.name != AppRouterPath.cart) {
                 context.router.replaceNamed(AppRouterPath.cart);
 
                 GlobalVariable.currentNavBarPage = NavigationNameEnum.CART.name;
@@ -156,8 +153,11 @@ class _BottomNavigationBarComponentState
     );
   }
 
-  Widget _navBarButton(String iconUrl, String name,
-      {required void Function() onTap}) {
+  Widget _navBarButton(
+    String iconUrl,
+    String name, {
+    required void Function() onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -200,18 +200,16 @@ class _BottomNavigationBarComponentState
         height: 54,
         width: 120,
         decoration: BoxDecoration(
-          color:
-              GlobalVariable.currentNavBarPage == NavigationNameEnum.CART.name
-                  ? Colors.orange
-                  : null,
+          color: context.router.current.path == AppRouterPath.cart
+              ? Colors.orange
+              : null,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40.radius),
             bottomLeft: Radius.circular(40.radius),
           ),
-          gradient:
-              GlobalVariable.currentNavBarPage == NavigationNameEnum.CART.name
-                  ? null
-                  : UiRender.generalLinearGradient(),
+          gradient: context.router.current.path == AppRouterPath.cart
+              ? null
+              : UiRender.generalLinearGradient(),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

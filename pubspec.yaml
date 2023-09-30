@@ -66,6 +66,8 @@ dependencies:
   curl_logger_dio_interceptor: ^1.0.0
   web_socket_channel: ^2.4.0
   stomp_dart_client: ^1.0.0
+  flutter_calendar_carousel: ^2.4.2
+  copy_with_extension: ^5.0.4
 
 dev_dependencies:
   flutter_test:

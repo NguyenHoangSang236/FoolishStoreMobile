@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/dto/invoice_filter.dart';
 import 'package:fashionstore/data/entity/online_payment_info.dart';
+import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/network/network_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,8 +104,10 @@ class InvoiceRepository {
           'paymentMethod': filter.paymentMethod,
           'paymentStatus': filter.paymentStatus,
           'deliveryStatus': filter.deliveryStatus,
-          'startInvoiceDate': filter.startInvoiceDate,
-          'endInvoiceDate': filter.endInvoiceDate,
+          'startInvoiceDate':
+              filter.startInvoiceDate?.dateApiFormat ?? '2020-01-01',
+          'endInvoiceDate': filter.endInvoiceDate?.dateApiFormat ??
+              DateTime.now().dateApiFormat,
         },
         'pagination': {
           'page': filter.page ?? 1,

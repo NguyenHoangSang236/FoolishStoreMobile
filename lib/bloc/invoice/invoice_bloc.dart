@@ -15,11 +15,11 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
 
   OnlinePaymentInfo? currentOnlinePaymentInfo;
   List<Invoice> currentInvoiceList = [];
-  InvoiceFilter? currentInvoiceFilter;
+  InvoiceFilter currentInvoiceFilter = InvoiceFilter();
   int currentPage = 1;
   int currentAddedInvoiceId = 0;
-  String currentPaymentMethod = '';
-  String currentDeliveryType = '';
+  String currentCheckoutPaymentMethod = '';
+  String currentCheckoutDeliveryType = '';
 
   InvoiceBloc(this._invoiceRepository) : super(InvoiceInitial()) {
     on<OnAddNewOrderEvent>((event, emit) async {
@@ -60,7 +60,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         response.fold(
           (failure) => emit(InvoiceErrorState(failure.message)),
           (onlinePaymentInfo) {
-            currentPaymentMethod = event.paymentMethod;
+            currentCheckoutPaymentMethod = event.paymentMethod;
             currentOnlinePaymentInfo = onlinePaymentInfo;
 
             emit(
@@ -104,7 +104,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
 
       try {
         final response = await _invoiceRepository.filterOrders(
-          currentInvoiceFilter!,
+          currentInvoiceFilter,
         );
 
         response.fold(
@@ -128,11 +128,11 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     on<OnClearInvoiceFilterEvent>((event, emit) async {
       currentOnlinePaymentInfo = null;
       currentInvoiceList = [];
-      currentInvoiceFilter = null;
+      currentInvoiceFilter = InvoiceFilter();
       currentPage = 1;
       currentAddedInvoiceId = 0;
-      currentPaymentMethod = '';
-      currentDeliveryType = '';
+      currentCheckoutPaymentMethod = '';
+      currentCheckoutDeliveryType = '';
       emit(const InvoiceFilterClearedState('Invoice filter has been cleared'));
     });
   }

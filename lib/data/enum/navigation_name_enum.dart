@@ -4,4 +4,5 @@ enum NavigationNameEnum {
   CART,
   PROFILE,
   CLOTHINGS,
+  NOTIFICATION,
 }

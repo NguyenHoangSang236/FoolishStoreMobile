@@ -1,3 +1,4 @@
+import 'package:fashionstore/presentation/components/checkbox_selection.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +8,14 @@ import '../../bloc/cart/cart_bloc.dart';
 import '../../data/enum/cart_enum.dart';
 import 'gradient_button.dart';
 
-class CartFilter extends StatefulWidget {
-  const CartFilter({super.key});
+class CartFilterComponent extends StatefulWidget {
+  const CartFilterComponent({super.key});
 
   @override
   State<StatefulWidget> createState() => _CartFilterState();
 }
 
-class _CartFilterState extends State<CartFilter> {
+class _CartFilterState extends State<CartFilterComponent> {
   final TextEditingController brandFilterController = TextEditingController();
   final List<String> filterOptionList = [
     CartEnum.SELECTED.name,
@@ -87,11 +88,8 @@ class _CartFilterState extends State<CartFilter> {
             itemBuilder: (context, index) {
               return Row(
                 children: [
-                  Checkbox(
-                    activeColor: Colors.orange,
-                    checkColor: Colors.white,
-                    value: checkBoxValueList[index],
-                    shape: const CircleBorder(),
+                  CheckBoxSelection(
+                    checkValue: checkBoxValueList[index],
                     onChanged: (value) {
                       setState(() {
                         if (value == true) {
@@ -105,15 +103,7 @@ class _CartFilterState extends State<CartFilter> {
                         checkBoxValueList[index] = value!;
                       });
                     },
-                  ),
-                  Text(
-                    filterOptionTextList[index],
-                    style: TextStyle(
-                      fontFamily: 'Sen',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15.size,
-                      color: const Color(0xFF464646),
-                    ),
+                    content: filterOptionTextList[index],
                   ),
                 ],
               );

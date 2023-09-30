@@ -5,7 +5,6 @@ import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
-import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,7 +47,7 @@ class _OnlinePaymentReceiverInfoPageState
         onRefresh: () async => BlocProvider.of<InvoiceBloc>(context).add(
           OnLoadOnlinePaymentInfoEvent(
             BlocProvider.of<InvoiceBloc>(context).currentAddedInvoiceId,
-            BlocProvider.of<InvoiceBloc>(context).currentPaymentMethod,
+            BlocProvider.of<InvoiceBloc>(context).currentCheckoutPaymentMethod,
           ),
         ),
         child: SingleChildScrollView(
@@ -84,16 +83,17 @@ class _OnlinePaymentReceiverInfoPageState
                     15.verticalSpace,
                     _onlinePaymentInfoComponent(
                       'Payment method',
-                      ValueRender.getPaymentMethodFromEnum(
-                        PaymentEnum.values.firstWhere(
-                          (element) =>
-                              element.name == paymentInfo?.receiverInfo!.type,
-                        ),
-                      ),
+                      PaymentMethodEnum.values
+                          .firstWhere(
+                            (element) =>
+                                element.name == paymentInfo?.receiverInfo!.type,
+                          )
+                          .name
+                          .formatEnumToUppercaseFirstLetter,
                       false,
                     ),
                     paymentInfo?.receiverInfo?.type ==
-                            PaymentEnum.BANK_TRANSFER.name
+                            PaymentMethodEnum.BANK_TRANSFER.name
                         ? _onlinePaymentInfoComponent(
                             'Bank name',
                             paymentInfo?.receiverInfo!.additionalInfo ??
