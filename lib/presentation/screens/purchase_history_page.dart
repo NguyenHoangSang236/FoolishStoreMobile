@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
+import 'package:fashionstore/config/app_router/app_router_config.dart';
 import 'package:fashionstore/data/dto/invoice_filter.dart';
 import 'package:fashionstore/data/entity/invoice.dart';
 import 'package:fashionstore/presentation/components/calendar.dart';
-import 'package:fashionstore/presentation/components/gradient_button.dart';
 import 'package:fashionstore/presentation/components/invoice_filter_component.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
@@ -33,7 +33,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
   late DateTime _toDate;
   late DateTime _fromDate;
 
-  void onPressFilterButton() {
+  void _onPressFilterButton() {
     SideSheet.left(
       context: context,
       width: MediaQuery.of(context).size.width * 3 / 5,
@@ -81,6 +81,10 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
       return false;
     }
+  }
+
+  void _onTapInvoice(Invoice invoice) {
+    context.router.push(InvoiceDetailsRoute(invoice: invoice));
   }
 
   @override
@@ -139,7 +143,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
                           return IconButton(
                             padding: EdgeInsets.zero,
-                            onPressed: onPressFilterButton,
+                            onPressed: _onPressFilterButton,
                             icon: ImageIcon(
                               const AssetImage(
                                 'assets/icon/filter_icon.png',
@@ -195,11 +199,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 ),
                 BlocConsumer<InvoiceBloc, InvoiceState>(
                   listener: (context, state) {
-                    if (state is InvoiceLoadingState) {
-                      UiRender.showLoaderDialog(context);
-                    } else if (state is InvoiceListFilteredState) {
-                      context.router.pop();
-                    } else if (state is InvoiceErrorState) {
+                    if (state is InvoiceErrorState) {
                       UiRender.showDialog(context, '', state.message);
                     }
                   },
@@ -210,6 +210,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
                     if (state is InvoiceListFilteredState) {
                       invoiceList = state.invoiceList;
+                    } else if (state is InvoiceLoadingState) {
+                      return UiRender.loadingCircle();
                     }
 
                     return Column(
@@ -231,44 +233,53 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
   Widget _invoiceComponent(Invoice invoice) {
     return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.fromLTRB(10.width, 8.height, 10.width, 20.height),
       margin: EdgeInsets.symmetric(vertical: 10.height),
-      decoration: BoxDecoration(
+      child: Material(
         borderRadius: BorderRadius.circular(10.radius),
         color: Colors.white,
-      ),
-      child: Column(
-        children: [
-          _invoiceData(
-            title: "Order ID",
-            data: invoice.id.toString(),
-            isHeader: true,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10.radius),
+          splashColor: Colors.orange,
+          onTap: () => _onTapInvoice(invoice),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding:
+                EdgeInsets.fromLTRB(10.width, 8.height, 10.width, 20.height),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.radius),
+              color: Colors.transparent,
+            ),
+            child: Column(
+              children: [
+                _invoiceData(
+                  title: "Order ID",
+                  data: invoice.id.toString(),
+                  isHeader: true,
+                ),
+                10.verticalSpace,
+                _invoiceData(
+                  title: 'Invoice date',
+                  data: invoice.invoiceDate.dateTime,
+                ),
+                _invoiceData(
+                  title: 'Payment status',
+                  data: invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
+                ),
+                _invoiceData(
+                  title: 'Payment method',
+                  data: invoice
+                      .getPaymentMethod()
+                      .formatEnumToUppercaseFirstLetter,
+                ),
+                _invoiceData(
+                  title: 'Total price',
+                  isPrice: true,
+                  data: invoice.totalPrice.format.dollar,
+                ),
+              ],
+            ),
           ),
-          10.verticalSpace,
-          _invoiceData(
-            title: 'Invoice date',
-            data: invoice.invoiceDate.dateTime,
-          ),
-          _invoiceData(
-            title: 'Payment status',
-            data: invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
-          ),
-          _invoiceData(
-            title: 'Payment method',
-            data: invoice.getPaymentMethod().formatEnumToUppercaseFirstLetter,
-          ),
-          _invoiceData(
-            title: 'Total price',
-            isPrice: true,
-            data: invoice.totalPrice.format.dollar,
-          ),
-          GradientElevatedButton(
-            buttonMargin: EdgeInsets.only(top: 20.height),
-            text: 'View details',
-            onPress: () {},
-          ),
-        ],
+        ),
       ),
     );
   }

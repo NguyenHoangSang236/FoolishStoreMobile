@@ -50,6 +50,16 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const InitialLoadingPage(),
       );
     },
+    InvoiceDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<InvoiceDetailsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: InvoiceDetailsPage(
+          key: args.key,
+          invoice: args.invoice,
+        ),
+      );
+    },
     LoginRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -187,6 +197,44 @@ class InitialLoadingRoute extends PageRouteInfo<void> {
   static const String name = 'InitialLoadingRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [InvoiceDetailsPage]
+class InvoiceDetailsRoute extends PageRouteInfo<InvoiceDetailsRouteArgs> {
+  InvoiceDetailsRoute({
+    Key? key,
+    required Invoice invoice,
+    List<PageRouteInfo>? children,
+  }) : super(
+          InvoiceDetailsRoute.name,
+          args: InvoiceDetailsRouteArgs(
+            key: key,
+            invoice: invoice,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'InvoiceDetailsRoute';
+
+  static const PageInfo<InvoiceDetailsRouteArgs> page =
+      PageInfo<InvoiceDetailsRouteArgs>(name);
+}
+
+class InvoiceDetailsRouteArgs {
+  const InvoiceDetailsRouteArgs({
+    this.key,
+    required this.invoice,
+  });
+
+  final Key? key;
+
+  final Invoice invoice;
+
+  @override
+  String toString() {
+    return 'InvoiceDetailsRouteArgs{key: $key, invoice: $invoice}';
+  }
 }
 
 /// generated route for

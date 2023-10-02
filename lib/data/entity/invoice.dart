@@ -12,6 +12,8 @@ class Invoice {
   DateTime? payDate;
   String deliveryStatus;
   String paymentStatus;
+  String deliveryType;
+  double deliveryFee;
   String paymentMethod;
   String currency;
   String? intent;
@@ -26,6 +28,8 @@ class Invoice {
     this.invoiceDate,
     this.payDate,
     this.deliveryStatus,
+    this.deliveryType,
+    this.deliveryFee,
     this.paymentStatus,
     this.paymentMethod,
     this.currency,
@@ -75,11 +79,11 @@ class Invoice {
                                             DeliveryEnum.SHIPPER_WAITING.name
                                         ? 'Waiting for shipper to take your order'
                                         : deliveryStatus ==
-                                                DeliveryEnum
+                                                DeliveryTypeEnum
                                                     .NORMAL_DELIVERY.name
                                             ? 'Normal delivery'
                                             : deliveryStatus ==
-                                                    DeliveryEnum
+                                                    DeliveryTypeEnum
                                                         .EXPRESS_DELIVERY.name
                                                 ? 'Express delivery'
                                                 : deliveryStatus ==

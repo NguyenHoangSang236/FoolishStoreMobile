@@ -39,6 +39,12 @@ class OnFilterInvoiceEvent extends InvoiceEvent {
   const OnFilterInvoiceEvent(this.invoiceFilter);
 }
 
+class OnLoadInvoiceDetailsEvent extends InvoiceEvent {
+  final int invoiceId;
+
+  const OnLoadInvoiceDetailsEvent(this.invoiceId);
+}
+
 class OnLoadNextPageEvent extends InvoiceEvent {
   const OnLoadNextPageEvent();
 }

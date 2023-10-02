@@ -11,4 +11,5 @@ class AppRouterPath {
   static String searching = '/searching';
   static String purchaseHistory = '/purchaseHistory';
   static String notification = '/notification';
+  static String invoiceDetails = '/invoiceDetails';
 }

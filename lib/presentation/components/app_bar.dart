@@ -61,7 +61,7 @@ class _AppBarComponentState extends State<AppBarComponent> {
       _dropdownMenuList.add(_dropdownItem('My Account', () {}));
       _dropdownMenuList.add(_dropdownItem('My profile', () {
         GlobalVariable.currentNavBarPage = NavigationNameEnum.PROFILE.name;
-        context.router.replaceNamed(AppRouterPath.profile);
+        context.router.pushNamed(AppRouterPath.profile);
       }));
       _dropdownMenuList.add(_dropdownItem('Log out', () {
         BlocProvider.of<AuthenticationBloc>(context).add(

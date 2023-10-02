@@ -47,9 +47,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Layout(
-      forceCanNotBack: true,
       hintSearchBarText: 'What product are you looking for?',
       textEditingController: _textEditingController,
+      needSearchBar: false,
+      needBottomNavBar: false,
       body: RefreshIndicator(
         onRefresh: () async {},
         color: Colors.orange,

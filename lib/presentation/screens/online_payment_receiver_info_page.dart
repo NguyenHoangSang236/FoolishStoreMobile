@@ -41,6 +41,7 @@ class _OnlinePaymentReceiverInfoPageState
       textEditingController: _textEditingController,
       pageName: 'Online Payment',
       needSearchBar: false,
+      needBottomNavBar: false,
       body: RefreshIndicator(
         color: Colors.orange,
         key: _refreshIndicatorKey,

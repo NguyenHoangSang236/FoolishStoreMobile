@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
+import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
@@ -53,26 +54,24 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     PaymentMethodEnum.PAYPAL,
     PaymentMethodEnum.COD,
   ];
-  final List<DeliveryEnum> _deliveryTypeList = [
-    DeliveryEnum.NORMAL_DELIVERY,
-    DeliveryEnum.EXPRESS_DELIVERY,
-  ];
+
   late Widget _selectedPaymentMethodIcon;
-  late DeliveryEnum _selectedDeliveryType;
+  late DeliveryTypeEnum _selectedDeliveryType;
   late PaymentMethodEnum _selectedPaymentMethod;
 
   void resetCheckoutInfo() {
     setState(() {
       _selectedPaymentMethodIcon = _paymentImageIconList.first;
-      _selectedDeliveryType = _deliveryTypeList.first;
       _selectedPaymentMethod = _paymentMethodList.first;
     });
   }
 
   void onPressCheckoutButton() {
     BlocProvider.of<CartBloc>(context).add(
-      OnCheckoutEvent(_selectedDeliveryType),
+      OnCheckoutEvent(DeliveryTypeEnum.values.first),
     );
+
+    BlocProvider.of<DeliveryBloc>(context).add(OnLoadDeliveryTypeEvent());
 
     context.router.pop().then(
           (value) => showModalBottomSheet(
@@ -152,7 +151,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressPlaceOrderButton() {
-    // context.router.pushNamed(AppRouterPath.onlinePaymentReceiverInfo);
     BlocProvider.of<InvoiceBloc>(context).add(
       OnAddNewOrderEvent(
         _selectedPaymentMethod.name,
@@ -212,7 +210,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     }
   }
 
-  void onPressDeliveryTypeRadioButton(DeliveryEnum? deliveryEnum) {
+  void onPressDeliveryTypeRadioButton(DeliveryTypeEnum? deliveryEnum) {
     context.router.pop();
 
     BlocProvider.of<CartBloc>(context).add(
@@ -248,14 +246,14 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    GlobalVariable.currentNavBarPage = NavigationNameEnum.CART.name;
-    _selectedPaymentMethodIcon = _paymentImageIconList.first;
-    _selectedDeliveryType = _deliveryTypeList.first;
-    _selectedPaymentMethod = _paymentMethodList.first;
-
     if (BlocProvider.of<CartBloc>(context).cartItemList.isEmpty) {
       LoadingService(context).reloadCartPage();
     }
+
+    GlobalVariable.currentNavBarPage = NavigationNameEnum.CART.name;
+    _selectedPaymentMethodIcon = _paymentImageIconList.first;
+    // _selectedDeliveryType = _deliveryTypeList.first;
+    _selectedPaymentMethod = _paymentMethodList.first;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initAnimationController();
@@ -288,6 +286,17 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         },
         child: MultiBlocListener(
           listeners: [
+            BlocListener<DeliveryBloc, DeliveryState>(
+                listener: (context, state) {
+              if (state is DeliveryTypeListLoadedState) {
+                setState(() {
+                  _selectedDeliveryType = DeliveryTypeEnum.values.firstWhere(
+                    (element) =>
+                        element.name == state.deliveryTypeList.first.name,
+                  );
+                });
+              }
+            }),
             BlocListener<CartBloc, CartState>(
               listener: (context, cartState) {
                 if (cartState is CartErrorState) {
@@ -403,35 +412,35 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                   fontSize: 16.size,
                 ),
               ),
-              BlocBuilder<CartBloc, CartState>(builder: (context, cartState) {
-                List<CartItem> cartItemList =
-                    BlocProvider.of<CartBloc>(context).cartItemList;
+              BlocBuilder<CartBloc, CartState>(
+                builder: (context, cartState) {
+                  List<CartItem> cartItemList =
+                      BlocProvider.of<CartBloc>(context).cartItemList;
 
-                if (cartState is CartLoadingState) {
-                  return SizedBox(
-                    height: 10.height,
-                    width: 10.width,
-                    child: CircularProgressIndicator(
+                  if (cartState is CartLoadingState) {
+                    return SizedBox(
+                      height: 10.height,
+                      width: 10.width,
+                      child: CircularProgressIndicator(
+                        color: Colors.orange,
+                        strokeWidth: 2.width,
+                      ),
+                    );
+                  } else if (cartState is AllCartListLoadedState) {
+                    cartItemList = cartState.cartItemList;
+                  }
+
+                  return Text(
+                    ValueRender.totalCartPrice(cartItemList).format.dollar,
+                    style: TextStyle(
+                      fontFamily: 'Sen',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16.size,
                       color: Colors.orange,
-                      strokeWidth: 2.width,
                     ),
                   );
-                }
-
-                if (cartState is AllCartListLoadedState) {
-                  cartItemList = cartState.cartItemList;
-                }
-
-                return Text(
-                  ValueRender.totalCartPrice(cartItemList).format.dollar,
-                  style: TextStyle(
-                    fontFamily: 'Sen',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16.size,
-                    color: Colors.orange,
-                  ),
-                );
-              })
+                },
+              )
             ],
           ),
         ),
@@ -524,11 +533,26 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  _checkoutBottomSheetContent(
-                    title: 'Delivery type',
-                    content: _selectedDeliveryType
-                        .name.formatEnumToUppercaseFirstLetter,
-                    onPress: onSelectDeliveryType,
+                  BlocBuilder<DeliveryBloc, DeliveryState>(
+                    builder: (context, state) {
+                      if (state is DeliveryLoadingState) {
+                        return _checkoutBottomSheetContent(
+                          title: 'Delivery type',
+                          content: 'Loading...',
+                        );
+                      } else if (state is DeliveryTypeListLoadedState) {
+                        return _checkoutBottomSheetContent(
+                          title: 'Delivery type',
+                          content: _selectedDeliveryType
+                              .name.formatEnumToUppercaseFirstLetter,
+                          onPress: onSelectDeliveryType,
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 35.height,
+                      );
+                    },
                   ),
                   _checkoutBottomSheetContent(
                     title: 'Payment Method',
@@ -713,7 +737,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _deliveryTypeOption(DeliveryEnum deliveryEnum) {
+  Widget _deliveryTypeOption(DeliveryTypeEnum deliveryEnum) {
     return RadioListTile(
       title: Text(deliveryEnum.name.formatEnumToUppercaseFirstLetter),
       value: deliveryEnum,
@@ -724,15 +748,17 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   Widget _checkoutPopupContent({bool isDeliveryType = true}) {
+    List<DeliveryTypeEnum> list = DeliveryTypeEnum.values;
+
     return Material(
       color: Colors.transparent,
       child: Column(
         children: [
           if (isDeliveryType)
             ...List<Widget>.generate(
-              _deliveryTypeList.length,
+              list.length,
               (index) => _deliveryTypeOption(
-                _deliveryTypeList[index],
+                list[index],
               ),
             )
           else

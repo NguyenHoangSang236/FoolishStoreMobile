@@ -3,10 +3,12 @@ import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/presentation/screens/index_page.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../data/entity/invoice.dart';
 import '../../presentation/screens/all_categories_page.dart';
 import '../../presentation/screens/all_products_page.dart';
 import '../../presentation/screens/cart_page.dart';
 import '../../presentation/screens/initial_loading_page.dart';
+import '../../presentation/screens/invoice_details_page.dart';
 import '../../presentation/screens/login_page.dart';
 import '../../presentation/screens/notification_page.dart';
 import '../../presentation/screens/online_payment_receiver_info_page.dart';
@@ -71,6 +73,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: NotificationRoute.page,
           path: AppRouterPath.notification,
+        ),
+        AutoRoute(
+          page: InvoiceDetailsRoute.page,
+          path: AppRouterPath.invoiceDetails,
         ),
       ];
 }

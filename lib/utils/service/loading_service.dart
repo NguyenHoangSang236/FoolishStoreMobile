@@ -25,7 +25,9 @@ class LoadingService {
       ..add(const OnLoadNewArrivalProductListEvent())
       ..add(const OnLoadTopBestSellerProductListEvent())
       ..add(const OnLoadHotDiscountProductListEvent());
-    BlocProvider.of<CartBloc>(context).add(OnLoadTotalCartItemQuantityEvent());
+    BlocProvider.of<CartBloc>(context)
+      ..add(OnLoadTotalCartItemQuantityEvent())
+      ..add(const OnLoadAllCartListEvent(1, 10));
   }
 
   void selectToViewProduct(Product product) {

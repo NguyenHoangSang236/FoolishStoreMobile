@@ -55,7 +55,9 @@ class _CartItemDetailsState extends State<CartItemDetails> {
         List<String> productColorList = [];
         // get list of products size using product color
         List<String> productSizeList = ValueRender.getProductSizeListByColor(
-            editedCartItem.color, selectedProductDetails);
+          editedCartItem.color,
+          selectedProductDetails,
+        );
 
         if (productDetailsState is ProductDetailsLoadingState) {}
 

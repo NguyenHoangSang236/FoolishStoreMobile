@@ -45,21 +45,21 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
   }
 
   void onPressFilterButton() {
-    BlocProvider.of<InvoiceBloc>(context).add(
-      OnFilterInvoiceEvent(invoiceFilter),
-    );
-
-    context.router.pop();
+    context.router.pop().then(
+          (value) => BlocProvider.of<InvoiceBloc>(context).add(
+            OnFilterInvoiceEvent(invoiceFilter),
+          ),
+        );
   }
 
   void onPressClearFilterButton() {
-    BlocProvider.of<InvoiceBloc>(context).add(
-      const OnClearInvoiceFilterEvent(),
-    );
+    context.router.pop().then((value) {
+      BlocProvider.of<InvoiceBloc>(context).add(
+        const OnClearInvoiceFilterEvent(),
+      );
 
-    LoadingService(context).reloadAndClearPurchaseHistoryPage();
-
-    context.router.pop();
+      LoadingService(context).reloadAndClearPurchaseHistoryPage();
+    });
   }
 
   @override

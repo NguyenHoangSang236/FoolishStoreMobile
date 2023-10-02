@@ -146,7 +146,8 @@ class CartRepository {
     );
   }
 
-  Future<Either<Failure, CartCheckout>> checkout(DeliveryEnum deliveryEnum) {
+  Future<Either<Failure, CartCheckout>> checkout(
+      DeliveryTypeEnum deliveryEnum) {
     return getCartCheckout('/checkout?delivery_type=${deliveryEnum.name}');
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/dto/invoice_filter.dart';
+import 'package:fashionstore/data/entity/invoice_item.dart';
 import 'package:fashionstore/data/entity/online_payment_info.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/network/failure.dart';
@@ -31,6 +32,32 @@ class InvoiceRepository {
 
       if (response.result == 'success') {
         return Right(OnlinePaymentInfo.fromJson(response.content));
+      } else {
+        return Left(ApiFailure(response.content));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught Exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<InvoiceItem>>> getInvoiceItemList(
+    String url,
+  ) async {
+    try {
+      ApiResponse response = await NetworkService.getDataFromApi(
+        ValueRender.getUrl(
+          type: type,
+          url: url,
+          isAuthen: true,
+        ),
+      );
+
+      if (response.result == 'success') {
+        List<dynamic> jsonList = json.decode(jsonEncode(response.content));
+
+        return Right(
+            jsonList.map((json) => InvoiceItem.fromJson(json)).toList());
       } else {
         return Left(ApiFailure(response.content));
       }
@@ -93,6 +120,12 @@ class InvoiceRepository {
         "paymentMethod": paymentMethod,
       },
     );
+  }
+
+  Future<Either<Failure, List<InvoiceItem>>> invoiceItemListFromInvoiceId(
+    int invoiceId,
+  ) {
+    return getInvoiceItemList('/invoice_id=$invoiceId');
   }
 
   Future<Either<Failure, List<Invoice>>> filterOrders(InvoiceFilter filter) {

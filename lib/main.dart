@@ -5,6 +5,7 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
+import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:fashionstore/repository/authentication_repository.dart';
 import 'package:fashionstore/repository/cart_repository.dart';
 import 'package:fashionstore/repository/category_repository.dart';
 import 'package:fashionstore/repository/comment_repository.dart';
+import 'package:fashionstore/repository/delivery_repository.dart';
 import 'package:fashionstore/repository/google_drive_repository.dart';
 import 'package:fashionstore/repository/invoice_repository.dart';
 import 'package:fashionstore/repository/shop_repository.dart';
@@ -34,6 +36,7 @@ final appRouter = AppRouter();
 final Dio dio = Dio();
 
 const String domain = '192.168.1.9';
+// const String domain = '172.16.51.252';
 
 late StompClient stompClient;
 
@@ -68,6 +71,8 @@ void main() async {
             create: (context) => GoogleDriveRepository()),
         RepositoryProvider<InvoiceRepository>(
             create: (context) => InvoiceRepository()),
+        RepositoryProvider<DeliveryRepository>(
+            create: (context) => DeliveryRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -103,6 +108,9 @@ void main() async {
           BlocProvider<InvoiceBloc>(
               create: (context) => InvoiceBloc(
                   RepositoryProvider.of<InvoiceRepository>(context))),
+          BlocProvider<DeliveryBloc>(
+              create: (context) => DeliveryBloc(
+                  RepositoryProvider.of<DeliveryRepository>(context))),
         ],
         child: const MyApp(),
       ),
