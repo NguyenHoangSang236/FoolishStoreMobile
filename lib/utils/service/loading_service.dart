@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
+import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
@@ -91,6 +92,10 @@ class LoadingService {
         BlocProvider.of<InvoiceBloc>(context).add(
           OnFilterInvoiceEvent(invoiceFilter),
         );
+        
+        if(BlocProvider.of<DeliveryBloc>(context).currentDeliveryTypeList.isEmpty) {
+          BlocProvider.of<DeliveryBloc>(context).add(OnLoadDeliveryTypeEvent());
+        }
       },
     );
   }

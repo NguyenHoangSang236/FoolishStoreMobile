@@ -1,8 +1,10 @@
 import 'package:auto_route/annotations.dart';
+import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/data/entity/invoice.dart';
 import 'package:fashionstore/data/entity/invoice_item.dart';
 import 'package:fashionstore/presentation/layout/layout.dart';
+import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
@@ -23,7 +25,8 @@ class InvoiceDetailsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _InvoiceDetailsState();
 }
 
-class _InvoiceDetailsState extends State<InvoiceDetailsPage> {
+class _InvoiceDetailsState extends State<InvoiceDetailsPage>
+    with TickerProviderStateMixin {
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -91,6 +94,14 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage> {
         if (state is InvoiceItemListLoadedState) {
           List<InvoiceItem> invoiceItemList = state.invoiceItemList;
 
+          double totalPrice = 0;
+          int totalQuantity = 0;
+
+          for (InvoiceItem item in invoiceItemList) {
+            totalPrice += item.sellingPrice;
+            totalQuantity += item.quantity;
+          }
+
           return Column(
             children: [
               ListView.builder(
@@ -107,8 +118,40 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage> {
               ),
               20.verticalSpace,
               _invoiceDataLine(
-                'Delivery type',
+                "Invoice date",
+                widget.invoice.invoiceDate.dateTime,
+              ),
+              _invoiceDataLine(
+                "Payment method",
+                widget.invoice.paymentMethod.formatEnumToUppercaseFirstLetter,
+              ),
+              _invoiceDataLine(
+                "Payment status",
+                widget.invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
+              ),
+              _invoiceDataLine(
+                "Delivery status",
+                widget.invoice.deliveryStatus.formatEnumToUppercaseFirstLetter,
+              ),
+              widget.invoice.reason != null && widget.invoice.reason!.isNotEmpty
+                  ? _invoiceDataLine(
+                      'Delivery reason',
+                      widget.invoice.reason ?? '',
+                    )
+                  : const SizedBox(),
+              _invoiceDataLine(
+                'Total items ($totalQuantity)',
+                totalPrice.format.dollar,
+              ),
+              _invoiceDataLine(
                 widget.invoice.deliveryType.formatEnumToUppercaseFirstLetter,
+                BlocProvider.of<DeliveryBloc>(context)
+                    .currentDeliveryTypeList
+                    .firstWhere((element) =>
+                        element.name == widget.invoice.deliveryType)
+                    .price
+                    .format
+                    .dollar,
               ),
               _invoiceDataLine(
                 'Total price (${invoiceItemList.length})',
