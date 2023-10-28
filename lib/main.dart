@@ -35,8 +35,8 @@ import 'config/network/http_client_config.dart';
 final appRouter = AppRouter();
 final Dio dio = Dio();
 
-const String domain = '192.168.1.9';
-// const String domain = '192.168.1.22';
+// const String domain = '172.16.30.142';
+const String domain = '192.168.1.10';
 
 late StompClient stompClient;
 

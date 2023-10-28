@@ -23,6 +23,15 @@ class ProductDetailsLoadedState extends ProductDetailsState {
   List<Object> get props => [productList];
 }
 
+class ProductDetailsColorSelectedState extends ProductDetailsState {
+  final String color;
+
+  const ProductDetailsColorSelectedState(this.color);
+
+  @override
+  List<Object> get props => [color];
+}
+
 class ProductDetailsErrorState extends ProductDetailsState {
   final String message;
 
@@ -31,5 +40,3 @@ class ProductDetailsErrorState extends ProductDetailsState {
   @override
   List<Object> get props => [message];
 }
-
-

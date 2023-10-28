@@ -129,6 +129,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ],
             child: BlocConsumer<ProductDetailsBloc, ProductDetailsState>(
               listener: (context, productState) {
+                if (productState is ProductDetailsColorSelectedState) {
+                  setState(() {
+                    selectedColor = productState.color;
+                  });
+                }
                 if (productState is ProductDetailsLoadedState) {
                   setState(() {
                     selectedImageUrlList =

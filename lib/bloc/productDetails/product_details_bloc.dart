@@ -41,6 +41,7 @@ class ProductDetailsBloc
 
     on<OnSelectProductColorEvent>((event, emit) {
       selectedColor = event.color;
+      emit(ProductDetailsColorSelectedState(selectedColor));
     });
   }
 }

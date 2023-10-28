@@ -88,10 +88,10 @@ class ValueRender {
         productList.where((element) => element.color == color).toList();
 
     List<String> imageUrlList = [
-      coloredSelectedProductList[0].image1 ?? '',
-      coloredSelectedProductList[0].image2 ?? '',
-      coloredSelectedProductList[0].image3 ?? '',
-      coloredSelectedProductList[0].image4 ?? '',
+      coloredSelectedProductList.first.image1 ?? '',
+      coloredSelectedProductList.first.image2 ?? '',
+      coloredSelectedProductList.first.image3 ?? '',
+      coloredSelectedProductList.first.image4 ?? '',
     ];
 
     return imageUrlList.where((element) => element.isNotEmpty).toList();

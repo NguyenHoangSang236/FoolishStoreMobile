@@ -38,10 +38,10 @@ class LoadingService {
         BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
         BlocProvider.of<ProductDetailsBloc>(context)
           ..add(
-            OnSelectProductEvent(product.productId),
+            OnSelectProductColorEvent(product.color),
           )
           ..add(
-            OnSelectProductColorEvent(product.color),
+            OnSelectProductEvent(product.productId),
           );
         BlocProvider.of<ProductAddToCartBloc>(context).add(
           OnSelectProductAddToCartEvent(
@@ -92,8 +92,10 @@ class LoadingService {
         BlocProvider.of<InvoiceBloc>(context).add(
           OnFilterInvoiceEvent(invoiceFilter),
         );
-        
-        if(BlocProvider.of<DeliveryBloc>(context).currentDeliveryTypeList.isEmpty) {
+
+        if (BlocProvider.of<DeliveryBloc>(context)
+            .currentDeliveryTypeList
+            .isEmpty) {
           BlocProvider.of<DeliveryBloc>(context).add(OnLoadDeliveryTypeEvent());
         }
       },

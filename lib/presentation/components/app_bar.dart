@@ -121,22 +121,24 @@ class _AppBarComponentState extends State<AppBarComponent> {
                 GestureDetector(
                   onTap: () {
                     showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (BuildContext context) {
-                          return Dialog(
-                            alignment: Alignment.topRight,
-                            insetPadding: EdgeInsets.only(
-                                top: 67.height,
-                                left: MediaQuery.of(context).size.width / 3),
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: _dropdownMenuList.length,
-                                itemBuilder: (context, index) {
-                                  return _dropdownMenuList[index];
-                                }),
-                          );
-                        });
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          alignment: Alignment.topRight,
+                          insetPadding: EdgeInsets.only(
+                              top: 67.height,
+                              left: MediaQuery.of(context).size.width / 3),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _dropdownMenuList.length,
+                            itemBuilder: (context, index) {
+                              return _dropdownMenuList[index];
+                            },
+                          ),
+                        );
+                      },
+                    );
                   },
                   child: UiRender.buildCachedNetworkImage(
                     context,

@@ -148,6 +148,7 @@ class UiRender {
     String? hintText,
     bool needCenterText = false,
     bool isTranslator = false,
+    TextInputType textInputType = TextInputType.text,
   }) async {
     bool? result = await showPlatformDialog(
       barrierDismissible: true,
@@ -162,6 +163,7 @@ class UiRender {
                 textAlign:
                     needCenterText == true ? TextAlign.center : TextAlign.start,
                 controller: controller,
+                keyboardType: textInputType,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: hintText ?? '',

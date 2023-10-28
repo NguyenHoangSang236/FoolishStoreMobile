@@ -66,6 +66,7 @@ class _ProductDetailsBottomNavigationBarComponentState
   void onPressQuantityButton() {
     UiRender.showSingleTextFieldDialog(
       context,
+      textInputType: TextInputType.number,
       hintText: 'Your quantity...',
       needCenterText: true,
       title: 'Input the quantity you want to purchase!',
@@ -141,6 +142,7 @@ class _ProductDetailsBottomNavigationBarComponentState
             text: widget.textEditingController?.text != ''
                 ? 'Quantity: ${widget.textEditingController?.text}'
                 : 'Input Quantity',
+            textSize: 12.size,
             buttonWidth: 70.width,
             buttonHeight: 40.height,
             borderRadiusIndex: 5.radius,
