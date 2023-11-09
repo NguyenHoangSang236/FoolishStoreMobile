@@ -56,61 +56,92 @@ void main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<CategoryRepository>(
-            create: (context) => CategoryRepository()),
+          create: (context) => CategoryRepository(),
+        ),
         RepositoryProvider<ShopRepository>(
-            create: (context) => ShopRepository()),
+          create: (context) => ShopRepository(),
+        ),
         RepositoryProvider<AuthenticationRepository>(
-            create: (context) => AuthenticationRepository()),
+          create: (context) => AuthenticationRepository(),
+        ),
         RepositoryProvider<CartRepository>(
-            create: (context) => CartRepository()),
+          create: (context) => CartRepository(),
+        ),
         RepositoryProvider<TranslatorRepository>(
-            create: (context) => TranslatorRepository()),
+          create: (context) => TranslatorRepository(),
+        ),
         RepositoryProvider<CommentRepository>(
-            create: (context) => CommentRepository()),
+          create: (context) => CommentRepository(),
+        ),
         RepositoryProvider<GoogleDriveRepository>(
-            create: (context) => GoogleDriveRepository()),
+          create: (context) => GoogleDriveRepository(),
+        ),
         RepositoryProvider<InvoiceRepository>(
-            create: (context) => InvoiceRepository()),
+          create: (context) => InvoiceRepository(),
+        ),
         RepositoryProvider<DeliveryRepository>(
-            create: (context) => DeliveryRepository()),
+          create: (context) => DeliveryRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<CategoryBloc>(
-              create: (context) => CategoryBloc(
-                  RepositoryProvider.of<CategoryRepository>(context))),
+            create: (context) => CategoryBloc(
+              RepositoryProvider.of<CategoryRepository>(context),
+            ),
+          ),
           BlocProvider<ProductBloc>(
-              create: (context) =>
-                  ProductBloc(RepositoryProvider.of<ShopRepository>(context))),
+            create: (context) => ProductBloc(
+              RepositoryProvider.of<ShopRepository>(context),
+            ),
+          ),
           BlocProvider<ProductSearchingBloc>(
-              create: (context) => ProductSearchingBloc(
-                  RepositoryProvider.of<ShopRepository>(context))),
+            create: (context) => ProductSearchingBloc(
+              RepositoryProvider.of<ShopRepository>(context),
+            ),
+          ),
           BlocProvider<ProductDetailsBloc>(
-              create: (context) => ProductDetailsBloc(
-                  RepositoryProvider.of<ShopRepository>(context))),
+            create: (context) => ProductDetailsBloc(
+              RepositoryProvider.of<ShopRepository>(context),
+            ),
+          ),
           BlocProvider<ProductAddToCartBloc>(
               create: (context) => ProductAddToCartBloc()),
           BlocProvider<AuthenticationBloc>(
-              create: (context) => AuthenticationBloc(
-                  RepositoryProvider.of<AuthenticationRepository>(context))),
+            create: (context) => AuthenticationBloc(
+              RepositoryProvider.of<AuthenticationRepository>(context),
+            ),
+          ),
           BlocProvider<CartBloc>(
-              create: (context) =>
-                  CartBloc(RepositoryProvider.of<CartRepository>(context))),
+            create: (context) => CartBloc(
+              RepositoryProvider.of<CartRepository>(context),
+            ),
+          ),
           BlocProvider<TranslatorBloc>(
-              create: (context) => TranslatorBloc(
-                  RepositoryProvider.of<TranslatorRepository>(context))),
+            create: (context) => TranslatorBloc(
+              RepositoryProvider.of<TranslatorRepository>(context),
+            ),
+          ),
           BlocProvider<CommentBloc>(
-              create: (context) => CommentBloc(
-                  RepositoryProvider.of<CommentRepository>(context))),
+            create: (context) => CommentBloc(
+              RepositoryProvider.of<CommentRepository>(context),
+            ),
+          ),
           BlocProvider<UploadFileBloc>(
-              create: (context) => UploadFileBloc(
-                  RepositoryProvider.of<GoogleDriveRepository>(context))),
+            create: (context) => UploadFileBloc(
+              RepositoryProvider.of<GoogleDriveRepository>(context),
+            ),
+          ),
           BlocProvider<InvoiceBloc>(
-              create: (context) => InvoiceBloc(
-                  RepositoryProvider.of<InvoiceRepository>(context))),
+            create: (context) => InvoiceBloc(
+              RepositoryProvider.of<InvoiceRepository>(context),
+            ),
+          ),
           BlocProvider<DeliveryBloc>(
-              create: (context) => DeliveryBloc(
-                  RepositoryProvider.of<DeliveryRepository>(context))),
+            create: (context) => DeliveryBloc(
+              RepositoryProvider.of<DeliveryRepository>(context),
+            ),
+          ),
         ],
         child: const MyApp(),
       ),

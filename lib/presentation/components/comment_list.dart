@@ -40,22 +40,21 @@ class _CommentList extends State<CommentList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CommentBloc, CommentState>(
-      builder: (context, commentState) {
+    return BlocConsumer<CommentBloc, CommentState>(
+      listener: (context, state) {},
+      builder: (context, state) {
         List<int> commentYouLikedIdList =
-            BlocProvider.of<CommentBloc>(context).commentYouLikedIdList;
+            context.read<CommentBloc>().commentYouLikedIdList;
 
-        List<Comment> commentList =
-            BlocProvider.of<CommentBloc>(context).commentList;
+        List<Comment> commentList = context.read<CommentBloc>().commentList;
 
-        int selectedId =
-            BlocProvider.of<CommentBloc>(context).selectedCommentId;
+        int selectedId = context.read<CommentBloc>().selectedCommentId;
 
-        if (commentState is CommentIdYouLikedListLoadedState) {
-          commentYouLikedIdList = commentState.commentIdList;
-        } else if (commentState is CommentListLoadedState && selectedId == 0) {
-          commentList = commentState.commentList;
-        } else if (commentState is CommentLoadingState) {
+        if (state is CommentIdYouLikedListLoadedState) {
+          commentYouLikedIdList = state.commentIdList;
+        } else if (state is CommentListLoadedState && selectedId == 0) {
+          commentList = state.commentList;
+        } else if (state is CommentLoadingState) {
           return UiRender.loadingCircle();
         }
 
@@ -68,13 +67,13 @@ class _CommentList extends State<CommentList> {
                   currentPage++;
                 });
 
-                BlocProvider.of<CommentBloc>(context).add(
-                  OnLoadCommentListEvent(
-                    productColor: widget.productColor,
-                    productId: widget.productId,
-                    page: currentPage,
-                  ),
-                );
+                context.read<CommentBloc>().add(
+                      OnLoadCommentListEvent(
+                        productColor: widget.productColor,
+                        productId: widget.productId,
+                        page: currentPage,
+                      ),
+                    );
               },
               child: commentList.isNotEmpty
                   ? commentList.length % 5 == 0
@@ -110,6 +109,7 @@ class _CommentList extends State<CommentList> {
               commentList.length,
               (index) => CommentComponent(
                 comment: commentList[index],
+                productId: widget.productId,
                 isLiked: commentYouLikedIdList.indexWhere(
                       (element) => element == commentList[index].id,
                     ) >=
@@ -118,16 +118,14 @@ class _CommentList extends State<CommentList> {
               ),
             ),
             TextSenderComponent(
-              sendAction: () {
-                BlocProvider.of<CommentBloc>(context).add(
-                  OnAddCommentEvent(
-                    widget.controller.text,
-                    widget.productColor,
-                    widget.productId,
-                    0,
+              sendAction: () => context.read<CommentBloc>().add(
+                    OnAddCommentEvent(
+                      widget.controller.text,
+                      widget.productColor,
+                      widget.productId,
+                      0,
+                    ),
                   ),
-                );
-              },
               controller: widget.controller,
             ),
           ],

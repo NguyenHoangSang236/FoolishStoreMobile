@@ -40,37 +40,35 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void _scrollListener() {
     if (_scrollController.offset >=
         _scrollController.position.maxScrollExtent) {
-      if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName ==
-              'All' &&
+      if (context.read<CategoryBloc>().selectedCategoryName == 'All' &&
           isLoaded == false) {
         setState(() {
           isLoaded = true;
           currentOffset = _scrollController.offset;
         });
 
-        BlocProvider.of<ProductBloc>(context).add(
-          OnLoadAllProductListEvent(
-            BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
-            8,
-          ),
-        );
-      } else if (BlocProvider.of<CategoryBloc>(context).selectedCategoryName !=
-              'All' &&
+        context.read<ProductBloc>().add(
+              OnLoadAllProductListEvent(
+                context.read<ProductBloc>().currentAllProductListPage + 1,
+                8,
+              ),
+            );
+      } else if (context.read<CategoryBloc>().selectedCategoryName != 'All' &&
           isLoaded == false) {
         setState(() {
           isLoaded = true;
           currentOffset = _scrollController.offset;
         });
 
-        BlocProvider.of<ProductBloc>(context).add(
-          OnLoadFilterProductListEvent(
-            BlocProvider.of<ProductBloc>(context).currentAllProductListPage + 1,
-            8,
-            categoryList: [
-              BlocProvider.of<CategoryBloc>(context).selectedCategoryName
-            ],
-          ),
-        );
+        context.read<ProductBloc>().add(
+              OnLoadFilterProductListEvent(
+                context.read<ProductBloc>().currentAllProductListPage + 1,
+                8,
+                categoryList: [
+                  context.read<CategoryBloc>().selectedCategoryName
+                ],
+              ),
+            );
       }
     }
   }
@@ -78,24 +76,26 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void _reloadPage() {
     setState(() {
       String currentCateName =
-          BlocProvider.of<CategoryBloc>(context).selectedCategoryName;
+          context.read<CategoryBloc>().selectedCategoryName;
 
       isLoaded = false;
       currentOffset = 0;
 
       if (currentCateName == "All") {
         selectedCategoryIndex = 0;
-        BlocProvider.of<ProductBloc>(context).add(
-          const OnLoadAllProductListEvent(1, 8),
-        );
+        context.read<ProductBloc>().add(
+              const OnLoadAllProductListEvent(1, 8),
+            );
       } else {
-        selectedCategoryIndex = BlocProvider.of<CategoryBloc>(context)
+        selectedCategoryIndex = context
+            .read<CategoryBloc>()
             .categoryList
             .indexWhere((element) => element.name == currentCateName);
 
-        BlocProvider.of<ProductBloc>(context).add(
-          OnLoadFilterProductListEvent(1, 8, categoryList: [currentCateName]),
-        );
+        context.read<ProductBloc>().add(
+              OnLoadFilterProductListEvent(1, 8,
+                  categoryList: [currentCateName]),
+            );
       }
     });
   }
@@ -105,17 +105,16 @@ class _AllProductsPageState extends State<AllProductsPage> {
       isLoaded = false;
       currentOffset = 0;
 
-      BlocProvider.of<CategoryBloc>(context).add(OnSelectedCategoryEvent(name));
+      context.read<CategoryBloc>().add(OnSelectedCategoryEvent(name));
     });
 
     if (name == 'All') {
-      BlocProvider.of<ProductBloc>(context)
-          .add(const OnLoadAllProductListEvent(1, 8));
+      context.read<ProductBloc>().add(const OnLoadAllProductListEvent(1, 8));
     } else {
-      BlocProvider.of<ProductBloc>(context).add(OnClearProductListEvent());
-      BlocProvider.of<ProductBloc>(context).add(
-        OnLoadFilterProductListEvent(1, 8, categoryList: [name]),
-      );
+      context.read<ProductBloc>().add(OnClearProductListEvent());
+      context.read<ProductBloc>().add(
+            OnLoadFilterProductListEvent(1, 8, categoryList: [name]),
+          );
     }
   }
 
@@ -127,19 +126,19 @@ class _AllProductsPageState extends State<AllProductsPage> {
       _scrollController.addListener(_scrollListener);
 
       if (widget.isFromCategoryPage == false) {
-        BlocProvider.of<ProductBloc>(context).add(
-          const OnLoadAllProductListEvent(1, 8),
-        );
+        context.read<ProductBloc>().add(
+              const OnLoadAllProductListEvent(1, 8),
+            );
       } else {
         selectedCategoryIndex =
-            BlocProvider.of<CategoryBloc>(context).categoryList.indexOf(
-                  BlocProvider.of<CategoryBloc>(context)
+            context.read<CategoryBloc>().categoryList.indexOf(
+                  context
+                      .read<CategoryBloc>()
                       .categoryList
                       .where(
                         (element) =>
                             element.name ==
-                            BlocProvider.of<CategoryBloc>(context)
-                                .selectedCategoryName,
+                            context.read<CategoryBloc>().selectedCategoryName,
                       )
                       .first,
                 );
@@ -204,26 +203,21 @@ class _AllProductsPageState extends State<AllProductsPage> {
         padding: EdgeInsets.symmetric(horizontal: 10.width, vertical: 5.height),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(40.radius),
-          color: BlocProvider.of<CategoryBloc>(context).selectedCategoryName !=
-                  name
+          color: context.read<CategoryBloc>().selectedCategoryName != name
               ? Colors.white
               : null,
-          gradient:
-              BlocProvider.of<CategoryBloc>(context).selectedCategoryName ==
-                      name
-                  ? UiRender.generalLinearGradient()
-                  : null,
+          gradient: context.read<CategoryBloc>().selectedCategoryName == name
+              ? UiRender.generalLinearGradient()
+              : null,
         ),
         child: Text(
           name,
           style: TextStyle(
             fontFamily: 'Work Sans',
             fontWeight: FontWeight.w400,
-            color:
-                BlocProvider.of<CategoryBloc>(context).selectedCategoryName ==
-                        name
-                    ? Colors.white
-                    : Colors.black,
+            color: context.read<CategoryBloc>().selectedCategoryName == name
+                ? Colors.white
+                : Colors.black,
           ),
         ),
       ),
@@ -234,7 +228,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
     return BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, categoryState) {
       List<Category> categoryList =
-          List.from(BlocProvider.of<CategoryBloc>(context).categoryList);
+          List.from(context.read<CategoryBloc>().categoryList);
 
       if (categoryState is CategoryLoadingState) {
         return UiRender.loadingCircle();
@@ -284,10 +278,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
         List<Product> productList = [];
 
         if (productState is ProductAllListLoadedState) {
-          productList = BlocProvider.of<ProductBloc>(context).allProductList;
+          productList = context.read<ProductBloc>().allProductList;
         } else if (productState is ProductFilteredListLoadedState) {
-          productList =
-              BlocProvider.of<ProductBloc>(context).filteredProductList;
+          productList = context.read<ProductBloc>().filteredProductList;
         }
 
         if (productList.isNotEmpty) {

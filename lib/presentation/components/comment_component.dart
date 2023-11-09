@@ -15,11 +15,13 @@ class CommentComponent extends StatefulWidget {
     required this.comment,
     required this.needBorder,
     this.isLiked = false,
+    required this.productId,
   });
 
   final Comment comment;
   final bool needBorder;
   final bool isLiked;
+  final int productId;
 
   @override
   State<StatefulWidget> createState() => _CommentComponentState();
@@ -30,23 +32,24 @@ class _CommentComponentState extends State<CommentComponent> {
   int currentPage = 1;
   final TextEditingController controller = TextEditingController();
   late bool isReply;
+  late Comment currentComment;
 
   void reloadCommentYouLikeIdList() {
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentIdYouLikedListEvent(
-        productColor: widget.comment.productColor,
-        productId: widget.comment.productId,
-      ),
-    );
+    context.read<CommentBloc>().add(
+          OnLoadCommentIdYouLikedListEvent(
+            productColor: widget.comment.productColor,
+            productId: widget.comment.productId,
+          ),
+        );
   }
 
   void onPressLikeButton() {
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
-        BlocProvider.of<CommentBloc>(context).add(
-          OnReactCommentEvent(widget.comment.id),
-        );
+        context.read<CommentBloc>().add(
+              OnReactCommentEvent(widget.comment.id),
+            );
       },
     );
   }
@@ -55,21 +58,21 @@ class _CommentComponentState extends State<CommentComponent> {
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
-        BlocProvider.of<CommentBloc>(context).add(
-          replyButtonPressed == true
-              ? OnAddReplyCommentEvent(
-                  controller.text,
-                  widget.comment.productColor,
-                  widget.comment.productId,
-                  widget.comment.id,
-                )
-              : OnAddCommentEvent(
-                  controller.text,
-                  widget.comment.productColor,
-                  widget.comment.productId,
-                  widget.comment.id,
-                ),
-        );
+        context.read<CommentBloc>().add(
+              replyButtonPressed == true
+                  ? OnAddReplyCommentEvent(
+                      controller.text,
+                      widget.comment.productColor,
+                      widget.comment.productId,
+                      widget.comment.id,
+                    )
+                  : OnAddCommentEvent(
+                      controller.text,
+                      widget.comment.productColor,
+                      widget.productId,
+                      widget.comment.id,
+                    ),
+            );
         controller.clear();
       },
     );
@@ -80,19 +83,21 @@ class _CommentComponentState extends State<CommentComponent> {
       currentPage++;
     });
 
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadReplyCommentListEvent(
-        productColor: widget.comment.productColor,
-        productId: widget.comment.productId,
-        page: currentPage,
-        replyOn: widget.comment.id,
-      ),
-    );
+    context.read<CommentBloc>().add(
+          OnLoadReplyCommentListEvent(
+            productColor: widget.comment.productColor,
+            productId: widget.comment.productId,
+            page: currentPage,
+            replyOn: widget.comment.id,
+          ),
+        );
   }
 
   @override
   void initState() {
+    currentComment = widget.comment;
     isReply = widget.comment.replyOn != 0;
+
     super.initState();
   }
 
@@ -126,12 +131,12 @@ class _CommentComponentState extends State<CommentComponent> {
                     child: UiRender.buildCachedNetworkImage(
                       context,
                       borderRadius: BorderRadius.circular(50.radius),
-                      ValueRender.getGoogleDriveImageUrl(widget.comment.avatar),
+                      ValueRender.getGoogleDriveImageUrl(currentComment.avatar),
                     ),
                   ),
                   5.horizontalSpace,
                   Text(
-                    widget.comment.name,
+                    currentComment.name,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 13.size,
@@ -142,7 +147,7 @@ class _CommentComponentState extends State<CommentComponent> {
                 ],
               ),
               Text(
-                widget.comment.commentDate.date,
+                currentComment.commentDate.date,
                 style: TextStyle(
                   color: const Color(0xFF979797),
                   fontSize: 11.size,
@@ -154,7 +159,7 @@ class _CommentComponentState extends State<CommentComponent> {
           ),
           12.verticalSpace,
           Text(
-            widget.comment.commentContent,
+            currentComment.commentContent,
             style: TextStyle(
               color: const Color(0xFF626262),
               fontSize: 11.size,
@@ -167,7 +172,7 @@ class _CommentComponentState extends State<CommentComponent> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${widget.comment.likeQuantity} people liked this comment',
+                '${currentComment.likeQuantity} people liked this comment',
                 style: TextStyle(
                   color: const Color(0xFF979797),
                   fontSize: 10.size,
@@ -229,48 +234,50 @@ class _CommentComponentState extends State<CommentComponent> {
                     listener:
                         (BuildContext context, CommentState commentState) {
                       if (commentState is CommentReplyAddedState) {
-                        if (commentState.replyOn == widget.comment.id) {
-                          UiRender.showDialog(
+                        if (commentState.replyOn == currentComment.id) {
+                          UiRender.showSnackBar(
                             context,
-                            '',
                             commentState.message,
                           );
 
-                          BlocProvider.of<CommentBloc>(context).add(
-                            OnLoadReplyCommentListEvent(
-                              productColor: widget.comment.productColor,
-                              productId: widget.comment.productId,
-                              page: currentPage,
-                              replyOn: widget.comment.id,
-                            ),
-                          );
+                          setState(() {
+                            currentComment.replyQuantity++;
+                          });
+
+                          context.read<CommentBloc>().add(
+                                OnLoadReplyCommentListEvent(
+                                  productColor: currentComment.productColor,
+                                  productId: currentComment.productId,
+                                  page: currentPage,
+                                  replyOn: currentComment.id,
+                                ),
+                              );
                         }
                       } else if (commentState is CommentReactedState) {
                         reloadCommentYouLikeIdList();
                       }
                     },
                     builder: (context, commentState) {
-                      List<Comment> repCommentList =
-                          BlocProvider.of<CommentBloc>(context)
-                              .replyCommentList
-                              .where((element) =>
-                                  element.replyOn == widget.comment.id)
-                              .toList();
+                      List<Comment> repCommentList = context
+                          .read<CommentBloc>()
+                          .replyCommentList
+                          .where(
+                              (element) => element.replyOn == currentComment.id)
+                          .toList();
 
-                      int selectedId = BlocProvider.of<CommentBloc>(context)
-                          .selectedCommentId;
+                      int selectedId =
+                          context.read<CommentBloc>().selectedCommentId;
 
                       List<int> commentYouLikedIdList =
-                          BlocProvider.of<CommentBloc>(context)
-                              .commentYouLikedIdList;
+                          context.read<CommentBloc>().commentYouLikedIdList;
 
                       if (commentState is CommentIdYouLikedListLoadedState) {
                         commentYouLikedIdList = commentState.commentIdList;
                       } else if (commentState is CommentReplyLoadingState &&
-                          selectedId == widget.comment.id) {
+                          selectedId == currentComment.id) {
                         return UiRender.loadingCircle();
                       } else if (commentState is CommentReplyListLoadedState &&
-                          selectedId == widget.comment.id) {
+                          selectedId == currentComment.id) {
                         repCommentList = commentState.commentList;
                       }
 
@@ -278,7 +285,7 @@ class _CommentComponentState extends State<CommentComponent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           5.verticalSpace,
-                          if (widget.comment.replyQuantity > 0 &&
+                          if (currentComment.replyQuantity > 0 &&
                               repCommentList.isNotEmpty) ...[
                             GestureDetector(
                               onTap: onPressSeePreviousComments,
@@ -308,20 +315,22 @@ class _CommentComponentState extends State<CommentComponent> {
                                     ) >=
                                     0,
                                 comment: repCommentList[index],
+                                productId: widget.productId,
                                 needBorder: false,
                               ),
                             ),
-                          ] else if (widget.comment.replyQuantity > 0 &&
+                          ] else if (currentComment.replyQuantity > 0 &&
                               repCommentList.isEmpty) ...[
                             GestureDetector(
                               onTap: () {
-                                BlocProvider.of<CommentBloc>(context).add(
-                                  OnLoadReplyCommentListEvent(
-                                    productColor: widget.comment.productColor,
-                                    productId: widget.comment.productId,
-                                    replyOn: widget.comment.id,
-                                  ),
-                                );
+                                context.read<CommentBloc>().add(
+                                      OnLoadReplyCommentListEvent(
+                                        productColor:
+                                            currentComment.productColor,
+                                        productId: currentComment.productId,
+                                        replyOn: currentComment.id,
+                                      ),
+                                    );
                               },
                               child: Row(
                                 children: [
@@ -333,7 +342,7 @@ class _CommentComponentState extends State<CommentComponent> {
                                     ),
                                   ),
                                   Text(
-                                    'See ${widget.comment.replyQuantity} other replies',
+                                    'See ${currentComment.replyQuantity} other replies',
                                     style: TextStyle(
                                       color: const Color(0xFF979797),
                                       fontSize: 10.size,

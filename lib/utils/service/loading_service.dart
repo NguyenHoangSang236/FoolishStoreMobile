@@ -21,46 +21,46 @@ class LoadingService {
   LoadingService(this.context);
 
   void reloadIndexPage() {
-    BlocProvider.of<CategoryBloc>(context).add(OnLoadCategoryEvent());
-    BlocProvider.of<ProductBloc>(context)
+    context.read<CategoryBloc>().add(OnLoadCategoryEvent());
+    context.read<ProductBloc>()
       ..add(const OnLoadNewArrivalProductListEvent())
       ..add(const OnLoadTopBestSellerProductListEvent())
       ..add(const OnLoadHotDiscountProductListEvent());
-    BlocProvider.of<CartBloc>(context)
+    context.read<CartBloc>()
       ..add(OnLoadTotalCartItemQuantityEvent())
       ..add(const OnLoadAllCartListEvent(1, 10));
   }
 
-  void selectToViewProduct(Product product) {
-    Future.delayed(
+  Future<void> selectToViewProduct(Product product) async {
+    return Future.delayed(
       const Duration(milliseconds: 150),
       () {
-        BlocProvider.of<CommentBloc>(context).add(const OnClearCommentEvent());
-        BlocProvider.of<ProductDetailsBloc>(context)
-          ..add(
-            OnSelectProductColorEvent(product.color),
-          )
+        context.read<CommentBloc>().add(const OnClearCommentEvent());
+        context.read<ProductDetailsBloc>()
           ..add(
             OnSelectProductEvent(product.productId),
+          )
+          ..add(
+            OnSelectProductColorEvent(product.color),
           );
-        BlocProvider.of<ProductAddToCartBloc>(context).add(
-          OnSelectProductAddToCartEvent(
-            productName: product.name,
-            color: product.color,
-            size: product.size.toLowerCase() == 'none' ? product.size : '',
-          ),
-        );
-        BlocProvider.of<CommentBloc>(context)
+        context.read<ProductAddToCartBloc>().add(
+              OnSelectProductAddToCartEvent(
+                productName: product.name,
+                color: product.color,
+                size: product.size.toLowerCase() == 'none' ? product.size : '',
+              ),
+            );
+        context.read<CommentBloc>()
           ..add(
             OnLoadCommentIdYouLikedListEvent(
               productColor: product.color,
-              productId: product.id,
+              productId: product.productId,
             ),
           )
           ..add(
             OnLoadCommentListEvent(
               productColor: product.color,
-              productId: product.id,
+              productId: product.productId,
             ),
           );
       },
@@ -71,7 +71,7 @@ class LoadingService {
     Future.delayed(
       const Duration(milliseconds: 150),
       () {
-        BlocProvider.of<CartBloc>(context)
+        context.read<CartBloc>()
           ..add(const OnLoadAllCartListEvent(1, 10))
           ..add(OnLoadTotalCartItemQuantityEvent());
       },
@@ -82,21 +82,18 @@ class LoadingService {
     Future.delayed(
       const Duration(milliseconds: 150),
       () {
-        InvoiceFilter invoiceFilter = BlocProvider.of<InvoiceBloc>(context)
-            .currentInvoiceFilter
-            .copyValues;
+        InvoiceFilter invoiceFilter =
+            context.read<InvoiceBloc>().currentInvoiceFilter.copyValues;
 
         invoiceFilter.page = 1;
         invoiceFilter.limit = 10;
 
-        BlocProvider.of<InvoiceBloc>(context).add(
-          OnFilterInvoiceEvent(invoiceFilter),
-        );
+        context.read<InvoiceBloc>().add(
+              OnFilterInvoiceEvent(invoiceFilter),
+            );
 
-        if (BlocProvider.of<DeliveryBloc>(context)
-            .currentDeliveryTypeList
-            .isEmpty) {
-          BlocProvider.of<DeliveryBloc>(context).add(OnLoadDeliveryTypeEvent());
+        if (context.read<DeliveryBloc>().currentDeliveryTypeList.isEmpty) {
+          context.read<DeliveryBloc>().add(OnLoadDeliveryTypeEvent());
         }
       },
     );
@@ -106,15 +103,15 @@ class LoadingService {
     Future.delayed(
       const Duration(milliseconds: 150),
       () {
-        BlocProvider.of<ProductBloc>(context).add(OnLoadFilterProductListEvent(
-          1,
-          8,
-          categoryList: [category.name],
-        ));
+        context.read<ProductBloc>().add(OnLoadFilterProductListEvent(
+              1,
+              8,
+              categoryList: [category.name],
+            ));
 
-        BlocProvider.of<CategoryBloc>(context).add(
-          OnSelectedCategoryEvent(category.name),
-        );
+        context.read<CategoryBloc>().add(
+              OnSelectedCategoryEvent(category.name),
+            );
 
         context.router.replaceNamed(AppRouterPath.allProducts);
       },

@@ -359,18 +359,19 @@ class _LoginPageState extends State<LoginPage> {
                                                 .text ==
                                             _passwordTextEditingController
                                                 .text)) {
-                                      BlocProvider.of<AuthenticationBloc>(
-                                              context)
-                                          .add(
-                                        OnRegisterAuthenticationEvent(
-                                          _userNameTextEditingController.text,
-                                          _passwordTextEditingController.text,
-                                          _fullNameTextEditingController.text,
-                                          _emailTextEditingController.text,
-                                          _phoneNumberTextEditingController
-                                              .text,
-                                        ),
-                                      );
+                                      context.read<AuthenticationBloc>().add(
+                                            OnRegisterAuthenticationEvent(
+                                              _userNameTextEditingController
+                                                  .text,
+                                              _passwordTextEditingController
+                                                  .text,
+                                              _fullNameTextEditingController
+                                                  .text,
+                                              _emailTextEditingController.text,
+                                              _phoneNumberTextEditingController
+                                                  .text,
+                                            ),
+                                          );
                                     } else if (_confirmPasswordTextEditingController
                                             .text !=
                                         _passwordTextEditingController.text) {

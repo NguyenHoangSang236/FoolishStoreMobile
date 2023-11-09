@@ -64,9 +64,9 @@ class _AppBarComponentState extends State<AppBarComponent> {
         context.router.pushNamed(AppRouterPath.profile);
       }));
       _dropdownMenuList.add(_dropdownItem('Log out', () {
-        BlocProvider.of<AuthenticationBloc>(context).add(
-          OnLogoutAuthenticationEvent(),
-        );
+        context.read<AuthenticationBloc>().add(
+              OnLogoutAuthenticationEvent(),
+            );
         context.router.replaceNamed(AppRouterPath.login);
       }));
     });
@@ -143,9 +143,7 @@ class _AppBarComponentState extends State<AppBarComponent> {
                   child: UiRender.buildCachedNetworkImage(
                     context,
                     ValueRender.getGoogleDriveImageUrl(
-                      BlocProvider.of<AuthenticationBloc>(context)
-                              .currentUser
-                              ?.avatar ??
+                      context.read<AuthenticationBloc>().currentUser?.avatar ??
                           '',
                     ),
                     width: 40.height,
@@ -238,9 +236,9 @@ class _AppBarComponentState extends State<AppBarComponent> {
                               suffixIcon: IconButton(
                                 tooltip: "Translator",
                                 onPressed: () {
-                                  BlocProvider.of<TranslatorBloc>(context).add(
-                                    OnLoadLanguageListTranslatorEvent(),
-                                  );
+                                  context.read<TranslatorBloc>().add(
+                                        OnLoadLanguageListTranslatorEvent(),
+                                      );
 
                                   UiRender.showSingleTextFieldDialog(
                                     context,
@@ -253,24 +251,23 @@ class _AppBarComponentState extends State<AppBarComponent> {
                                       if (widget.translatorEditingController
                                                   ?.text !=
                                               null &&
-                                          BlocProvider.of<TranslatorBloc>(
-                                                      context)
+                                          context
+                                                  .read<TranslatorBloc>()
                                                   .selectedLanguage
                                                   ?.languageCode !=
                                               null) {
-                                        BlocProvider.of<TranslatorBloc>(context)
-                                            .add(
-                                          OnTranslateEvent(
-                                            widget.translatorEditingController
-                                                    ?.text ??
-                                                '',
-                                            BlocProvider.of<TranslatorBloc>(
-                                                        context)
-                                                    .selectedLanguage
-                                                    ?.languageCode ??
-                                                '',
-                                          ),
-                                        );
+                                        context.read<TranslatorBloc>().add(
+                                              OnTranslateEvent(
+                                                widget.translatorEditingController
+                                                        ?.text ??
+                                                    '',
+                                                context
+                                                        .read<TranslatorBloc>()
+                                                        .selectedLanguage
+                                                        ?.languageCode ??
+                                                    '',
+                                              ),
+                                            );
                                       }
                                       widget.translatorEditingController
                                           ?.clear();

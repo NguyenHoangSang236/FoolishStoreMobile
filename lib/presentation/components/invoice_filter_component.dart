@@ -46,17 +46,17 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
 
   void onPressFilterButton() {
     context.router.pop().then(
-          (value) => BlocProvider.of<InvoiceBloc>(context).add(
-            OnFilterInvoiceEvent(invoiceFilter),
-          ),
+          (value) => context.read<InvoiceBloc>().add(
+                OnFilterInvoiceEvent(invoiceFilter),
+              ),
         );
   }
 
   void onPressClearFilterButton() {
     context.router.pop().then((value) {
-      BlocProvider.of<InvoiceBloc>(context).add(
-        const OnClearInvoiceFilterEvent(),
-      );
+      context.read<InvoiceBloc>().add(
+            const OnClearInvoiceFilterEvent(),
+          );
 
       LoadingService(context).reloadAndClearPurchaseHistoryPage();
     });
@@ -64,10 +64,9 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
 
   @override
   void initState() {
-    invoiceFilter = BlocProvider.of<InvoiceBloc>(context)
-            .currentInvoiceFilter
-            ?.copyValues ??
-        InvoiceFilter();
+    invoiceFilter =
+        context.read<InvoiceBloc>().currentInvoiceFilter?.copyValues ??
+            InvoiceFilter();
 
     super.initState();
   }

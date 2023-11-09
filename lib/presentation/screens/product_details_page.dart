@@ -41,34 +41,38 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   List<String> selectedImageUrlList = [];
 
   void reloadCommentList() {
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentListEvent(
-        productColor: selectedColor,
-        productId: selectedProductId,
-        replyOn: 0,
-        page: currentCommentPage,
-      ),
-    );
+    context.read<CommentBloc>().add(
+          OnLoadCommentListEvent(
+            productColor: selectedColor,
+            productId: selectedProductId,
+            replyOn: 0,
+            page: currentCommentPage,
+          ),
+        );
   }
 
   void reloadCommentYouLikeIdList() {
-    BlocProvider.of<CommentBloc>(context).add(
-      OnLoadCommentIdYouLikedListEvent(
-        productColor: selectedColor,
-        productId: selectedProductId,
-      ),
+    context.read<CommentBloc>().add(
+          OnLoadCommentIdYouLikedListEvent(
+            productColor: selectedColor,
+            productId: selectedProductId,
+          ),
+        );
+  }
+
+  void animateScroller() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 1000),
+      curve: Curves.easeInOut,
     );
   }
 
   @override
   void initState() {
-    setState(() {
-      selectedColor =
-          BlocProvider.of<ProductDetailsBloc>(context).selectedColor;
+    selectedColor = context.read<ProductDetailsBloc>().selectedColor;
 
-      selectedProductId =
-          BlocProvider.of<ProductDetailsBloc>(context).selectedProductId;
-    });
+    selectedProductId = context.read<ProductDetailsBloc>().selectedProductId;
     super.initState();
   }
 
@@ -79,12 +83,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       needProductDetailsBottomNavBar: true,
       scaffoldKey: _scaffoldKey,
       textEditingController: _textEditingController,
-      onBack: () => BlocProvider.of<ProductBloc>(context).add(
-        OnDeselectProduct(),
-      ),
+      onBack: () => context.read<ProductBloc>().add(
+            OnDeselectProduct(),
+          ),
       body: RefreshIndicator(
         onRefresh: () async => LoadingService(context).selectToViewProduct(
-          BlocProvider.of<ProductBloc>(context).selectedProductToView!,
+          context.read<ProductBloc>().selectedProductToView!,
         ),
         color: Colors.orange,
         child: SingleChildScrollView(
@@ -96,7 +100,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 listener: (context, cartState) {
                   if (cartState is CartAddedState) {
                     UiRender.showDialog(context, '', cartState.message);
-                    BlocProvider.of<CartBloc>(context)
+                    context
+                        .read<CartBloc>()
                         .add(OnLoadTotalCartItemQuantityEvent());
                   }
                 },
@@ -113,7 +118,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               BlocListener<CommentBloc, CommentState>(
                 listener: (context, commentState) {
                   if (commentState is CommentAddedState) {
-                    UiRender.showDialog(context, '', commentState.message);
+                    UiRender.showSnackBar(context, commentState.message);
 
                     reloadCommentList();
 
@@ -121,6 +126,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       _commentController.clear();
                       _replyController.clear();
                     });
+
+                    animateScroller();
                   } else if (commentState is CommentReactedState) {
                     reloadCommentYouLikeIdList();
                   }
@@ -141,6 +148,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       selectedColor,
                       productState.productList,
                     );
+
+                    selectedProductId =
+                        productState.productList.first.productId;
                   });
                 }
               },
@@ -165,14 +175,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // get list of products first image from different colors
                   List<String> productColorImageUrlList =
                       ValueRender.getProductImagesFromDifferentColors(
-                          selectedProductDetails);
+                    selectedProductDetails,
+                  );
                   // get all colors of a product
                   List<String> productColorList =
                       ValueRender.getProductColorList(selectedProductDetails);
                   // get list of products size using product color
                   List<String> productSizeList =
                       ValueRender.getProductSizeListByColor(
-                          selectedColor, selectedProductDetails);
+                    selectedColor,
+                    selectedProductDetails,
+                  );
 
                   return Column(
                     children: [
@@ -318,13 +331,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               title: 'Rate this product!',
             ).then((ratePoint) {
               if (ratePoint != null && ratePoint > 0) {
-                BlocProvider.of<ProductBloc>(context).add(
-                  OnRateProduct(
-                    selectedProductId,
-                    selectedColor,
-                    ratePoint,
-                  ),
-                );
+                context.read<ProductBloc>().add(
+                      OnRateProduct(
+                        selectedProductId,
+                        selectedColor,
+                        ratePoint,
+                      ),
+                    );
               }
             });
           },
@@ -436,18 +449,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             (index) {
               return GestureDetector(
                 onTap: () {
-                  BlocProvider.of<ProductAddToCartBloc>(context).add(
-                    OnSelectProductAddToCartEvent(
-                      color: productColorList[index],
-                    ),
-                  );
+                  context.read<ProductAddToCartBloc>().add(
+                        OnSelectProductAddToCartEvent(
+                          color: productColorList[index],
+                        ),
+                      );
 
-                  BlocProvider.of<CommentBloc>(context).add(
-                    OnLoadCommentListEvent(
-                      productColor: productColorList[index],
-                      productId: selectedProductId,
-                    ),
-                  );
+                  context.read<CommentBloc>().add(
+                        OnLoadCommentListEvent(
+                          productColor: productColorList[index],
+                          productId: selectedProductId,
+                        ),
+                      );
 
                   setState(() {
                     selectedColor = productColorList[index];
@@ -502,11 +515,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  BlocProvider.of<ProductAddToCartBloc>(context).add(
-                    OnSelectProductAddToCartEvent(
-                      size: productSizeList[index],
-                    ),
-                  );
+                  context.read<ProductAddToCartBloc>().add(
+                        OnSelectProductAddToCartEvent(
+                          size: productSizeList[index],
+                        ),
+                      );
 
                   setState(() {
                     selectedSize = productSizeList[index];

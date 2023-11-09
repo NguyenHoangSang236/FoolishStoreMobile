@@ -58,7 +58,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
   void _filterWithSelectedDate(DateTime selectedDate, bool isFromDate) {
     InvoiceFilter invoiceFilter =
-        BlocProvider.of<InvoiceBloc>(context).currentInvoiceFilter.copyValues;
+        context.read<InvoiceBloc>().currentInvoiceFilter.copyValues;
 
     if (isFromDate) {
       invoiceFilter.startInvoiceDate = selectedDate.dateOnly;
@@ -66,9 +66,9 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       invoiceFilter.endInvoiceDate = selectedDate.dateOnly;
     }
 
-    BlocProvider.of<InvoiceBloc>(context).add(
-      OnFilterInvoiceEvent(invoiceFilter),
-    );
+    context.read<InvoiceBloc>().add(
+          OnFilterInvoiceEvent(invoiceFilter),
+        );
   }
 
   bool _isNewDateUpdatable(
@@ -84,14 +84,11 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
   @override
   void initState() {
-    _toDate = BlocProvider.of<InvoiceBloc>(context)
-            .currentInvoiceFilter
-            .endInvoiceDate ??
+    _toDate = context.read<InvoiceBloc>().currentInvoiceFilter.endInvoiceDate ??
         DateTime.now();
-    _fromDate = BlocProvider.of<InvoiceBloc>(context)
-            .currentInvoiceFilter
-            .startInvoiceDate ??
-        DateTime.parse('2020-01-01');
+    _fromDate =
+        context.read<InvoiceBloc>().currentInvoiceFilter.startInvoiceDate ??
+            DateTime.parse('2020-01-01');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       LoadingService(context).reloadAndClearPurchaseHistoryPage();
@@ -129,12 +126,19 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                     SizedBox(
                       height: 20.size,
                       width: 20.size,
-                      child: BlocBuilder<InvoiceBloc, InvoiceState>(
+                      child: BlocConsumer<InvoiceBloc, InvoiceState>(
+                        listener: (context, state) {
+                          if (state is InvoiceErrorState) {
+                            UiRender.showDialog(context, '', state.message);
+                          } else if (state is InvoiceCanceledState) {
+                            UiRender.showDialog(context, '', state.message);
+                          }
+                        },
                         builder: (context, state) {
-                          bool isInvoiceFilterClear =
-                              BlocProvider.of<InvoiceBloc>(context)
-                                  .currentInvoiceFilter
-                                  .isClear();
+                          bool isInvoiceFilterClear = context
+                              .read<InvoiceBloc>()
+                              .currentInvoiceFilter
+                              .isClear();
 
                           return IconButton(
                             padding: EdgeInsets.zero,
@@ -200,8 +204,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                   },
                   builder: (context, state) {
                     List<Invoice> invoiceList =
-                        BlocProvider.of<InvoiceBloc>(context)
-                            .currentInvoiceList;
+                        context.read<InvoiceBloc>().currentInvoiceList;
 
                     if (state is InvoiceListFilteredState) {
                       invoiceList = state.invoiceList;

@@ -55,15 +55,15 @@ class _CartItemComponentState extends State<CartItemComponent> {
                   selectStatus = 1;
                 }
 
-                BlocProvider.of<CartBloc>(context).add(OnUpdateCartEvent([
-                  CartItemInfo(
-                      widget.cartItem.productId,
-                      widget.cartItem.id,
-                      widget.cartItem.quantity,
-                      widget.cartItem.color,
-                      widget.cartItem.size,
-                      selectStatus)
-                ], needReload: false));
+                context.read<CartBloc>().add(OnUpdateCartEvent([
+                      CartItemInfo(
+                          widget.cartItem.productId,
+                          widget.cartItem.id,
+                          widget.cartItem.quantity,
+                          widget.cartItem.color,
+                          widget.cartItem.size,
+                          selectStatus)
+                    ], needReload: false));
               }),
         ),
         GestureDetector(
@@ -201,11 +201,11 @@ class _CartItemComponentState extends State<CartItemComponent> {
                     color: const Color(0xfff3f3f3),
                     child: IconButton(
                       onPressed: () {
-                        BlocProvider.of<CartBloc>(context).add(
-                          OnRemoveCartItemEvent(
-                            [widget.cartItem.id],
-                          ),
-                        );
+                        context.read<CartBloc>().add(
+                              OnRemoveCartItemEvent(
+                                [widget.cartItem.id],
+                              ),
+                            );
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

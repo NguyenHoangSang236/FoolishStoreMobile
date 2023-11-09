@@ -28,12 +28,12 @@ class _InitialLoadingState extends State<InitialLoadingPage> {
       LocalStorageKeyEnum.SAVED_PASSWORD.name,
     ) as String;
 
-    BlocProvider.of<AuthenticationBloc>(context).add(
-      OnLoginAuthenticationEvent(
-        _savedUserName,
-        _savedPassword,
-      ),
-    );
+    context.read<AuthenticationBloc>().add(
+          OnLoginAuthenticationEvent(
+            _savedUserName,
+            _savedPassword,
+          ),
+        );
   }
 
   @override

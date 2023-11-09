@@ -48,7 +48,7 @@ class _CartItemDetailsState extends State<CartItemDetails> {
     return BlocBuilder<ProductDetailsBloc, ProductDetailsState>(
       builder: (context, productDetailsState) {
         List<Product> selectedProductDetails =
-            BlocProvider.of<ProductDetailsBloc>(context).selectedProductDetails;
+            context.read<ProductDetailsBloc>().selectedProductDetails;
         // get list of products first image from different colors
         List<String> productColorImageUrlList = [];
         // get all colors of a product
@@ -314,21 +314,21 @@ class _CartItemDetailsState extends State<CartItemDetails> {
                           editedCartItem.quantity =
                               int.parse(quantityController.text);
 
-                          BlocProvider.of<CartBloc>(context).add(
-                            OnUpdateCartEvent(
-                              [
-                                CartItemInfo(
-                                  editedCartItem.productId,
-                                  editedCartItem.id,
-                                  editedCartItem.quantity,
-                                  editedCartItem.color,
-                                  editedCartItem.size,
-                                  editedCartItem.selectStatus,
-                                )
-                              ],
-                              needReload: true,
-                            ),
-                          );
+                          context.read<CartBloc>().add(
+                                OnUpdateCartEvent(
+                                  [
+                                    CartItemInfo(
+                                      editedCartItem.productId,
+                                      editedCartItem.id,
+                                      editedCartItem.quantity,
+                                      editedCartItem.color,
+                                      editedCartItem.size,
+                                      editedCartItem.selectStatus,
+                                    )
+                                  ],
+                                  needReload: true,
+                                ),
+                              );
 
                           context.router.pop();
                         });

@@ -72,11 +72,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     'Uploaded image successfully!',
                   ).then(
                     (value) {
-                      BlocProvider.of<AuthenticationBloc>(context)
-                              .currentUser
-                              ?.avatar =
+                      context.read<AuthenticationBloc>().currentUser?.avatar =
                           ValueRender.getFileIdFromGoogleDriveViewUrl(
-                              uploadFileState.url);
+                        uploadFileState.url,
+                      );
                     },
                   );
                 }
@@ -90,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
             listener: (context, authenState) {
               User? currentUser =
-                  BlocProvider.of<AuthenticationBloc>(context).currentUser;
+                  context.read<AuthenticationBloc>().currentUser;
 
               if (authenState is AuthenticationLoggedInState) {
                 currentUser = authenState.currentUser;
@@ -110,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
             },
             builder: (context, authenState) {
               User? currentUser =
-                  BlocProvider.of<AuthenticationBloc>(context).currentUser;
+                  context.read<AuthenticationBloc>().currentUser;
 
               if (authenState is AuthenticationLoggedInState) {
                 currentUser = authenState.currentUser;
@@ -198,9 +197,8 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, authenState) {
-            String? fileId = BlocProvider.of<AuthenticationBloc>(context)
-                .currentUser
-                ?.avatar;
+            String? fileId =
+                context.read<AuthenticationBloc>().currentUser?.avatar;
 
             if (authenState is AuthenticationAvatarUpdatedState) {
               fileId = authenState.fileId;
@@ -228,9 +226,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   if (image != null) {
                     File file = File(image.path);
 
-                    BlocProvider.of<UploadFileBloc>(context).add(
-                      OnUploadFileEvent(file, isCustomer: true),
-                    );
+                    context.read<UploadFileBloc>().add(
+                          OnUploadFileEvent(file, isCustomer: true),
+                        );
                   }
                 },
               );

@@ -1,10 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fashionstore/main.dart';
-import 'package:stomp_dart_client/stomp.dart';
-import 'package:stomp_dart_client/stomp_config.dart';
 
-import '../../config/network/web_socket_config.dart';
 import '../../data/entity/user.dart';
 import '../../data/enum/local_storage_key_enum.dart';
 import '../../repository/authentication_repository.dart';
@@ -41,27 +37,27 @@ class AuthenticationBloc
           (user) {
             currentUser = user;
 
-            stompClient = StompClient(
-              config: StompConfig(
-                useSockJS: true,
-                url: 'https://$domain:8080/wsNotificationEndPoint',
-                onConnect: WebSocketConfig.onConnect,
-                beforeConnect: WebSocketConfig.beforeConnect,
-                onStompError: WebSocketConfig.onStompError,
-                // onWebSocketDone: WebSocketConfig.onWebSocketDone,
-                onWebSocketError: WebSocketConfig.onWebSocketError,
-                stompConnectHeaders: {
-                  "Authorization": "Bearer $jwtFromStorage",
-                  "Upgrade": "websocket",
-                },
-                webSocketConnectHeaders: {
-                  "Authorization": "Bearer $jwtFromStorage",
-                  "Upgrade": "websocket",
-                },
-              ),
-            );
-
-            stompClient.activate();
+            // stompClient = StompClient(
+            //   config: StompConfig(
+            //     useSockJS: true,
+            //     url: 'https://$domain:8080/wsNotificationEndPoint',
+            //     onConnect: WebSocketConfig.onConnect,
+            //     beforeConnect: WebSocketConfig.beforeConnect,
+            //     onStompError: WebSocketConfig.onStompError,
+            //     // onWebSocketDone: WebSocketConfig.onWebSocketDone,
+            //     onWebSocketError: WebSocketConfig.onWebSocketError,
+            //     stompConnectHeaders: {
+            //       "Authorization": "Bearer $jwtFromStorage",
+            //       "Upgrade": "websocket",
+            //     },
+            //     webSocketConnectHeaders: {
+            //       "Authorization": "Bearer $jwtFromStorage",
+            //       "Upgrade": "websocket",
+            //     },
+            //   ),
+            // );
+            //
+            // stompClient.activate();
 
             emit(AuthenticationLoggedInState(user));
           },

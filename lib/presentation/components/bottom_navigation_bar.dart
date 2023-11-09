@@ -68,9 +68,9 @@ class _BottomNavigationBarComponentState
 
             GlobalVariable.currentNavBarPage =
                 NavigationNameEnum.CLOTHINGS.name;
-            BlocProvider.of<CategoryBloc>(context).add(
-              const OnSelectedCategoryEvent('All'),
-            );
+            context.read<CategoryBloc>().add(
+                  const OnSelectedCategoryEvent('All'),
+                );
           }
         },
       ),
@@ -237,8 +237,8 @@ class _BottomNavigationBarComponentState
                 ),
                 BlocBuilder<CartBloc, CartState>(
                   builder: (context, cartState) {
-                    int totalItems = BlocProvider.of<CartBloc>(context)
-                        .totalCartItemQuantity;
+                    int totalItems =
+                        context.read<CartBloc>().totalCartItemQuantity;
                     if (cartState is TotalCartItemQuantityLoadedState) {
                       totalItems = cartState.totalQuantity;
                     }

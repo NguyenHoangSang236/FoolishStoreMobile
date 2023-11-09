@@ -31,7 +31,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
     GlobalVariable.currentNavBarPage = NavigationNameEnum.CATEGORIES.name;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      BlocProvider.of<CategoryBloc>(context).add(OnLoadCategoryEvent());
+      context.read<CategoryBloc>().add(OnLoadCategoryEvent());
     });
 
     super.initState();
@@ -47,7 +47,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
         key: _refreshIndicatorKey,
         color: Colors.orange,
         onRefresh: () async {
-          BlocProvider.of<CategoryBloc>(context).add(OnLoadCategoryEvent());
+          context.read<CategoryBloc>().add(OnLoadCategoryEvent());
         },
         child: SingleChildScrollView(
           controller: _scrollController,
@@ -100,8 +100,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
   Widget _categoryList() {
     return BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, cateState) {
-      List<Category> categoryList =
-          BlocProvider.of<CategoryBloc>(context).categoryList;
+      List<Category> categoryList = context.read<CategoryBloc>().categoryList;
 
       if (cateState is CategoryLoadingState) {
         return UiRender.loadingCircle();

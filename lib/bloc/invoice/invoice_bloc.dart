@@ -150,6 +150,24 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       }
     });
 
+    on<OnCancelOrderEvent>((event, emit) async {
+      emit(InvoiceLoadingState());
+
+      try {
+        final response = await _invoiceRepository.cancelOrder(
+          event.orderId,
+        );
+
+        response.fold(
+          (failure) => emit(InvoiceErrorState(failure.message)),
+          (success) => emit(InvoiceCanceledState(success)),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(InvoiceErrorState(e.toString()));
+      }
+    });
+
     on<OnClearInvoiceFilterEvent>((event, emit) async {
       currentOnlinePaymentInfo = null;
       currentInvoiceList = [];

@@ -50,6 +50,15 @@ class InvoiceItemListLoadedState extends InvoiceState {
   List<Object> get props => [invoiceItemList];
 }
 
+class InvoiceCanceledState extends InvoiceState {
+  final String message;
+
+  const InvoiceCanceledState(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class InvoiceFilterClearedState extends InvoiceState {
   final String message;
 

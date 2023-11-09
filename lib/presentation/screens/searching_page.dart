@@ -32,8 +32,7 @@ class _SearchingPageState extends State<SearchingPage> {
 
   @override
   void initState() {
-    BlocProvider.of<ProductSearchingBloc>(context)
-        .add(OnClearProductResultsEvent());
+    context.read<ProductSearchingBloc>().add(OnClearProductResultsEvent());
     super.initState();
   }
 
@@ -48,12 +47,14 @@ class _SearchingPageState extends State<SearchingPage> {
       hintSearchBarText: "What product do you want to search?",
       onSearch: (text) {
         if (text.isNotEmpty) {
-          BlocProvider.of<ProductSearchingBloc>(context)
+          context
+              .read<ProductSearchingBloc>()
               .add(OnSearchProductEvent(text, 1, 10));
         }
 
         if (_searchingController.text.isEmpty) {
-          BlocProvider.of<ProductSearchingBloc>(context)
+          context
+              .read<ProductSearchingBloc>()
               .add(const OnSearchProductEvent('', 1, 10));
         }
       },
@@ -68,7 +69,8 @@ class _SearchingPageState extends State<SearchingPage> {
             if (translateState is TranslatorLoadedState) {
               context.router.pop();
 
-              BlocProvider.of<ProductSearchingBloc>(context)
+              context
+                  .read<ProductSearchingBloc>()
                   .add(OnSearchProductEvent(translateState.content, 1, 10));
 
               setState(() {
@@ -79,8 +81,7 @@ class _SearchingPageState extends State<SearchingPage> {
           child: BlocBuilder<ProductSearchingBloc, ProductSearchingState>(
             builder: (context, productState) {
               List<Product> productList =
-                  BlocProvider.of<ProductSearchingBloc>(context)
-                      .searchingProductList;
+                  context.read<ProductSearchingBloc>().searchingProductList;
 
               if (productState is ProductSearchingListLoadedState) {
                 productList = productState.productList;

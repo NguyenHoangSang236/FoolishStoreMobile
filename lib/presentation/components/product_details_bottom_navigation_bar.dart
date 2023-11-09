@@ -26,15 +26,15 @@ class ProductDetailsBottomNavigationBarComponent extends StatefulWidget {
 class _ProductDetailsBottomNavigationBarComponentState
     extends State<ProductDetailsBottomNavigationBarComponent> {
   void onPressAddToCartButton() {
-    String color = BlocProvider.of<ProductAddToCartBloc>(context).color;
-    String productName =
-        BlocProvider.of<ProductAddToCartBloc>(context).productName;
-    int productId = BlocProvider.of<ProductDetailsBloc>(context)
+    String color = context.read<ProductAddToCartBloc>().color;
+    String productName = context.read<ProductAddToCartBloc>().productName;
+    int productId = context
+        .read<ProductDetailsBloc>()
         .selectedProductDetails
         .first
         .productId;
-    String size = BlocProvider.of<ProductAddToCartBloc>(context).size;
-    int quantity = BlocProvider.of<ProductAddToCartBloc>(context).quantity;
+    String size = context.read<ProductAddToCartBloc>().size;
+    int quantity = context.read<ProductAddToCartBloc>().quantity;
 
     if (color != '' && productName != '' && size != '' && quantity > 0) {
       UiRender.showConfirmDialog(
@@ -49,9 +49,9 @@ class _ProductDetailsBottomNavigationBarComponentState
         ),
       ).then((value) {
         if (value == true) {
-          BlocProvider.of<CartBloc>(context).add(
-            OnAddCartItemEvent(productId, color, size, quantity),
-          );
+          context.read<CartBloc>().add(
+                OnAddCartItemEvent(productId, color, size, quantity),
+              );
         }
       });
     } else {
@@ -75,11 +75,12 @@ class _ProductDetailsBottomNavigationBarComponentState
       if (value) {
         try {
           if (int.parse(widget.textEditingController?.text ?? '0') > 0) {
-            BlocProvider.of<ProductAddToCartBloc>(context).add(
-              OnSelectProductAddToCartEvent(
-                quantity: int.parse(widget.textEditingController?.text ?? '0'),
-              ),
-            );
+            context.read<ProductAddToCartBloc>().add(
+                  OnSelectProductAddToCartEvent(
+                    quantity:
+                        int.parse(widget.textEditingController?.text ?? '0'),
+                  ),
+                );
           } else {
             UiRender.showDialog(
               context,
@@ -121,7 +122,8 @@ class _ProductDetailsBottomNavigationBarComponentState
               color: Color(0xffa4a4a4),
             ),
             onPressed: () {
-              BlocProvider.of<ProductAddToCartBloc>(context)
+              context
+                  .read<ProductAddToCartBloc>()
                   .add(OnClearProductAddToCartEvent());
               context.router.pop();
             },

@@ -179,12 +179,10 @@ class UiRender {
                   ? BlocBuilder<TranslatorBloc, TranslatorState>(
                       builder: (context, translatorState) {
                         List<TranslatorLanguage> languageList =
-                            BlocProvider.of<TranslatorBloc>(context)
-                                .languageList;
+                            context.read<TranslatorBloc>().languageList;
                         List<DropdownMenuItem> dropDownItemList = [];
                         TranslatorLanguage? selectedLanguage =
-                            BlocProvider.of<TranslatorBloc>(context)
-                                .selectedLanguage;
+                            context.read<TranslatorBloc>().selectedLanguage;
 
                         if (translatorState is TranslatorSelectedState) {
                           selectedLanguage = translatorState.selectedLanguage;
@@ -259,9 +257,10 @@ class UiRender {
                                 return dropDownItemList;
                               },
                               onChanged: (value) {
-                                BlocProvider.of<TranslatorBloc>(context).add(
-                                  OnSelectLanguageCodeTranslatorEvent(value),
-                                );
+                                context.read<TranslatorBloc>().add(
+                                      OnSelectLanguageCodeTranslatorEvent(
+                                          value),
+                                    );
                               },
                             ),
                           ),

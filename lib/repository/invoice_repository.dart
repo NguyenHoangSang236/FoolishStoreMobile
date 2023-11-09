@@ -149,4 +149,12 @@ class InvoiceRepository {
       },
     );
   }
+
+  Future<Either<Failure, String>> cancelOrder(int invoiceId) {
+    return NetworkService.getMessageFromApi(
+      '/cancel_order_id=$invoiceId',
+      isAuthen: true,
+      type: type,
+    );
+  }
 }

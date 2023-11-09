@@ -32,12 +32,12 @@ class _CartFilterState extends State<CartFilterComponent> {
   List<String> resultFilterList = [];
 
   void onPressFilterButton() {
-    BlocProvider.of<CartBloc>(context).add(
-      OnFilterCartEvent(
-        status: resultFilterList,
-        brand: brandFilterController.text,
-      ),
-    );
+    context.read<CartBloc>().add(
+          OnFilterCartEvent(
+            status: resultFilterList,
+            brand: brandFilterController.text,
+          ),
+        );
   }
 
   void onPressClearFilterButton() {

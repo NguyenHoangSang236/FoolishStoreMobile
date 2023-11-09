@@ -45,12 +45,12 @@ class _OnlinePaymentReceiverInfoPageState
       body: RefreshIndicator(
         color: Colors.orange,
         key: _refreshIndicatorKey,
-        onRefresh: () async => BlocProvider.of<InvoiceBloc>(context).add(
-          OnLoadOnlinePaymentInfoEvent(
-            BlocProvider.of<InvoiceBloc>(context).currentAddedInvoiceId,
-            BlocProvider.of<InvoiceBloc>(context).currentCheckoutPaymentMethod,
-          ),
-        ),
+        onRefresh: () async => context.read<InvoiceBloc>().add(
+              OnLoadOnlinePaymentInfoEvent(
+                context.read<InvoiceBloc>().currentAddedInvoiceId,
+                context.read<InvoiceBloc>().currentCheckoutPaymentMethod,
+              ),
+            ),
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Padding(
@@ -61,8 +61,7 @@ class _OnlinePaymentReceiverInfoPageState
             child: BlocBuilder<InvoiceBloc, InvoiceState>(
               builder: (context, state) {
                 OnlinePaymentInfo? paymentInfo =
-                    BlocProvider.of<InvoiceBloc>(context)
-                        .currentOnlinePaymentInfo;
+                    context.read<InvoiceBloc>().currentOnlinePaymentInfo;
 
                 if (state is InvoiceOnlinePaymentInfoLoadedState) {
                   paymentInfo = state.onlinePaymentInfo;

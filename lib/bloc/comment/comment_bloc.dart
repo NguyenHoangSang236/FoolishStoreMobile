@@ -127,7 +127,11 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
 
         response.fold(
           (failure) => emit(CommentErrorState(failure.message)),
-          (message) => emit(CommentReplyAddedState(message, event.replyOn)),
+          (message) {
+            selectedCommentId = event.replyOn;
+
+            emit(CommentReplyAddedState(message, event.replyOn));
+          },
         );
       } catch (e) {
         debugPrint(e.toString());

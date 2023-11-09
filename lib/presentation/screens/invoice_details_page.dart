@@ -46,9 +46,9 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
 
   @override
   void initState() {
-    BlocProvider.of<InvoiceBloc>(context).add(
-      OnLoadInvoiceDetailsEvent(widget.invoice.id),
-    );
+    context.read<InvoiceBloc>().add(
+          OnLoadInvoiceDetailsEvent(widget.invoice.id),
+        );
     super.initState();
   }
 
@@ -145,7 +145,8 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
               ),
               _invoiceDataLine(
                 widget.invoice.deliveryType.formatEnumToUppercaseFirstLetter,
-                BlocProvider.of<DeliveryBloc>(context)
+                context
+                    .read<DeliveryBloc>()
                     .currentDeliveryTypeList
                     .firstWhere((element) =>
                         element.name == widget.invoice.deliveryType)

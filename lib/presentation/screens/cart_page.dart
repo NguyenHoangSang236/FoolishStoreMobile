@@ -67,11 +67,11 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressCheckoutButton() {
-    BlocProvider.of<CartBloc>(context).add(
-      OnCheckoutEvent(DeliveryTypeEnum.values.first),
-    );
+    context.read<CartBloc>().add(
+          OnCheckoutEvent(DeliveryTypeEnum.values.first),
+        );
 
-    BlocProvider.of<DeliveryBloc>(context).add(OnLoadDeliveryTypeEvent());
+    context.read<DeliveryBloc>().add(OnLoadDeliveryTypeEvent());
 
     context.router.pop().then(
           (value) => showModalBottomSheet(
@@ -98,9 +98,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   void onPressCartItem(CartItem cartItem) {
     setState(
       () {
-        BlocProvider.of<ProductDetailsBloc>(context).add(
-          OnSelectProductEvent(cartItem.productId),
-        );
+        context.read<ProductDetailsBloc>().add(
+              OnSelectProductEvent(cartItem.productId),
+            );
 
         showModalBottomSheet(
           shape: RoundedRectangleBorder(
@@ -151,12 +151,12 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressPlaceOrderButton() {
-    BlocProvider.of<InvoiceBloc>(context).add(
-      OnAddNewOrderEvent(
-        _selectedPaymentMethod.name,
-        _selectedDeliveryType.name,
-      ),
-    );
+    context.read<InvoiceBloc>().add(
+          OnAddNewOrderEvent(
+            _selectedPaymentMethod.name,
+            _selectedDeliveryType.name,
+          ),
+        );
   }
 
   void onSelectPaymentMethod({bool isDeliveryType = true}) {
@@ -178,33 +178,33 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     if (_scrollController.position.maxScrollExtent ==
             _scrollController.offset &&
         !_scrollController.position.outOfRange &&
-        BlocProvider.of<CartBloc>(context).cartItemList.length <
-            BlocProvider.of<CartBloc>(context).totalCartItemQuantity) {
+        context.read<CartBloc>().cartItemList.length <
+            context.read<CartBloc>().totalCartItemQuantity) {
       setState(() {
         currentOffset = _scrollController.offset;
       });
 
-      List<String> filterOptions =
-          BlocProvider.of<CartBloc>(context).currentFilterOption;
-      String filterBrand =
-          BlocProvider.of<CartBloc>(context).currentBrandFilter;
-      String filterName = BlocProvider.of<CartBloc>(context).currentNameFilter;
-      int currentPage = BlocProvider.of<CartBloc>(context).currentPage;
+      List<String> filterOptions = context.read<CartBloc>().currentFilterOption;
+      String filterBrand = context.read<CartBloc>().currentBrandFilter;
+      String filterName = context.read<CartBloc>().currentNameFilter;
+      int currentPage = context.read<CartBloc>().currentPage;
 
       Future.delayed(
         const Duration(milliseconds: 300),
         () {
-          BlocProvider.of<CartBloc>(context).add(
-            filterOptions.isEmpty && filterBrand.isEmpty && filterName.isEmpty
-                ? OnLoadAllCartListEvent(currentPage + 1, 10)
-                : OnFilterCartEvent(
-                    page: currentPage + 1,
-                    limit: 10,
-                    status: filterOptions,
-                    brand: filterBrand,
-                    name: filterName,
-                  ),
-          );
+          context.read<CartBloc>().add(
+                filterOptions.isEmpty &&
+                        filterBrand.isEmpty &&
+                        filterName.isEmpty
+                    ? OnLoadAllCartListEvent(currentPage + 1, 10)
+                    : OnFilterCartEvent(
+                        page: currentPage + 1,
+                        limit: 10,
+                        status: filterOptions,
+                        brand: filterBrand,
+                        name: filterName,
+                      ),
+              );
         },
       );
     }
@@ -213,9 +213,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   void onPressDeliveryTypeRadioButton(DeliveryTypeEnum? deliveryEnum) {
     context.router.pop();
 
-    BlocProvider.of<CartBloc>(context).add(
-      OnCheckoutEvent(deliveryEnum!),
-    );
+    context.read<CartBloc>().add(
+          OnCheckoutEvent(deliveryEnum!),
+        );
 
     setState(() {
       _selectedDeliveryType = deliveryEnum;
@@ -228,9 +228,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   ) {
     context.router.pop();
 
-    BlocProvider.of<CartBloc>(context).add(
-      OnCheckoutEvent(_selectedDeliveryType),
-    );
+    context.read<CartBloc>().add(
+          OnCheckoutEvent(_selectedDeliveryType),
+        );
 
     setState(() {
       _selectedPaymentMethod = paymentEnum!;
@@ -246,7 +246,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    if (BlocProvider.of<CartBloc>(context).cartItemList.isEmpty) {
+    if (context.read<CartBloc>().cartItemList.isEmpty) {
       LoadingService(context).reloadCartPage();
     }
 
@@ -314,13 +314,12 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                 } else if (invoiceState is InvoiceAddedState) {
                   UiRender.showDialog(context, '', invoiceState.message).then(
                     (value) => {
-                      BlocProvider.of<InvoiceBloc>(context).add(
-                        OnLoadOnlinePaymentInfoEvent(
-                          BlocProvider.of<InvoiceBloc>(context)
-                              .currentAddedInvoiceId,
-                          _selectedPaymentMethod.name,
-                        ),
-                      ),
+                      context.read<InvoiceBloc>().add(
+                            OnLoadOnlinePaymentInfoEvent(
+                              context.read<InvoiceBloc>().currentAddedInvoiceId,
+                              _selectedPaymentMethod.name,
+                            ),
+                          ),
                       context.router.pop(),
                     },
                   );
@@ -415,7 +414,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
               BlocBuilder<CartBloc, CartState>(
                 builder: (context, cartState) {
                   List<CartItem> cartItemList =
-                      BlocProvider.of<CartBloc>(context).cartItemList;
+                      context.read<CartBloc>().cartItemList;
 
                   if (cartState is CartLoadingState) {
                     return SizedBox(
@@ -466,8 +465,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         }
       },
       builder: (context, cartState) {
-        List<CartItem> cartItemList =
-            BlocProvider.of<CartBloc>(context).cartItemList;
+        List<CartItem> cartItemList = context.read<CartBloc>().cartItemList;
 
         if (cartState is CartLoadingState) {
           return UiRender.loadingCircle();

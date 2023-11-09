@@ -91,9 +91,9 @@ class _IndexPageState extends State<IndexPage> {
                     onPress: () {
                       context.router.pushNamed(AppRouterPath.allProducts);
 
-                      BlocProvider.of<CategoryBloc>(context).add(
-                        const OnSelectedCategoryEvent('All'),
-                      );
+                      context.read<CategoryBloc>().add(
+                            const OnSelectedCategoryEvent('All'),
+                          );
 
                       GlobalVariable.currentNavBarPage =
                           NavigationNameEnum.CLOTHINGS.name;
@@ -183,8 +183,7 @@ class _IndexPageState extends State<IndexPage> {
   Widget _categoryListComponent() {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
-        List<Category> categoryList =
-            BlocProvider.of<CategoryBloc>(context).categoryList;
+        List<Category> categoryList = context.read<CategoryBloc>().categoryList;
 
         if (categoryState is CategoryLoadingState) {
           return UiRender.loadingCircle();
@@ -215,11 +214,10 @@ class _IndexPageState extends State<IndexPage> {
     return BlocBuilder<ProductBloc, ProductState>(
         builder: (context, productState) {
       List<Product> productList = (type == 'HOT_DISCOUNT'
-          ? BlocProvider.of<ProductBloc>(context).hotDiscountProductList
+          ? context.read<ProductBloc>().hotDiscountProductList
           : type == 'NEW_ARRIVAL'
-              ? BlocProvider.of<ProductBloc>(context).newArrivalProductList
-              : BlocProvider.of<ProductBloc>(context)
-                  .top8BestSellerProductList);
+              ? context.read<ProductBloc>().newArrivalProductList
+              : context.read<ProductBloc>().top8BestSellerProductList);
       if (productState is ProductLoadingState) {
         return UiRender.loadingCircle();
       }
@@ -230,20 +228,20 @@ class _IndexPageState extends State<IndexPage> {
         switch (type) {
           case 'HOT_DISCOUNT':
             {
-              productList = List.from(
-                  BlocProvider.of<ProductBloc>(context).hotDiscountProductList);
+              productList =
+                  List.from(context.read<ProductBloc>().hotDiscountProductList);
               break;
             }
           case 'NEW_ARRIVAL':
             {
-              productList = List.from(
-                  BlocProvider.of<ProductBloc>(context).newArrivalProductList);
+              productList =
+                  List.from(context.read<ProductBloc>().newArrivalProductList);
               break;
             }
           case 'TOP_BEST_SELLERS':
             {
-              productList = List.from(BlocProvider.of<ProductBloc>(context)
-                  .top8BestSellerProductList);
+              productList = List.from(
+                  context.read<ProductBloc>().top8BestSellerProductList);
               break;
             }
         }
@@ -267,10 +265,13 @@ class _IndexPageState extends State<IndexPage> {
           itemBuilder: (context, index) {
             return ProductComponent(
               product: productList[index],
-              onClick: () {
-                LoadingService(context).selectToViewProduct(productList[index]);
-
-                context.router.pushNamed(AppRouterPath.productDetails);
+              onClick: () async {
+                await LoadingService(context)
+                    .selectToViewProduct(productList[index])
+                    .then(
+                      (value) => context.router
+                          .pushNamed(AppRouterPath.productDetails),
+                    );
               },
             );
           },

@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../config/app_router/app_router_config.dart';
@@ -21,9 +23,14 @@ class InvoiceComponent extends StatefulWidget {
 class _InvoiceComponentState extends State<InvoiceComponent> {
   double _compHeight = 0;
   bool _isPressed = false;
+  bool _canCancel = true;
 
-  void _onPressViewDetails(Invoice invoice) {
-    context.router.push(InvoiceDetailsRoute(invoice: invoice));
+  void _onPressViewDetails() {
+    context.router.push(InvoiceDetailsRoute(invoice: widget.invoice));
+  }
+
+  void _onPressCancelOrder() {
+    context.read<InvoiceBloc>().add(OnCancelOrderEvent(widget.invoice.id));
   }
 
   void _scaleUp() {
@@ -38,6 +45,11 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
       _compHeight = 0;
       _isPressed = false;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -101,14 +113,14 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
                           buttonMargin: EdgeInsets.zero,
                           buttonWidth: 133.width,
                           buttonHeight: 35.height,
-                          onPress: () => _onPressViewDetails(widget.invoice),
+                          onPress: _onPressViewDetails,
                         ),
                         GradientElevatedButton(
                           text: 'Cancel order',
                           buttonMargin: EdgeInsets.zero,
                           buttonWidth: 130.width,
                           buttonHeight: 35.height,
-                          onPress: () {},
+                          onPress: _onPressCancelOrder,
                         ),
                       ],
                     ),
