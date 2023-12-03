@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/product.dart';
-import '../../repository/shop_repository.dart';
+import '../../data/repository/shop_repository.dart';
 
 part 'product_searching_event.dart';
 part 'product_searching_state.dart';

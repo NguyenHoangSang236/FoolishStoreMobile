@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dio/dio.dart';
 import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
@@ -10,15 +11,18 @@ import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
 import 'package:fashionstore/config/network/dio_config.dart';
-import 'package:fashionstore/repository/authentication_repository.dart';
-import 'package:fashionstore/repository/cart_repository.dart';
-import 'package:fashionstore/repository/category_repository.dart';
-import 'package:fashionstore/repository/comment_repository.dart';
-import 'package:fashionstore/repository/delivery_repository.dart';
-import 'package:fashionstore/repository/google_drive_repository.dart';
-import 'package:fashionstore/repository/invoice_repository.dart';
-import 'package:fashionstore/repository/shop_repository.dart';
-import 'package:fashionstore/repository/translator_repository.dart';
+import 'package:fashionstore/data/repository/authentication_repository.dart';
+import 'package:fashionstore/data/repository/cart_repository.dart';
+import 'package:fashionstore/data/repository/category_repository.dart';
+import 'package:fashionstore/data/repository/comment_repository.dart';
+import 'package:fashionstore/data/repository/delivery_repository.dart';
+import 'package:fashionstore/data/repository/google_drive_repository.dart';
+import 'package:fashionstore/data/repository/invoice_repository.dart';
+import 'package:fashionstore/data/repository/shop_repository.dart';
+import 'package:fashionstore/data/repository/translator_repository.dart';
+import 'package:fashionstore/service/firebase_messaging_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,14 +35,43 @@ import 'bloc/productSearching/product_searching_bloc.dart';
 import 'bloc/products/product_bloc.dart';
 import 'config/app_router/app_router_config.dart';
 import 'config/network/http_client_config.dart';
+import 'firebase_options.dart';
 
 final appRouter = AppRouter();
 final Dio dio = Dio();
 
 // const String domain = '172.16.30.142';
-const String domain = '192.168.1.10';
+const String domain = '192.168.1.25';
+const String serverKey =
+    'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
 
 late StompClient stompClient;
+
+@pragma("vm:entry-point")
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  print('Handling a background message ${message.messageId}');
+  // await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+
+  FirebaseMessagingService.initializeLocalNotifications(debug: true);
+  FirebaseMessagingService.initializeRemoteNotifications(debug: true);
+
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: message.hashCode,
+      channelKey: "high_importance_channel",
+      title: message.data['title'],
+      body: message.data['body'],
+      bigPicture: message.data['image'],
+      notificationLayout: NotificationLayout.BigPicture,
+      largeIcon: message.data['image'],
+      payload: Map<String, String>.from(message.data),
+      hideLargeIconOnExpand: true,
+    ),
+  );
+}
 
 void main() async {
   HttpOverrides.global = HttpClientConfig();
@@ -48,9 +81,18 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  FirebaseMessagingService.initializeLocalNotifications(debug: true);
+  FirebaseMessagingService.initializeRemoteNotifications(debug: true);
 
   runApp(
     MultiRepositoryProvider(
@@ -157,6 +199,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    FirebaseMessagingService.checkPermission();
+    FirebaseMessagingService.requestFirebaseToken();
+    FirebaseMessagingService.startListeningNotificationEvents();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

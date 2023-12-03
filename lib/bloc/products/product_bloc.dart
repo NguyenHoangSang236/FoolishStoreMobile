@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/product.dart';
 import '../../data/enum/product_list_type_enum.dart';
-import '../../repository/shop_repository.dart';
+import '../../data/repository/shop_repository.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';

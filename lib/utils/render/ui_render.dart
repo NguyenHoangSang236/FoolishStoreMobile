@@ -2,12 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/data/entity/translator_language.dart';
-import 'package:fashionstore/presentation/components/rating_popup_dialog.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import '../../views/components/rating_popup_dialog.dart';
 
 class UiRender {
   const UiRender._();

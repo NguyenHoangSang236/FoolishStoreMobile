@@ -6,7 +6,7 @@ import 'package:fashionstore/data/entity/online_payment_info.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/invoice_item.dart';
-import '../../repository/invoice_repository.dart';
+import '../../data/repository/invoice_repository.dart';
 
 part 'invoice_event.dart';
 part 'invoice_state.dart';

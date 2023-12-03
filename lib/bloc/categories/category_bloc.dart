@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/category.dart';
-import '../../repository/category_repository.dart';
+import '../../data/repository/category_repository.dart';
 
 part 'category_event.dart';
 part 'category_state.dart';

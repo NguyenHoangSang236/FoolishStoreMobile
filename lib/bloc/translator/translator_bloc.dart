@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:fashionstore/data/entity/translator_language.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../repository/translator_repository.dart';
+import '../../data/repository/translator_repository.dart';
 
 part 'translator_event.dart';
 part 'translator_state.dart';

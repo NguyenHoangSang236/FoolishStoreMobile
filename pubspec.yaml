@@ -68,6 +68,12 @@ dependencies:
   stomp_dart_client: ^1.0.0
   flutter_calendar_carousel: ^2.4.2
   copy_with_extension: ^5.0.4
+  firebase_core: ^2.23.0
+  awesome_notifications: ^0.8.2
+  awesome_notifications_fcm: ^0.8.0
+  firebase: ^9.0.3
+  messaging: ^0.2.1
+  firebase_messaging: ^14.7.5
 
 dev_dependencies:
   flutter_test:

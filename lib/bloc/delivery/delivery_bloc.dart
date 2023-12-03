@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/delivery_type.dart';
-import '../../repository/delivery_repository.dart';
+import '../../data/repository/delivery_repository.dart';
 
 part 'delivery_event.dart';
 part 'delivery_state.dart';

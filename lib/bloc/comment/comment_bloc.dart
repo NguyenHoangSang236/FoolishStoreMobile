@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/comment.dart';
-import '../../repository/comment_repository.dart';
+import '../../data/repository/comment_repository.dart';
 
 part 'comment_event.dart';
 part 'comment_state.dart';

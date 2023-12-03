@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/entity/user.dart';
 import '../../data/enum/local_storage_key_enum.dart';
-import '../../repository/authentication_repository.dart';
+import '../../data/repository/authentication_repository.dart';
 import '../../utils/local_storage/local_storage_service.dart';
 
 part 'authentication_event.dart';

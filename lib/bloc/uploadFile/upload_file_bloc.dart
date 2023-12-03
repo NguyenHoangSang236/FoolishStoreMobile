@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../repository/google_drive_repository.dart';
+import '../../data/repository/google_drive_repository.dart';
 
 part 'upload_file_event.dart';
 part 'upload_file_state.dart';

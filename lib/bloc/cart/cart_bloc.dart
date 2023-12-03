@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/cart_item.dart';
 import '../../data/entity/cart_item_info.dart';
-import '../../repository/cart_repository.dart';
+import '../../data/repository/cart_repository.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';

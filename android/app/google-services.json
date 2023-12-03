@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "136237959521",
+    "project_id": "foolishfashionstore-384509",
+    "storage_bucket": "foolishfashionstore-384509.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136237959521:android:2df30bc674e4da84935d20",
+        "android_client_info": {
+          "package_name": "com.example.fashionstore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136237959521-psmvr8mmtenlnhmu355260lq2rj029u5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIgUp9-MXMg4iSS_i2dz0qYOXYvPUs1RQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136237959521-psmvr8mmtenlnhmu355260lq2rj029u5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

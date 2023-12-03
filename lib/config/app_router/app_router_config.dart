@@ -1,21 +1,21 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
-import 'package:fashionstore/presentation/screens/index_page.dart';
+import 'package:fashionstore/views/screens/index_page.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/invoice.dart';
-import '../../presentation/screens/all_categories_page.dart';
-import '../../presentation/screens/all_products_page.dart';
-import '../../presentation/screens/cart_page.dart';
-import '../../presentation/screens/initial_loading_page.dart';
-import '../../presentation/screens/invoice_details_page.dart';
-import '../../presentation/screens/login_page.dart';
-import '../../presentation/screens/notification_page.dart';
-import '../../presentation/screens/online_payment_receiver_info_page.dart';
-import '../../presentation/screens/product_details_page.dart';
-import '../../presentation/screens/profile_page.dart';
-import '../../presentation/screens/purchase_history_page.dart';
-import '../../presentation/screens/searching_page.dart';
+import '../../views/screens/all_categories_page.dart';
+import '../../views/screens/all_products_page.dart';
+import '../../views/screens/cart_page.dart';
+import '../../views/screens/initial_loading_page.dart';
+import '../../views/screens/invoice_details_page.dart';
+import '../../views/screens/login_page.dart';
+import '../../views/screens/notification_page.dart';
+import '../../views/screens/online_payment_receiver_info_page.dart';
+import '../../views/screens/product_details_page.dart';
+import '../../views/screens/profile_page.dart';
+import '../../views/screens/purchase_history_page.dart';
+import '../../views/screens/searching_page.dart';
 
 part 'app_router_config.gr.dart';
 
