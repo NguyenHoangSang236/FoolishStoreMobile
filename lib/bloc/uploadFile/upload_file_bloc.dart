@@ -19,19 +19,17 @@ class UploadFileBloc extends Bloc<UploadFileEvent, UploadFileState> {
       emit(UploadFileUploadingState());
 
       try {
-        String response = await _googleDriveRepository.uploadFileToGoogleDrive(
-            event.uploadFile,
-            isCustomer: event.isCustomer);
+        final response = await _googleDriveRepository.uploadFileToGoogleDrive(
+          event.uploadFile,
+          isCustomer: event.isCustomer,
+        );
 
-        ggDriveFileUrl = response;
-
-        if (response.contains('https://drive.google')) {
-          emit(UploadFileUploadedState(response));
-        } else {
-          emit(UploadFileErrorState(response));
-        }
-      } catch (e) {
-        debugPrint(e.toString());
+        response.fold(
+          (failure) => emit(UploadFileErrorState(failure.message)),
+          (url) => emit(UploadFileUploadedState(url)),
+        );
+      } catch (e, stackTrace) {
+        debugPrint('Caught Exception: $e\n$stackTrace');
         emit(UploadFileErrorState(e.toString()));
       }
     });

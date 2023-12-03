@@ -96,7 +96,6 @@ class InvoiceRepository {
 
   Future<Either<Failure, String>> addNewOrder({
     required String paymentMethod,
-    required String deliveryType,
   }) {
     return NetworkService.getMessageFromApi(
       '/addNewOrder',
@@ -104,7 +103,6 @@ class InvoiceRepository {
       isAuthen: true,
       paramBody: {
         'paymentMethod': paymentMethod,
-        'deliveryType': deliveryType,
       },
     );
   }

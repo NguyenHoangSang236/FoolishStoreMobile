@@ -12,9 +12,7 @@ Invoice _$InvoiceFromJson(Map<String, dynamic> json) => Invoice(
       json['payDate'] == null
           ? null
           : DateTime.parse(json['payDate'] as String),
-      json['deliveryStatus'] as String,
-      json['deliveryType'] as String,
-      (json['deliveryFee'] as num).toDouble(),
+      json['orderStatus'] as String?,
       json['paymentStatus'] as String,
       json['paymentMethod'] as String,
       json['currency'] as String,
@@ -30,10 +28,8 @@ Map<String, dynamic> _$InvoiceToJson(Invoice instance) => <String, dynamic>{
       'id': instance.id,
       'invoiceDate': instance.invoiceDate.toIso8601String(),
       'payDate': instance.payDate?.toIso8601String(),
-      'deliveryStatus': instance.deliveryStatus,
+      'orderStatus': instance.orderStatus,
       'paymentStatus': instance.paymentStatus,
-      'deliveryType': instance.deliveryType,
-      'deliveryFee': instance.deliveryFee,
       'paymentMethod': instance.paymentMethod,
       'currency': instance.currency,
       'intent': instance.intent,

@@ -10,10 +10,8 @@ class Invoice {
   int id;
   DateTime invoiceDate;
   DateTime? payDate;
-  String deliveryStatus;
+  String? orderStatus;
   String paymentStatus;
-  String deliveryType;
-  double deliveryFee;
   String paymentMethod;
   String currency;
   String? intent;
@@ -27,9 +25,7 @@ class Invoice {
     this.id,
     this.invoiceDate,
     this.payDate,
-    this.deliveryStatus,
-    this.deliveryType,
-    this.deliveryFee,
+    this.orderStatus,
     this.paymentStatus,
     this.paymentMethod,
     this.currency,
@@ -59,53 +55,44 @@ class Invoice {
   }
 
   String getDeliveryStatus() {
-    return deliveryStatus == DeliveryEnum.NOT_SHIPPED.name
+    return orderStatus == DeliveryEnum.NOT_SHIPPED.name
         ? 'Not shipped'
-        : deliveryStatus == DeliveryEnum.ACCEPTANCE_WAITING.name
+        : orderStatus == DeliveryEnum.ACCEPTANCE_WAITING.name
             ? 'Waiting for Admin\'s acceptance'
-            : deliveryStatus == DeliveryEnum.SHIPPING.name
+            : orderStatus == DeliveryEnum.SHIPPING.name
                 ? 'Shipping'
-                : deliveryStatus == DeliveryEnum.FAILED.name
+                : orderStatus == DeliveryEnum.FAILED.name
                     ? 'Shipped failed'
-                    : deliveryStatus == DeliveryEnum.SHIPPED.name
+                    : orderStatus == DeliveryEnum.SHIPPED.name
                         ? 'Shipped successfully'
-                        : deliveryStatus == DeliveryEnum.CUSTOMER_CANCEL.name
+                        : orderStatus == DeliveryEnum.CUSTOMER_CANCEL.name
                             ? 'Customer canceled order'
-                            : deliveryStatus == DeliveryEnum.SHIPPER_CANCEL.name
+                            : orderStatus == DeliveryEnum.SHIPPER_CANCEL.name
                                 ? 'Shipper canceled order'
-                                : deliveryStatus == DeliveryEnum.PACKING.name
+                                : orderStatus == DeliveryEnum.PACKING.name
                                     ? 'We are packing your order'
-                                    : deliveryStatus ==
+                                    : orderStatus ==
                                             DeliveryEnum.SHIPPER_WAITING.name
                                         ? 'Waiting for shipper to take your order'
-                                        : deliveryStatus ==
-                                                DeliveryTypeEnum
-                                                    .NORMAL_DELIVERY.name
-                                            ? 'Normal delivery'
-                                            : deliveryStatus ==
-                                                    DeliveryTypeEnum
-                                                        .EXPRESS_DELIVERY.name
-                                                ? 'Express delivery'
-                                                : deliveryStatus ==
+                                        : orderStatus ==
+                                                DeliveryEnum
+                                                    .PAYMENT_WAITING.name
+                                            ? 'Waiting for your online payment'
+                                            : orderStatus ==
+                                                    DeliveryEnum
+                                                        .FIRST_ATTEMPT_FAILED
+                                                        .name
+                                                ? 'Shipped failed once'
+                                                : orderStatus ==
                                                         DeliveryEnum
-                                                            .PAYMENT_WAITING
+                                                            .SECOND_ATTEMPT_FAILED
                                                             .name
-                                                    ? 'Waiting for your online payment'
-                                                    : deliveryStatus ==
-                                                            DeliveryEnum
-                                                                .FIRST_ATTEMPT_FAILED
-                                                                .name
-                                                        ? 'Shipped failed once'
-                                                        : deliveryStatus ==
-                                                                DeliveryEnum
-                                                                    .SECOND_ATTEMPT_FAILED
-                                                                    .name
-                                                            ? 'Shipped failed twice'
-                                                            : 'Undefined';
+                                                    ? 'Shipped failed twice'
+                                                    : 'Undefined';
   }
 
   @override
   String toString() {
-    return 'Invoice{id: $id, invoiceDate: $invoiceDate, payDate: $payDate, deliveryStatus: $deliveryStatus, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, currency: $currency, intent: $intent, description: $description, refundPercentage: $refundPercentage, totalPrice: $totalPrice, reason: $reason, adminAcceptance: $adminAcceptance}';
+    return 'Invoice{id: $id, invoiceDate: $invoiceDate, payDate: $payDate, orderStatus: $orderStatus, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, currency: $currency, intent: $intent, description: $description, refundPercentage: $refundPercentage, totalPrice: $totalPrice, reason: $reason, adminAcceptance: $adminAcceptance}';
   }
 }

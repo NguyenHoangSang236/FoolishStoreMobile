@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
-import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
@@ -10,10 +9,10 @@ import 'package:fashionstore/data/dto/invoice_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/categories/category_bloc.dart';
-import '../../bloc/productDetails/product_details_bloc.dart';
-import '../../data/entity/category.dart';
-import '../../data/entity/product.dart';
+import '../bloc/categories/category_bloc.dart';
+import '../bloc/productDetails/product_details_bloc.dart';
+import '../data/entity/category.dart';
+import '../data/entity/product.dart';
 
 class LoadingService {
   final BuildContext context;
@@ -91,10 +90,6 @@ class LoadingService {
         context.read<InvoiceBloc>().add(
               OnFilterInvoiceEvent(invoiceFilter),
             );
-
-        if (context.read<DeliveryBloc>().currentDeliveryTypeList.isEmpty) {
-          context.read<DeliveryBloc>().add(OnLoadDeliveryTypeEvent());
-        }
       },
     );
   }

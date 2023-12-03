@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/dto/cart_checkout.dart';
-import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
@@ -146,8 +145,7 @@ class CartRepository {
     );
   }
 
-  Future<Either<Failure, CartCheckout>> checkout(
-      DeliveryTypeEnum deliveryEnum) {
-    return getCartCheckout('/checkout?delivery_type=${deliveryEnum.name}');
+  Future<Either<Failure, CartCheckout>> checkout() {
+    return getCartCheckout('/checkout');
   }
 }

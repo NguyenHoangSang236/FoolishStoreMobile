@@ -37,8 +37,8 @@ class DioConfig {
     dio.options = BaseOptions(
       baseUrl: 'https://$domain:8080',
       receiveDataWhenStatusError: true,
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
       validateStatus: (status) {
         return status! < 500;
       },

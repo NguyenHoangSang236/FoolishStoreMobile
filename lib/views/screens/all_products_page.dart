@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/data/enum/navigation_name_enum.dart';
-import 'package:fashionstore/views/layout/layout.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
+import 'package:fashionstore/views/layout/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -13,7 +13,7 @@ import '../../config/app_router/app_router_path.dart';
 import '../../data/entity/category.dart';
 import '../../data/entity/product.dart';
 import '../../data/static/global_variables.dart';
-import '../../utils/service/loading_service.dart';
+import '../../service/loading_service.dart';
 import '../components/product_component.dart';
 
 @RoutePage()

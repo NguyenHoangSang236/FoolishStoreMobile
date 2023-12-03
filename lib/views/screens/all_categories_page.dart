@@ -1,8 +1,8 @@
 import 'package:auto_route/annotations.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/data/entity/category.dart';
+import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
-import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

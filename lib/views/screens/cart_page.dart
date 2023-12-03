@@ -1,18 +1,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
-import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/entity/cart_item.dart';
-import 'package:fashionstore/data/enum/delivery_enum.dart';
-import 'package:fashionstore/views/components/cart_filter_component.dart';
-import 'package:fashionstore/views/components/cart_item_component.dart';
-import 'package:fashionstore/views/components/cart_item_details.dart';
+import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
-import 'package:fashionstore/utils/service/loading_service.dart';
+import 'package:fashionstore/views/components/cart_filter_component.dart';
+import 'package:fashionstore/views/components/cart_item_component.dart';
+import 'package:fashionstore/views/components/cart_item_details.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,7 +54,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   ];
 
   late Widget _selectedPaymentMethodIcon;
-  late DeliveryTypeEnum _selectedDeliveryType;
   late PaymentMethodEnum _selectedPaymentMethod;
 
   void resetCheckoutInfo() {
@@ -68,10 +65,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   void onPressCheckoutButton() {
     context.read<CartBloc>().add(
-          OnCheckoutEvent(DeliveryTypeEnum.values.first),
+          OnCheckoutEvent(),
         );
-
-    context.read<DeliveryBloc>().add(OnLoadDeliveryTypeEvent());
 
     context.router.pop().then(
           (value) => showModalBottomSheet(
@@ -135,31 +130,15 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     context.router.pop();
   }
 
-  void onSelectDeliveryType() {
-    showCupertinoDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: const Text(
-            'Choose delivery service type',
-          ),
-          content: _checkoutPopupContent(),
-        );
-      },
-    );
-  }
-
   void onPressPlaceOrderButton() {
     context.read<InvoiceBloc>().add(
           OnAddNewOrderEvent(
             _selectedPaymentMethod.name,
-            _selectedDeliveryType.name,
           ),
         );
   }
 
-  void onSelectPaymentMethod({bool isDeliveryType = true}) {
+  void onSelectPaymentMethod() {
     showCupertinoDialog(
       barrierDismissible: true,
       context: context,
@@ -168,7 +147,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           title: const Text(
             'Choose delivery payment method',
           ),
-          content: _checkoutPopupContent(isDeliveryType: isDeliveryType),
+          content: _checkoutPopupContent(),
         );
       },
     );
@@ -210,27 +189,13 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     }
   }
 
-  void onPressDeliveryTypeRadioButton(DeliveryTypeEnum? deliveryEnum) {
-    context.router.pop();
-
-    context.read<CartBloc>().add(
-          OnCheckoutEvent(deliveryEnum!),
-        );
-
-    setState(() {
-      _selectedDeliveryType = deliveryEnum;
-    });
-  }
-
   void onPressPaymentMethodRadioButton(
     PaymentMethodEnum? paymentEnum,
     Widget paymentIcon,
   ) {
     context.router.pop();
 
-    context.read<CartBloc>().add(
-          OnCheckoutEvent(_selectedDeliveryType),
-        );
+    context.read<CartBloc>().add(const OnCheckoutEvent());
 
     setState(() {
       _selectedPaymentMethod = paymentEnum!;
@@ -286,17 +251,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         },
         child: MultiBlocListener(
           listeners: [
-            BlocListener<DeliveryBloc, DeliveryState>(
-                listener: (context, state) {
-              if (state is DeliveryTypeListLoadedState) {
-                setState(() {
-                  _selectedDeliveryType = DeliveryTypeEnum.values.firstWhere(
-                    (element) =>
-                        element.name == state.deliveryTypeList.first.name,
-                  );
-                });
-              }
-            }),
             BlocListener<CartBloc, CartState>(
               listener: (context, cartState) {
                 if (cartState is CartErrorState) {
@@ -531,30 +485,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  BlocBuilder<DeliveryBloc, DeliveryState>(
-                    builder: (context, state) {
-                      if (state is DeliveryLoadingState) {
-                        return _checkoutBottomSheetContent(
-                          title: 'Delivery type',
-                          content: 'Loading...',
-                        );
-                      } else if (state is DeliveryTypeListLoadedState) {
-                        return _checkoutBottomSheetContent(
-                          title: 'Delivery type',
-                          content: _selectedDeliveryType
-                              .name.formatEnumToUppercaseFirstLetter,
-                          onPress: onSelectDeliveryType,
-                        );
-                      }
-
-                      return SizedBox(
-                        height: 35.height,
-                      );
-                    },
-                  ),
                   _checkoutBottomSheetContent(
                     title: 'Payment Method',
-                    onPress: () => onSelectPaymentMethod(isDeliveryType: false),
+                    onPress: onSelectPaymentMethod,
                     isPayment: true,
                   ),
                   _checkoutBottomSheetContent(
@@ -735,39 +668,17 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _deliveryTypeOption(DeliveryTypeEnum deliveryEnum) {
-    return RadioListTile(
-      title: Text(deliveryEnum.name.formatEnumToUppercaseFirstLetter),
-      value: deliveryEnum,
-      groupValue: _selectedDeliveryType,
-      activeColor: Colors.orange,
-      onChanged: onPressDeliveryTypeRadioButton,
-    );
-  }
-
-  Widget _checkoutPopupContent({bool isDeliveryType = true}) {
-    List<DeliveryTypeEnum> list = DeliveryTypeEnum.values;
-
+  Widget _checkoutPopupContent() {
     return Material(
       color: Colors.transparent,
       child: Column(
-        children: [
-          if (isDeliveryType)
-            ...List<Widget>.generate(
-              list.length,
-              (index) => _deliveryTypeOption(
-                list[index],
-              ),
-            )
-          else
-            ...List<Widget>.generate(
-              _paymentMethodList.length,
-              (index) => _paymentMethodOption(
-                _paymentMethodList[index],
-                _paymentImageIconList[index],
-              ),
-            )
-        ],
+        children: List<Widget>.generate(
+          _paymentMethodList.length,
+          (index) => _paymentMethodOption(
+            _paymentMethodList[index],
+            _paymentImageIconList[index],
+          ),
+        ),
       ),
     );
   }

@@ -5,10 +5,10 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
 import 'package:fashionstore/data/enum/navigation_name_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
-import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
+import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -59,10 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
           listeners: [
             BlocListener<UploadFileBloc, UploadFileState>(
               listener: (context, uploadFileState) {
-                if (uploadFileState is UploadFileUploadingState) {
-                  UiRender.showLoaderDialog(context);
-                }
-
                 if (uploadFileState is UploadFileUploadedState) {
                   context.router.pop();
 

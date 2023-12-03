@@ -1,13 +1,12 @@
 import 'package:auto_route/annotations.dart';
-import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/data/entity/invoice.dart';
 import 'package:fashionstore/data/entity/invoice_item.dart';
-import 'package:fashionstore/views/layout/layout.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
+import 'package:fashionstore/views/layout/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -129,10 +128,6 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
                 "Payment status",
                 widget.invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
               ),
-              _invoiceDataLine(
-                "Delivery status",
-                widget.invoice.deliveryStatus.formatEnumToUppercaseFirstLetter,
-              ),
               widget.invoice.reason != null && widget.invoice.reason!.isNotEmpty
                   ? _invoiceDataLine(
                       'Delivery reason',
@@ -142,17 +137,6 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
               _invoiceDataLine(
                 'Total items ($totalQuantity)',
                 totalPrice.format.dollar,
-              ),
-              _invoiceDataLine(
-                widget.invoice.deliveryType.formatEnumToUppercaseFirstLetter,
-                context
-                    .read<DeliveryBloc>()
-                    .currentDeliveryTypeList
-                    .firstWhere((element) =>
-                        element.name == widget.invoice.deliveryType)
-                    .price
-                    .format
-                    .dollar,
               ),
               _invoiceDataLine(
                 'Total price (${invoiceItemList.length})',

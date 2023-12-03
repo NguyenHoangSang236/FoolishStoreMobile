@@ -6,7 +6,6 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
-import 'package:fashionstore/bloc/delivery/delivery_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
@@ -15,7 +14,6 @@ import 'package:fashionstore/data/repository/authentication_repository.dart';
 import 'package:fashionstore/data/repository/cart_repository.dart';
 import 'package:fashionstore/data/repository/category_repository.dart';
 import 'package:fashionstore/data/repository/comment_repository.dart';
-import 'package:fashionstore/data/repository/delivery_repository.dart';
 import 'package:fashionstore/data/repository/google_drive_repository.dart';
 import 'package:fashionstore/data/repository/invoice_repository.dart';
 import 'package:fashionstore/data/repository/shop_repository.dart';
@@ -40,8 +38,7 @@ import 'firebase_options.dart';
 final appRouter = AppRouter();
 final Dio dio = Dio();
 
-// const String domain = '172.16.30.142';
-const String domain = '192.168.1.25';
+const String domain = '192.168.1.10';
 const String serverKey =
     'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
 
@@ -121,9 +118,6 @@ void main() async {
         RepositoryProvider<InvoiceRepository>(
           create: (context) => InvoiceRepository(),
         ),
-        RepositoryProvider<DeliveryRepository>(
-          create: (context) => DeliveryRepository(),
-        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -177,11 +171,6 @@ void main() async {
           BlocProvider<InvoiceBloc>(
             create: (context) => InvoiceBloc(
               RepositoryProvider.of<InvoiceRepository>(context),
-            ),
-          ),
-          BlocProvider<DeliveryBloc>(
-            create: (context) => DeliveryBloc(
-              RepositoryProvider.of<DeliveryRepository>(context),
             ),
           ),
         ],

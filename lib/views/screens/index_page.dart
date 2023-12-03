@@ -4,12 +4,12 @@ import 'package:fashionstore/bloc/products/product_bloc.dart';
 import 'package:fashionstore/data/entity/category.dart';
 import 'package:fashionstore/data/enum/product_list_type_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
+import 'package:fashionstore/service/loading_service.dart';
+import 'package:fashionstore/utils/extension/number_extension.dart';
+import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:fashionstore/views/components/product_component.dart';
 import 'package:fashionstore/views/layout/layout.dart';
-import 'package:fashionstore/utils/extension/number_extension.dart';
-import 'package:fashionstore/utils/render/value_render.dart';
-import 'package:fashionstore/utils/service/loading_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

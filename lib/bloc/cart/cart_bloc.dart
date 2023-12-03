@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fashionstore/data/dto/cart_checkout.dart';
 import 'package:fashionstore/data/enum/cart_enum.dart';
-import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/cart_item.dart';
@@ -203,7 +202,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartCheckoutLoadingState());
 
       try {
-        final response = await _cartRepository.checkout(event.deliveryType);
+        final response = await _cartRepository.checkout();
 
         response.fold(
           (failure) => emit(CartErrorState(failure.message)),

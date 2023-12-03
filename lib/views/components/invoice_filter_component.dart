@@ -5,14 +5,14 @@ import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/data/enum/admin_acceptance_enum.dart';
 import 'package:fashionstore/data/enum/delivery_enum.dart';
 import 'package:fashionstore/data/enum/payment_enum.dart';
-import 'package:fashionstore/views/components/checkbox_selection.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
+import 'package:fashionstore/views/components/checkbox_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/dto/invoice_filter.dart';
-import '../../utils/service/loading_service.dart';
+import '../../service/loading_service.dart';
 import 'gradient_button.dart';
 
 class InvoiceFilterComponent extends StatefulWidget {

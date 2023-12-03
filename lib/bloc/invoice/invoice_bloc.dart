@@ -30,7 +30,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       try {
         final response = await _invoiceRepository.addNewOrder(
           paymentMethod: event.paymentMethod,
-          deliveryType: event.deliveryType,
         );
 
         response.fold(

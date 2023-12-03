@@ -12,8 +12,3 @@ enum DeliveryEnum {
   FIRST_ATTEMPT_FAILED,
   SECOND_ATTEMPT_FAILED,
 }
-
-enum DeliveryTypeEnum {
-  NORMAL_DELIVERY,
-  EXPRESS_DELIVERY,
-}

@@ -17,9 +17,7 @@ class OnLoadAllCartListEvent extends CartEvent {
 }
 
 class OnCheckoutEvent extends CartEvent {
-  final DeliveryTypeEnum deliveryType;
-
-  const OnCheckoutEvent(this.deliveryType);
+  const OnCheckoutEvent();
 }
 
 class OnLoadTotalCartItemQuantityEvent extends CartEvent {}
