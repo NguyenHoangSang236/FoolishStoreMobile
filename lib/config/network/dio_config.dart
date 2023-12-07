@@ -35,7 +35,7 @@ class DioConfig {
 
   static void configBasicOptions(Dio dio) {
     dio.options = BaseOptions(
-      baseUrl: 'https://$domain:8080',
+      baseUrl: 'https://$domainIP:8080',
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),

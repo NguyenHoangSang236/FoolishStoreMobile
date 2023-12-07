@@ -11,7 +11,7 @@ import '../render/value_render.dart';
 import 'failure.dart';
 
 class NetworkService {
-  static String baseUrl = 'https://$domain:8080';
+  static String baseUrl = 'https://$domainIP:8080';
 
   const NetworkService._();
 
@@ -55,7 +55,7 @@ class NetworkService {
     //     ),
     //   );
     // dio.options = BaseOptions(
-    //   baseUrl: domain,
+    //   baseUrl: domainIP,
     //   receiveDataWhenStatusError: true,
     //   validateStatus: (status) {
     //     return status! < 500;
@@ -74,7 +74,7 @@ class NetworkService {
         ? await dio.get(baseUrl + url)
         : await dio.post(baseUrl + url, data: formDataParam ?? param);
 
-    // debugPrint(domain + url);
+    // debugPrint(domainIP + url);
     // debugPrint('request: ${param ?? formDataParam.toString()}');
     // debugPrint('header: ${response.headers}');
     // debugPrint('statusCode: ${response.statusCode}');

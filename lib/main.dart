@@ -38,7 +38,7 @@ import 'firebase_options.dart';
 final appRouter = AppRouter();
 final Dio dio = Dio();
 
-const String domain = '192.168.1.10';
+const String domainIP = '14.225.254.87';
 const String serverKey =
     'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
 

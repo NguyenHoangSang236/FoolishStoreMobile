@@ -2,14 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
 import 'package:fashionstore/data/entity/category.dart';
-import 'package:fashionstore/data/enum/product_list_type_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
 import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
-import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:fashionstore/views/components/product_component.dart';
-import 'package:fashionstore/views/layout/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,7 +14,10 @@ import '../../bloc/productSearching/product_searching_bloc.dart';
 import '../../config/app_router/app_router_path.dart';
 import '../../data/entity/product.dart';
 import '../../data/enum/navigation_name_enum.dart';
+import '../../data/enum/product_list_type_enum.dart';
 import '../../utils/render/ui_render.dart';
+import '../components/gradient_button.dart';
+import '../layout/layout.dart';
 
 @RoutePage()
 class IndexPage extends StatefulWidget {
@@ -212,71 +212,72 @@ class _IndexPageState extends State<IndexPage> {
 
   Widget _productList(String type) {
     return BlocBuilder<ProductBloc, ProductState>(
-        builder: (context, productState) {
-      List<Product> productList = (type == 'HOT_DISCOUNT'
-          ? context.read<ProductBloc>().hotDiscountProductList
-          : type == 'NEW_ARRIVAL'
-              ? context.read<ProductBloc>().newArrivalProductList
-              : context.read<ProductBloc>().top8BestSellerProductList);
-      if (productState is ProductLoadingState) {
-        return UiRender.loadingCircle();
-      }
-
-      if (productState is! ProductErrorState &&
-          productState is! ProductSearchingListLoadedState &&
-          productState is! ProductLoadingState) {
-        switch (type) {
-          case 'HOT_DISCOUNT':
-            {
-              productList =
-                  List.from(context.read<ProductBloc>().hotDiscountProductList);
-              break;
-            }
-          case 'NEW_ARRIVAL':
-            {
-              productList =
-                  List.from(context.read<ProductBloc>().newArrivalProductList);
-              break;
-            }
-          case 'TOP_BEST_SELLERS':
-            {
-              productList = List.from(
-                  context.read<ProductBloc>().top8BestSellerProductList);
-              break;
-            }
+      builder: (context, productState) {
+        List<Product> productList = (type == 'HOT_DISCOUNT'
+            ? context.read<ProductBloc>().hotDiscountProductList
+            : type == 'NEW_ARRIVAL'
+                ? context.read<ProductBloc>().newArrivalProductList
+                : context.read<ProductBloc>().top8BestSellerProductList);
+        if (productState is ProductLoadingState) {
+          return UiRender.loadingCircle();
         }
-      }
 
-      if (productList.isEmpty) {
-        return const Center(
-          child: Text('NOT AVAILABLE!!'),
-        );
-      } else {
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: productList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 0.65,
-            crossAxisCount: 2,
-            crossAxisSpacing: 20.height,
-            mainAxisSpacing: 25.width,
-          ),
-          itemBuilder: (context, index) {
-            return ProductComponent(
-              product: productList[index],
-              onClick: () async {
-                await LoadingService(context)
-                    .selectToViewProduct(productList[index])
-                    .then(
-                      (value) => context.router
-                          .pushNamed(AppRouterPath.productDetails),
-                    );
-              },
-            );
-          },
-        );
-      }
-    });
+        if (productState is! ProductErrorState &&
+            productState is! ProductSearchingListLoadedState &&
+            productState is! ProductLoadingState) {
+          switch (type) {
+            case 'HOT_DISCOUNT':
+              {
+                productList = List.from(
+                    context.read<ProductBloc>().hotDiscountProductList);
+                break;
+              }
+            case 'NEW_ARRIVAL':
+              {
+                productList = List.from(
+                    context.read<ProductBloc>().newArrivalProductList);
+                break;
+              }
+            case 'TOP_BEST_SELLERS':
+              {
+                productList = List.from(
+                    context.read<ProductBloc>().top8BestSellerProductList);
+                break;
+              }
+          }
+        }
+
+        if (productList.isEmpty) {
+          return const Center(
+            child: Text('NOT AVAILABLE!!'),
+          );
+        } else {
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: productList.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 0.65,
+              crossAxisCount: 2,
+              crossAxisSpacing: 20.height,
+              mainAxisSpacing: 25.width,
+            ),
+            itemBuilder: (context, index) {
+              return ProductComponent(
+                product: productList[index],
+                onClick: () async {
+                  await LoadingService(context)
+                      .selectToViewProduct(productList[index])
+                      .then(
+                        (value) => context.router
+                            .pushNamed(AppRouterPath.productDetails),
+                      );
+                },
+              );
+            },
+          );
+        }
+      },
+    );
   }
 }
