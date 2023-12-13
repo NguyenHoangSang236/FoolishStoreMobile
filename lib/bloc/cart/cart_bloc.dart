@@ -1,9 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fashionstore/data/dto/address_code_request.dart';
 import 'package:fashionstore/data/dto/cart_checkout.dart';
 import 'package:fashionstore/data/enum/cart_enum.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../data/dto/ghn_shipping_service.dart';
+import '../../data/entity/address_code.dart';
 import '../../data/entity/cart_item.dart';
 import '../../data/entity/cart_item_info.dart';
 import '../../data/repository/cart_repository.dart';
@@ -22,6 +25,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   CartCheckout? currentCheckout;
   String currentBrandFilter = '';
   String currentNameFilter = '';
+  AddressCode? currentAddressCode;
+  List<GhnShippingService>? currentGhnShippingServiceList;
 
   CartBloc(this._cartRepository) : super(CartInitial()) {
     on<OnLoadAllCartListEvent>((event, emit) async {
@@ -202,7 +207,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartCheckoutLoadingState());
 
       try {
-        final response = await _cartRepository.checkout();
+        final response = await _cartRepository.checkout(
+          addressCode: event.addressCode,
+          serviceId: event.serviceId,
+        );
 
         response.fold(
           (failure) => emit(CartErrorState(failure.message)),
@@ -210,6 +218,51 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             currentCheckout = cartCheckout;
 
             emit(CartCheckoutState(cartCheckout));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartErrorState(e.toString()));
+      }
+    });
+
+    on<OnLoadGhnAddressCodeEvent>((event, emit) async {
+      emit(CartCheckoutLoadingState());
+
+      try {
+        final response = await _cartRepository.getGhnAddressCode(
+          addressCodeRequest: event.addressCodeRequest,
+        );
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (addressCode) {
+            currentAddressCode = addressCode;
+
+            emit(AddressCodeLoadedState(addressCode));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartErrorState(e.toString()));
+      }
+    });
+
+    on<OnLoadGhnAvailableShippingServicesEvent>((event, emit) async {
+      emit(CartCheckoutLoadingState());
+
+      try {
+        final response = await _cartRepository.getGnhAvailableServiceList(
+          fromDistrictId: event.fromDistrictId,
+          toDistrictId: event.toDistrictId,
+        );
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (list) {
+            currentGhnShippingServiceList = list;
+
+            emit(GhnShippingServiceListLoadedState(list));
           },
         );
       } catch (e) {

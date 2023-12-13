@@ -91,6 +91,24 @@ class CartUpdatedState extends CartState {
   List<Object> get props => [message];
 }
 
+class AddressCodeLoadedState extends CartState {
+  final AddressCode addressCode;
+
+  const AddressCodeLoadedState(this.addressCode);
+
+  @override
+  List<Object> get props => [addressCode];
+}
+
+class GhnShippingServiceListLoadedState extends CartState {
+  final List<GhnShippingService> serviceList;
+
+  const GhnShippingServiceListLoadedState(this.serviceList);
+
+  @override
+  List<Object> get props => [serviceList];
+}
+
 class CartSelectedState extends CartState {
   @override
   List<Object> get props => [];

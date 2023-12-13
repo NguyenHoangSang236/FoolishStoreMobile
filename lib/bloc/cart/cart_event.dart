@@ -17,7 +17,29 @@ class OnLoadAllCartListEvent extends CartEvent {
 }
 
 class OnCheckoutEvent extends CartEvent {
-  const OnCheckoutEvent();
+  final AddressCode addressCode;
+  final int serviceId;
+
+  const OnCheckoutEvent(
+    this.addressCode,
+    this.serviceId,
+  );
+}
+
+class OnLoadGhnAddressCodeEvent extends CartEvent {
+  final AddressCodeRequest addressCodeRequest;
+
+  const OnLoadGhnAddressCodeEvent(this.addressCodeRequest);
+}
+
+class OnLoadGhnAvailableShippingServicesEvent extends CartEvent {
+  final int fromDistrictId;
+  final int toDistrictId;
+
+  const OnLoadGhnAvailableShippingServicesEvent(
+    this.fromDistrictId,
+    this.toDistrictId,
+  );
 }
 
 class OnLoadTotalCartItemQuantityEvent extends CartEvent {}

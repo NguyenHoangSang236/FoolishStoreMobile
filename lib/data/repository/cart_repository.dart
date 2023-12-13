@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:either_dart/either.dart';
+import 'package:fashionstore/data/dto/address_code_request.dart';
 import 'package:fashionstore/data/dto/cart_checkout.dart';
+import 'package:fashionstore/data/dto/ghn_shipping_service.dart';
 import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../utils/network/network_service.dart';
 import '../dto/api_response.dart';
+import '../entity/address_code.dart';
 import '../entity/cart_item.dart';
 import '../entity/cart_item_info.dart';
 
@@ -42,20 +45,73 @@ class CartRepository {
     }
   }
 
-  Future<Either<Failure, CartCheckout>> getCartCheckout(
-    String url,
-  ) async {
+  Future<Either<Failure, CartCheckout>> getCartCheckout({
+    required String url,
+    required AddressCode addressCode,
+    required int serviceId,
+  }) async {
     try {
+      Map<String, dynamic> requestMap = addressCode.toJson();
+      requestMap.addAll({"serviceId": serviceId});
+
       ApiResponse response = await NetworkService.getDataFromApi(
-        ValueRender.getUrl(
-          type: type,
-          url: url,
-          isAuthen: true,
-        ),
+        url,
+        param: requestMap,
       );
 
       if (response.result == 'success') {
         return Right(CartCheckout.fromJson(response.content));
+      } else {
+        return Left(ApiFailure(response.content));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught Exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, AddressCode>> getGhnAddressCodeFromAddressString({
+    required String url,
+    required AddressCodeRequest addressCodeRequest,
+  }) async {
+    try {
+      ApiResponse response = await NetworkService.getDataFromApi(
+        url,
+        param: addressCodeRequest.toJson(),
+      );
+
+      if (response.result == 'success') {
+        return Right(AddressCode.fromJson(response.content));
+      } else {
+        return Left(ApiFailure(response.content));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught Exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<GhnShippingService>>>
+      getGhnShippingServiceListFromDistrictId({
+    required String url,
+    required int fromDistrictId,
+    required int toDistrictId,
+  }) async {
+    try {
+      ApiResponse response = await NetworkService.getDataFromApi(
+        url,
+        param: {
+          "fromDistrictId": fromDistrictId,
+          "toDistrictId": toDistrictId,
+        },
+      );
+
+      if (response.result == 'success') {
+        List<dynamic> jsonList = json.decode(jsonEncode(response.content));
+
+        return Right(
+          jsonList.map((json) => GhnShippingService.fromJson(json)).toList(),
+        );
       } else {
         return Left(ApiFailure(response.content));
       }
@@ -145,7 +201,34 @@ class CartRepository {
     );
   }
 
-  Future<Either<Failure, CartCheckout>> checkout() {
-    return getCartCheckout('/checkout');
+  Future<Either<Failure, CartCheckout>> checkout({
+    required AddressCode addressCode,
+    required int serviceId,
+  }) {
+    return getCartCheckout(
+      url: '/checkout',
+      addressCode: addressCode,
+      serviceId: serviceId,
+    );
+  }
+
+  Future<Either<Failure, AddressCode>> getGhnAddressCode({
+    required AddressCodeRequest addressCodeRequest,
+  }) {
+    return getGhnAddressCodeFromAddressString(
+      url: '/getGhnAddressCode',
+      addressCodeRequest: addressCodeRequest,
+    );
+  }
+
+  Future<Either<Failure, List<GhnShippingService>>> getGnhAvailableServiceList({
+    required int fromDistrictId,
+    required int toDistrictId,
+  }) {
+    return getGhnShippingServiceListFromDistrictId(
+      url: '/getGnhAvailableServiceList',
+      fromDistrictId: fromDistrictId,
+      toDistrictId: toDistrictId,
+    );
   }
 }
