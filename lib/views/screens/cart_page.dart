@@ -64,9 +64,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressCheckoutButton() {
-    context.read<CartBloc>().add(
-          OnCheckoutEvent(),
-        );
+    // context.read<CartBloc>().add(
+    //       OnCheckoutEvent(),
+    //     );
 
     context.router.pop().then(
           (value) => showModalBottomSheet(
@@ -194,8 +194,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     Widget paymentIcon,
   ) {
     context.router.pop();
-
-    context.read<CartBloc>().add(const OnCheckoutEvent());
 
     setState(() {
       _selectedPaymentMethod = paymentEnum!;

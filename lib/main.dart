@@ -10,6 +10,7 @@ import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
 import 'package:fashionstore/config/network/dio_config.dart';
+import 'package:fashionstore/config/network/web_socket_config.dart';
 import 'package:fashionstore/data/repository/authentication_repository.dart';
 import 'package:fashionstore/data/repository/cart_repository.dart';
 import 'package:fashionstore/data/repository/category_repository.dart';
@@ -26,6 +27,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stomp_dart_client/stomp.dart';
+import 'package:stomp_dart_client/stomp_config.dart';
 
 import 'bloc/invoice/invoice_bloc.dart';
 import 'bloc/productDetails/product_details_bloc.dart';
@@ -38,11 +40,20 @@ import 'firebase_options.dart';
 final appRouter = AppRouter();
 final Dio dio = Dio();
 
-const String domainIP = '14.225.254.87';
+// const String domainIP = '14.225.254.87';
+const String domainIP = '192.168.1.20';
 const String serverKey =
     'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
 
-late StompClient stompClient;
+final StompClient stompClient = StompClient(
+  config: const StompConfig(
+    url: 'wss://$domainIP:8080',
+    onConnect: WebSocketConfig.onConnect,
+    onStompError: WebSocketConfig.onStompError,
+    onWebSocketError: WebSocketConfig.onWebSocketError,
+    onWebSocketDone: WebSocketConfig.onWebSocketDone,
+  ),
+);
 
 @pragma("vm:entry-point")
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -51,6 +62,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message ${message.messageId}');
   // await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
+
+  stompClient.activate();
 
   FirebaseMessagingService.initializeLocalNotifications(debug: true);
   FirebaseMessagingService.initializeRemoteNotifications(debug: true);

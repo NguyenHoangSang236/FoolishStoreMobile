@@ -7,7 +7,7 @@ import 'package:stomp_dart_client/stomp_frame.dart';
 class WebSocketConfig {
   static void onConnect(StompFrame frame) {
     stompClient.subscribe(
-      destination: '/authen/notification/filterNotifications',
+      destination: '/unauthen/topic/messages',
       callback: (frame) {
         debugPrint('subscribe');
         debugPrint(frame.body);
@@ -17,7 +17,7 @@ class WebSocketConfig {
     Timer.periodic(const Duration(seconds: 10), (_) {
       stompClient.send(
         destination: '/app/sendNotification',
-        body: '',
+        body: 'hello',
       );
     });
   }
