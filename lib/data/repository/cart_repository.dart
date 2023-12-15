@@ -7,6 +7,8 @@ import 'package:fashionstore/data/dto/ghn_shipping_service.dart';
 import 'package:fashionstore/utils/network/failure.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../utils/network/network_service.dart';
 import '../dto/api_response.dart';
@@ -55,7 +57,11 @@ class CartRepository {
       requestMap.addAll({"serviceId": serviceId});
 
       ApiResponse response = await NetworkService.getDataFromApi(
-        url,
+        ValueRender.getUrl(
+          isAuthen: true,
+          type: type,
+          url: url,
+        ),
         param: requestMap,
       );
 
@@ -76,7 +82,11 @@ class CartRepository {
   }) async {
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
-        url,
+        ValueRender.getUrl(
+          isAuthen: true,
+          type: type,
+          url: url,
+        ),
         param: addressCodeRequest.toJson(),
       );
 
@@ -99,7 +109,11 @@ class CartRepository {
   }) async {
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
-        url,
+        ValueRender.getUrl(
+          isAuthen: true,
+          type: type,
+          url: url,
+        ),
         param: {
           "fromDistrictId": fromDistrictId,
           "toDistrictId": toDistrictId,
@@ -230,5 +244,39 @@ class CartRepository {
       fromDistrictId: fromDistrictId,
       toDistrictId: toDistrictId,
     );
+  }
+
+  Future<Either<Failure, AddressCodeRequest>>
+      getAddressCodeRequestFromCoordinate(
+    LatLng latLng,
+  ) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final placeMark = placemarks.first;
+
+        print(placeMark.toJson());
+
+        return Right(AddressCodeRequest(
+          fromAddress: '249 Đặng Thúc Vịnh ấp 7',
+          fromWard: 'Đông Thạnh',
+          fromDistrict: 'Hóc Môn',
+          fromProvince: 'Thành phố Hồ Chí Minh',
+          toAddress: placeMark.street ?? '',
+          toWard: placeMark.subLocality ?? '',
+          toDistrict: placeMark.subAdministrativeArea ?? '',
+          toProvince: placeMark.administrativeArea ?? '',
+        ));
+      } else {
+        return const Left(ApiFailure('No data'));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Caught Exception: $e\n$stackTrace');
+      return Left(ExceptionFailure(e.toString()));
+    }
   }
 }

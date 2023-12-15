@@ -17,6 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:side_sheet/side_sheet.dart';
 
+import '../../data/entity/address_code.dart';
 import '../../data/enum/navigation_name_enum.dart';
 import '../../data/enum/payment_enum.dart';
 import '../../data/static/global_variables.dart';
@@ -53,6 +54,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     PaymentMethodEnum.COD,
   ];
 
+  late AddressCode _currentSelectedAddressCode;
+
   late Widget _selectedPaymentMethodIcon;
   late PaymentMethodEnum _selectedPaymentMethod;
 
@@ -65,27 +68,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   void onPressCheckoutButton() {
     context.router.pushNamed(AppRouterPath.map);
-
-    // context.router.pop().then(
-    //       (value) => showModalBottomSheet(
-    //         constraints: BoxConstraints(
-    //           maxHeight: MediaQuery.of(context).size.height,
-    //           minHeight: MediaQuery.of(context).size.height / 4,
-    //         ),
-    //         shape: RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.only(
-    //             topRight: Radius.circular(15.radius),
-    //             topLeft: Radius.circular(15.radius),
-    //           ),
-    //         ),
-    //         transitionAnimationController: _bottomSheetAnimation,
-    //         isScrollControlled: true,
-    //         context: context,
-    //         builder: (context) {
-    //           return _checkoutBottomSheet();
-    //         },
-    //       ),
-    //     );
   }
 
   void onPressCartItem(CartItem cartItem) {
@@ -254,6 +236,47 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                 } else if (cartState is AllCartListLoadedState ||
                     cartState is CartFilteredState) {
                   _scrollController.jumpTo(currentOffset);
+                } else if (cartState is AddressCodeRequestLoadedState) {
+                  context.read<CartBloc>().add(
+                        OnLoadGhnAddressCodeEvent(cartState.addressCodeRequest),
+                      );
+                } else if (cartState is AddressCodeLoadedState) {
+                  setState(() {
+                    _currentSelectedAddressCode = cartState.addressCode;
+                  });
+
+                  context.read<CartBloc>().add(
+                        OnLoadGhnAvailableShippingServicesEvent(
+                          cartState.addressCode.fromDistrictId!,
+                          cartState.addressCode.toDistrictId!,
+                        ),
+                      );
+                } else if (cartState is GhnShippingServiceListLoadedState) {
+                  context.read<CartBloc>().add(
+                        OnCheckoutEvent(
+                          _currentSelectedAddressCode,
+                          cartState.serviceList.first.service_id,
+                        ),
+                      );
+                } else if (cartState is CartCheckoutState) {
+                  showModalBottomSheet(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height,
+                      minHeight: MediaQuery.of(context).size.height / 4,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.radius),
+                        topLeft: Radius.circular(15.radius),
+                      ),
+                    ),
+                    transitionAnimationController: _bottomSheetAnimation,
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) {
+                      return _checkoutBottomSheet();
+                    },
+                  );
                 }
               },
             ),

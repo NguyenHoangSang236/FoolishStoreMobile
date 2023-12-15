@@ -4,6 +4,7 @@ import 'package:fashionstore/data/dto/address_code_request.dart';
 import 'package:fashionstore/data/dto/cart_checkout.dart';
 import 'package:fashionstore/data/enum/cart_enum.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../data/dto/ghn_shipping_service.dart';
 import '../../data/entity/address_code.dart';
@@ -26,6 +27,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   String currentBrandFilter = '';
   String currentNameFilter = '';
   AddressCode? currentAddressCode;
+  AddressCodeRequest? currentAddressCodeRequest;
   List<GhnShippingService>? currentGhnShippingServiceList;
 
   CartBloc(this._cartRepository) : super(CartInitial()) {
@@ -203,6 +205,29 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       }
     });
 
+    on<OnLoadAddressCodeRequestEvent>((event, emit) async {
+      emit(CartLoadingState());
+
+      try {
+        final response =
+            await _cartRepository.getAddressCodeRequestFromCoordinate(
+          event.latLng,
+        );
+
+        response.fold(
+          (failure) => emit(CartErrorState(failure.message)),
+          (addressCodeRequest) {
+            currentAddressCodeRequest = addressCodeRequest;
+
+            emit(AddressCodeRequestLoadedState(addressCodeRequest));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartErrorState(e.toString()));
+      }
+    });
+
     on<OnCheckoutEvent>((event, emit) async {
       emit(CartCheckoutLoadingState());
 
@@ -227,7 +252,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<OnLoadGhnAddressCodeEvent>((event, emit) async {
-      emit(CartCheckoutLoadingState());
+      emit(CartLoadingState());
 
       try {
         final response = await _cartRepository.getGhnAddressCode(
@@ -249,7 +274,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<OnLoadGhnAvailableShippingServicesEvent>((event, emit) async {
-      emit(CartCheckoutLoadingState());
+      emit(CartLoadingState());
 
       try {
         final response = await _cartRepository.getGnhAvailableServiceList(

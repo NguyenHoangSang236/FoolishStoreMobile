@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/main.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
 
 import '../../utils/network/failure.dart';
 import '../dto/place.dart';
@@ -23,11 +24,22 @@ class MapRepository {
 
         for (var result in results) {
           String formatted = result['formatted'];
-          double lat = result['geometry']['lat'];
-          double lng = result['geometry']['lng'];
 
-          Place place = Place(formatted, lat, lng);
-          suggestionPlaceList.add(place);
+          List<Location> locations = await locationFromAddress(formatted);
+
+          if (locations.isNotEmpty) {
+            Place place = Place(
+              formatted,
+              locations.first.latitude,
+              locations.first.longitude,
+            );
+            suggestionPlaceList.add(place);
+          } else {
+            return const Left(ApiFailure('No data'));
+          }
+
+          // double lat = result['geometry']['lat'];
+          // double lng = result['geometry']['lng'];
         }
 
         return Right(suggestionPlaceList);

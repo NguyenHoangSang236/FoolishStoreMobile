@@ -75,5 +75,15 @@ class OnAddCartItemEvent extends CartEvent {
   final int quantity;
 
   const OnAddCartItemEvent(
-      this.productId, this.color, this.size, this.quantity);
+    this.productId,
+    this.color,
+    this.size,
+    this.quantity,
+  );
+}
+
+class OnLoadAddressCodeRequestEvent extends CartEvent {
+  final LatLng latLng;
+
+  const OnLoadAddressCodeRequestEvent(this.latLng);
 }

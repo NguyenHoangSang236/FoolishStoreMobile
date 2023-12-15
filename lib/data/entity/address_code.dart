@@ -12,12 +12,12 @@ class AddressCode {
   String? toWardCode;
 
   AddressCode({
-    required this.fromDistrictId,
-    required this.toDistrictId,
-    required this.fromProvinceId,
-    required this.toProvinceId,
-    required this.fromWardCode,
-    required this.toWardCode,
+    this.fromDistrictId,
+    this.toDistrictId,
+    this.fromProvinceId,
+    this.toProvinceId,
+    this.fromWardCode,
+    this.toWardCode,
   });
 
   factory AddressCode.fromJson(Map<String, dynamic> json) =>

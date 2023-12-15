@@ -13,16 +13,16 @@ class AddressCodeRequest {
   String toWard;
   String toAddress;
 
-  AddressCodeRequest(
-    this.fromProvince,
-    this.fromDistrict,
-    this.fromWard,
-    this.fromAddress,
-    this.toProvince,
-    this.toDistrict,
-    this.toWard,
-    this.toAddress,
-  );
+  AddressCodeRequest({
+    required this.fromProvince,
+    required this.fromDistrict,
+    required this.fromWard,
+    required this.fromAddress,
+    required this.toProvince,
+    required this.toDistrict,
+    required this.toWard,
+    required this.toAddress,
+  });
 
   factory AddressCodeRequest.fromJson(Map<String, dynamic> json) =>
       _$AddressCodeRequestFromJson(json);

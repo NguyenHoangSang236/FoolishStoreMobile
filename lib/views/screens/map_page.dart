@@ -7,10 +7,12 @@ import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/position_extension.dart';
 import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../bloc/cart/cart_bloc.dart';
 import '../../data/dto/place.dart';
 import '../../service/map_service.dart';
 import '../../utils/render/ui_render.dart';
@@ -26,6 +28,7 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
   late Position _currentPosition;
+  LatLng? _currentLatLng;
   final TextEditingController _searchingController = TextEditingController();
   List<Place> _suggestionLPlaceList = [];
 
@@ -45,6 +48,9 @@ class _MapPageState extends State<MapPage> {
     required LatLng latLng,
   }) async {
     setState(() {
+      _currentLatLng = latLng;
+
+      _markers.removeWhere((marker) => marker.markerId.value == 'My Location');
       _markers.add(
         Marker(
           markerId: const MarkerId('My Location'),
@@ -62,6 +68,10 @@ class _MapPageState extends State<MapPage> {
       target: latLng,
       zoom: 14,
     );
+
+    setState(() {
+      _currentLatLng = latLng;
+    });
 
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(
@@ -111,6 +121,22 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       _searchingController.clear();
     });
+  }
+
+  void _confirmLocation() {
+    if (_currentLatLng != null) {
+      context.read<CartBloc>().add(
+            OnLoadAddressCodeRequestEvent(_currentLatLng!),
+          );
+
+      context.router.pop();
+    } else {
+      UiRender.showDialog(
+        context,
+        '',
+        'Please choose a location for us to ship your order!',
+      );
+    }
   }
 
   @override
@@ -229,7 +255,7 @@ class _MapPageState extends State<MapPage> {
           children: [
             GradientElevatedButton(
               text: 'Confirm Location',
-              onPress: () {},
+              onPress: _confirmLocation,
               buttonMargin: EdgeInsets.zero,
               buttonHeight: 50.height,
             ),

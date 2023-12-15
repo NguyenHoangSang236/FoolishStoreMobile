@@ -100,6 +100,15 @@ class AddressCodeLoadedState extends CartState {
   List<Object> get props => [addressCode];
 }
 
+class AddressCodeRequestLoadedState extends CartState {
+  final AddressCodeRequest addressCodeRequest;
+
+  const AddressCodeRequestLoadedState(this.addressCodeRequest);
+
+  @override
+  List<Object> get props => [addressCodeRequest];
+}
+
 class GhnShippingServiceListLoadedState extends CartState {
   final List<GhnShippingService> serviceList;
 
