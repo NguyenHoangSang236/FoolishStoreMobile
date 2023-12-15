@@ -6,6 +6,7 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
+import 'package:fashionstore/bloc/map/map_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
@@ -35,6 +36,7 @@ import 'bloc/productSearching/product_searching_bloc.dart';
 import 'bloc/products/product_bloc.dart';
 import 'config/app_router/app_router_config.dart';
 import 'config/network/http_client_config.dart';
+import 'data/repository/map_repository.dart';
 import 'firebase_options.dart';
 
 final appRouter = AppRouter();
@@ -42,6 +44,7 @@ final Dio dio = Dio();
 
 // const String domainIP = '14.225.254.87';
 const String domainIP = '192.168.1.20';
+const String apiKey = 'AIzaSyB81Tx01sQmpvx8VV7jKi7rE_4WZnoE0_g';
 const String serverKey =
     'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
 
@@ -131,6 +134,9 @@ void main() async {
         RepositoryProvider<InvoiceRepository>(
           create: (context) => InvoiceRepository(),
         ),
+        RepositoryProvider<MapRepository>(
+          create: (context) => MapRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -184,6 +190,11 @@ void main() async {
           BlocProvider<InvoiceBloc>(
             create: (context) => InvoiceBloc(
               RepositoryProvider.of<InvoiceRepository>(context),
+            ),
+          ),
+          BlocProvider<MapBloc>(
+            create: (context) => MapBloc(
+              RepositoryProvider.of<MapRepository>(context),
             ),
           ),
         ],

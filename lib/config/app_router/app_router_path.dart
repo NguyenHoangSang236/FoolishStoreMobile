@@ -12,4 +12,5 @@ class AppRouterPath {
   static String purchaseHistory = '/purchaseHistory';
   static String notification = '/notification';
   static String invoiceDetails = '/invoiceDetails';
+  static String map = '/map';
 }

@@ -64,30 +64,28 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressCheckoutButton() {
-    // context.read<CartBloc>().add(
-    //       OnCheckoutEvent(),
-    //     );
+    context.router.pushNamed(AppRouterPath.map);
 
-    context.router.pop().then(
-          (value) => showModalBottomSheet(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height,
-              minHeight: MediaQuery.of(context).size.height / 4,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(15.radius),
-                topLeft: Radius.circular(15.radius),
-              ),
-            ),
-            transitionAnimationController: _bottomSheetAnimation,
-            isScrollControlled: true,
-            context: context,
-            builder: (context) {
-              return _checkoutBottomSheet();
-            },
-          ),
-        );
+    // context.router.pop().then(
+    //       (value) => showModalBottomSheet(
+    //         constraints: BoxConstraints(
+    //           maxHeight: MediaQuery.of(context).size.height,
+    //           minHeight: MediaQuery.of(context).size.height / 4,
+    //         ),
+    //         shape: RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.only(
+    //             topRight: Radius.circular(15.radius),
+    //             topLeft: Radius.circular(15.radius),
+    //           ),
+    //         ),
+    //         transitionAnimationController: _bottomSheetAnimation,
+    //         isScrollControlled: true,
+    //         context: context,
+    //         builder: (context) {
+    //           return _checkoutBottomSheet();
+    //         },
+    //       ),
+    //     );
   }
 
   void onPressCartItem(CartItem cartItem) {

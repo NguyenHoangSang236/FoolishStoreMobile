@@ -10,6 +10,7 @@ import '../../views/screens/cart_page.dart';
 import '../../views/screens/initial_loading_page.dart';
 import '../../views/screens/invoice_details_page.dart';
 import '../../views/screens/login_page.dart';
+import '../../views/screens/map_page.dart';
 import '../../views/screens/notification_page.dart';
 import '../../views/screens/online_payment_receiver_info_page.dart';
 import '../../views/screens/product_details_page.dart';
@@ -61,6 +62,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: SearchingRoute.page,
           path: AppRouterPath.searching,
+        ),
+        AutoRoute(
+          page: MapRoute.page,
+          path: AppRouterPath.map,
         ),
         AutoRoute(
           page: OnlinePaymentReceiverInfoRoute.page,
