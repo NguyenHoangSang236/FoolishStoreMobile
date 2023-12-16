@@ -71,30 +71,28 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressCartItem(CartItem cartItem) {
-    setState(
-      () {
-        context.read<ProductDetailsBloc>().add(
-              OnSelectProductEvent(cartItem.productId),
-            );
+    setState(() {
+      context.read<ProductDetailsBloc>().add(
+            OnSelectProductEvent(cartItem.productId),
+          );
 
-        showModalBottomSheet(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(15.radius),
-              topLeft: Radius.circular(15.radius),
-            ),
+      showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(15.radius),
+            topLeft: Radius.circular(15.radius),
           ),
-          transitionAnimationController: _bottomSheetAnimation,
-          isScrollControlled: true,
-          context: context,
-          builder: (context) {
-            return CartItemDetails(
-              selectedCartItem: cartItem,
-            );
-          },
-        );
-      },
-    );
+        ),
+        transitionAnimationController: _bottomSheetAnimation,
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return CartItemDetails(
+            selectedCartItem: cartItem,
+          );
+        },
+      );
+    });
   }
 
   void onPressFilterButton() {

@@ -24,6 +24,7 @@ class NetworkService {
   static Future<ApiResponse> getDataFromApi(
     String url, {
     Map<String, dynamic>? param,
+    Map<String, dynamic>? queryParam,
     FormData? formDataParam,
   }) async {
     // dio.interceptors
@@ -71,7 +72,7 @@ class NetworkService {
     }
 
     final Response response = (param == null && formDataParam == null)
-        ? await dio.get(baseUrl + url)
+        ? await dio.get(baseUrl + url, queryParameters: queryParam)
         : await dio.post(baseUrl + url, data: formDataParam ?? param);
 
     // debugPrint(domainIP + url);

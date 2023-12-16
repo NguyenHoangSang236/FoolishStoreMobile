@@ -15,6 +15,7 @@ class ShopRepository {
   Future<Either<Failure, List<Product>>> getProductList(
     String url, {
     Map<String, dynamic>? paramBody,
+    Map<String, dynamic>? queryParamBody,
     bool isAuthen = false,
   }) async {
     try {
@@ -25,6 +26,7 @@ class ShopRepository {
           url: url,
         ),
         param: paramBody,
+        queryParam: queryParamBody,
       );
 
       if (response.result == 'success') {
@@ -140,7 +142,10 @@ class ShopRepository {
   }
 
   Future<Either<Failure, List<Product>>> getProductDetails(int productId) {
-    return getProductList('/product_id=$productId');
+    return getProductList(
+      '/product_id=$productId',
+      queryParamBody: {'showFull': true},
+    );
   }
 
   Future<Either<Failure, String>> rateProduct(
