@@ -1,0 +1,3 @@
+const apiKey = "bf1f41f64d1945b89a887e05cc2a3f00";
+const geocodingApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=${apiKey}`;
+const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${searchQuery}&key=${apiKey}`;

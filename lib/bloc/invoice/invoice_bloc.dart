@@ -124,9 +124,11 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     });
 
     on<OnLoadNextPageEvent>((event, emit) async {
-      emit(InvoiceLoadingState());
+      // emit(InvoiceLoadingState());
 
       try {
+        currentInvoiceFilter.page = currentPage + 1;
+
         final response = await _invoiceRepository.filterOrders(
           currentInvoiceFilter,
         );

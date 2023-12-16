@@ -32,6 +32,18 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
   late DateTime _toDate;
   late DateTime _fromDate;
 
+  void _scrollListener() {
+    if (_scrollController.offset >=
+        _scrollController.position.maxScrollExtent) {
+      _scrollController.jumpTo(_scrollController.offset - 10.height);
+
+      Future.delayed(
+        const Duration(milliseconds: 700),
+        () => context.read<InvoiceBloc>().add(const OnLoadNextPageEvent()),
+      );
+    }
+  }
+
   void _onPressFilterButton() {
     SideSheet.left(
       context: context,
@@ -91,6 +103,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
             DateTime.parse('2020-01-01');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.addListener(_scrollListener);
+
       LoadingService(context).reloadAndClearPurchaseHistoryPage();
     });
     super.initState();
@@ -208,6 +222,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
                     if (state is InvoiceListFilteredState) {
                       invoiceList = state.invoiceList;
+                      // _scrollController.jumpTo(_currentOffset);
                     } else if (state is InvoiceLoadingState) {
                       return UiRender.loadingCircle();
                     }
