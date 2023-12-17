@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../utils/render/value_render.dart';
 import '../dto/api_response.dart';
+import '../entity/address_code.dart';
 import '../entity/invoice.dart';
 
 class InvoiceRepository {
@@ -96,14 +97,21 @@ class InvoiceRepository {
 
   Future<Either<Failure, String>> addNewOrder({
     required String paymentMethod,
+    required AddressCode addressCode,
+    required int serviceId,
   }) {
+    Map<String, dynamic> requestMap = {
+      'paymentMethod': paymentMethod,
+      'serviceId': serviceId,
+    };
+
+    requestMap.addAll(addressCode.toJson());
+
     return NetworkService.getMessageFromApi(
       '/addNewOrder',
       type: type,
       isAuthen: true,
-      paramBody: {
-        'paymentMethod': paymentMethod,
-      },
+      paramBody: requestMap,
     );
   }
 

@@ -109,11 +109,24 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   }
 
   void onPressPlaceOrderButton() {
-    context.read<InvoiceBloc>().add(
-          OnAddNewOrderEvent(
-            _selectedPaymentMethod.name,
-          ),
-        );
+    AddressCode? currentAddressCode =
+        context.read<CartBloc>().currentAddressCode;
+
+    if (currentAddressCode == null) {
+      UiRender.showDialog(
+        context,
+        '',
+        'Please choose your location before placing an order!',
+      );
+    } else {
+      context.read<InvoiceBloc>().add(
+            OnAddNewOrderEvent(
+              _selectedPaymentMethod.name,
+              currentAddressCode!,
+              context.read<CartBloc>().currentServiceId,
+            ),
+          );
+    }
   }
 
   void onSelectPaymentMethod() {

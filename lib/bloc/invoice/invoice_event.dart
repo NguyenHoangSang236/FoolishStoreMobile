@@ -9,8 +9,14 @@ abstract class InvoiceEvent extends Equatable {
 
 class OnAddNewOrderEvent extends InvoiceEvent {
   final String paymentMethod;
+  final AddressCode addressCode;
+  final int serviceId;
 
-  const OnAddNewOrderEvent(this.paymentMethod);
+  const OnAddNewOrderEvent(
+    this.paymentMethod,
+    this.addressCode,
+    this.serviceId,
+  );
 }
 
 class OnCancelOrderEvent extends InvoiceEvent {

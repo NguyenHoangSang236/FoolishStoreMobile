@@ -21,6 +21,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   List<CartItem> cartItemList = [];
   int currentPage = 1;
   int totalCartItemQuantity = 0;
+  int currentServiceId = 0;
   bool isFiltered = false;
   List<String> currentFilterOption = [];
   CartCheckout? currentCheckout;
@@ -241,6 +242,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           (failure) => emit(CartErrorState(failure.message)),
           (cartCheckout) {
             currentCheckout = cartCheckout;
+            currentServiceId = event.serviceId;
+            currentAddressCode = event.addressCode;
 
             emit(CartCheckoutState(cartCheckout));
           },

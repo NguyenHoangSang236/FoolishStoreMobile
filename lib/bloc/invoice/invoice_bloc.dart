@@ -5,6 +5,7 @@ import 'package:fashionstore/data/entity/invoice.dart';
 import 'package:fashionstore/data/entity/online_payment_info.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../data/entity/address_code.dart';
 import '../../data/entity/invoice_item.dart';
 import '../../data/repository/invoice_repository.dart';
 
@@ -30,6 +31,8 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       try {
         final response = await _invoiceRepository.addNewOrder(
           paymentMethod: event.paymentMethod,
+          addressCode: event.addressCode,
+          serviceId: event.serviceId,
         );
 
         response.fold(
