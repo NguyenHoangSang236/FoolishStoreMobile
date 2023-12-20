@@ -141,10 +141,14 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
           (invoiceList) {
             currentPage++;
 
-            emit(
-              InvoiceListFilteredState(
-                _removeDuplicate([...currentInvoiceList, ...invoiceList]),
+            currentInvoiceList = List.of(
+              _removeDuplicate(
+                [...currentInvoiceList, ...invoiceList],
               ),
+            );
+
+            emit(
+              InvoiceListFilteredState(currentInvoiceList),
             );
           },
         );

@@ -3,7 +3,7 @@ import 'dart:core';
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
 import 'package:fashionstore/data/enum/admin_acceptance_enum.dart';
-import 'package:fashionstore/data/enum/delivery_enum.dart';
+import 'package:fashionstore/data/enum/order_status_enum.dart';
 import 'package:fashionstore/data/enum/payment_enum.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
@@ -27,10 +27,10 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
       AdminAcceptanceEnum.values;
   List<PaymentMethodEnum> paymentMethodEnumList = PaymentMethodEnum.values;
   List<PaymentStatusEnum> paymentStatusEnumList = PaymentStatusEnum.values;
-  List<DeliveryEnum> deliveryEnumList = DeliveryEnum.values;
+  List<OrderStatusEnum> orderStatusEnumList = OrderStatusEnum.values;
   late InvoiceFilter invoiceFilter;
 
-  void onPressCheckBox(Enum filterEnum) {
+  void _onPressCheckBox(Enum filterEnum) {
     setState(() {
       if (filterEnum is AdminAcceptanceEnum) {
         invoiceFilter.adminAcceptance = filterEnum.name;
@@ -38,13 +38,13 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
         invoiceFilter.paymentMethod = filterEnum.name;
       } else if (filterEnum is PaymentStatusEnum) {
         invoiceFilter.paymentStatus = filterEnum.name;
-      } else if (filterEnum is DeliveryEnum) {
-        invoiceFilter.deliveryStatus = filterEnum.name;
+      } else if (filterEnum is OrderStatusEnum) {
+        invoiceFilter.orderStatus = filterEnum.name;
       }
     });
   }
 
-  void onPressFilterButton() {
+  void _onPressFilterButton() {
     context.router.pop().then(
           (value) => context.read<InvoiceBloc>().add(
                 OnFilterInvoiceEvent(invoiceFilter),
@@ -52,7 +52,7 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
         );
   }
 
-  void onPressClearFilterButton() {
+  void _onPressClearFilterButton() {
     context.router.pop().then((value) {
       context.read<InvoiceBloc>().add(
             const OnClearInvoiceFilterEvent(),
@@ -65,7 +65,7 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
   @override
   void initState() {
     invoiceFilter =
-        context.read<InvoiceBloc>().currentInvoiceFilter?.copyValues ??
+        context.read<InvoiceBloc>().currentInvoiceFilter.copyValues ??
             InvoiceFilter();
 
     super.initState();
@@ -98,14 +98,14 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
               invoiceFilter.paymentMethod ?? '',
             ),
             _invoiceFilterSection(
-              'Delivery method',
-              deliveryEnumList,
-              invoiceFilter.deliveryStatus ?? '',
+              'Order method',
+              orderStatusEnumList,
+              invoiceFilter.orderStatus ?? '',
             ),
             GradientElevatedButton(
               text: 'Filter',
               textColor: Colors.white,
-              onPress: onPressFilterButton,
+              onPress: _onPressFilterButton,
               buttonMargin: EdgeInsets.only(bottom: 5.height, top: 30.height),
             ),
             GradientElevatedButton(
@@ -114,7 +114,7 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
               backgroundColor: Colors.white,
               text: 'Clear filter',
               textColor: Colors.orange,
-              onPress: onPressClearFilterButton,
+              onPress: _onPressClearFilterButton,
               buttonMargin: EdgeInsets.only(bottom: 5.height, top: 10.height),
             ),
           ],
@@ -151,7 +151,7 @@ class _InvoiceFilterState extends State<InvoiceFilterComponent> {
             itemBuilder: (context, index) {
               return CheckBoxSelection(
                 checkValue: filterSelection == contentEnumList[index].name,
-                onChanged: (value) => onPressCheckBox(contentEnumList[index]),
+                onChanged: (value) => _onPressCheckBox(contentEnumList[index]),
                 content: contentEnumList[index]
                     .name
                     .formatEnumToUppercaseFirstLetter,

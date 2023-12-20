@@ -15,12 +15,12 @@ class UploadFileUploadingState extends UploadFileState {
 }
 
 class UploadFileUploadedState extends UploadFileState {
-  final String url;
+  final String ggDriveId;
 
-  const UploadFileUploadedState(this.url);
+  const UploadFileUploadedState(this.ggDriveId);
 
   @override
-  List<Object> get props => [url];
+  List<Object> get props => [ggDriveId];
 }
 
 class UploadFileErrorState extends UploadFileState {

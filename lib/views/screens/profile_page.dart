@@ -36,7 +36,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  bool isPasswordHiddened = true;
 
   @override
   void initState() {
@@ -69,9 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ).then(
                     (value) {
                       context.read<AuthenticationBloc>().currentUser?.avatar =
-                          ValueRender.getFileIdFromGoogleDriveViewUrl(
-                        uploadFileState.url,
-                      );
+                          uploadFileState.ggDriveId;
                     },
                   );
                 }

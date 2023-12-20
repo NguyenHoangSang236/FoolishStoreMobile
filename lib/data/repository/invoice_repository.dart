@@ -142,7 +142,7 @@ class InvoiceRepository {
           'adminAcceptance': filter.adminAcceptance,
           'paymentMethod': filter.paymentMethod,
           'paymentStatus': filter.paymentStatus,
-          'deliveryStatus': filter.deliveryStatus,
+          'orderStatus': filter.orderStatus,
           'startInvoiceDate':
               filter.startInvoiceDate?.dateApiFormat ?? '2020-01-01',
           'endInvoiceDate': filter.endInvoiceDate?.dateApiFormat ??

@@ -1,4 +1,4 @@
-import 'package:fashionstore/data/enum/delivery_enum.dart';
+import 'package:fashionstore/data/enum/order_status_enum.dart';
 import 'package:fashionstore/data/enum/payment_enum.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -54,41 +54,28 @@ class Invoice {
                     : 'Undefined';
   }
 
-  String getDeliveryStatus() {
-    return orderStatus == DeliveryEnum.NOT_SHIPPED.name
-        ? 'Not shipped'
-        : orderStatus == DeliveryEnum.ACCEPTANCE_WAITING.name
+  String getOrderStatus() {
+    return orderStatus == OrderStatusEnum.FINISH_PACKING.name
+        ? 'Finished packing'
+        : orderStatus == OrderStatusEnum.ACCEPTANCE_WAITING.name
             ? 'Waiting for Admin\'s acceptance'
-            : orderStatus == DeliveryEnum.SHIPPING.name
+            : orderStatus == OrderStatusEnum.SHIPPING.name
                 ? 'Shipping'
-                : orderStatus == DeliveryEnum.FAILED.name
+                : orderStatus == OrderStatusEnum.FAILED.name
                     ? 'Shipped failed'
-                    : orderStatus == DeliveryEnum.SHIPPED.name
-                        ? 'Shipped successfully'
-                        : orderStatus == DeliveryEnum.CUSTOMER_CANCEL.name
-                            ? 'Customer canceled order'
-                            : orderStatus == DeliveryEnum.SHIPPER_CANCEL.name
-                                ? 'Shipper canceled order'
-                                : orderStatus == DeliveryEnum.PACKING.name
-                                    ? 'We are packing your order'
+                    : orderStatus == OrderStatusEnum.CUSTOMER_CANCEL.name
+                        ? 'Customer canceled order'
+                        : orderStatus == OrderStatusEnum.SHIPPER_CANCEL.name
+                            ? 'Shipper canceled order'
+                            : orderStatus == OrderStatusEnum.PACKING.name
+                                ? 'We are packing your order'
+                                : orderStatus ==
+                                        OrderStatusEnum.PAYMENT_WAITING.name
+                                    ? 'Waiting for your online payment'
                                     : orderStatus ==
-                                            DeliveryEnum.SHIPPER_WAITING.name
-                                        ? 'Waiting for shipper to take your order'
-                                        : orderStatus ==
-                                                DeliveryEnum
-                                                    .PAYMENT_WAITING.name
-                                            ? 'Waiting for your online payment'
-                                            : orderStatus ==
-                                                    DeliveryEnum
-                                                        .FIRST_ATTEMPT_FAILED
-                                                        .name
-                                                ? 'Shipped failed once'
-                                                : orderStatus ==
-                                                        DeliveryEnum
-                                                            .SECOND_ATTEMPT_FAILED
-                                                            .name
-                                                    ? 'Shipped failed twice'
-                                                    : 'Undefined';
+                                            OrderStatusEnum.SUCCESS.name
+                                        ? 'Success'
+                                        : 'Undefined';
   }
 
   @override

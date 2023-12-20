@@ -1,10 +1,8 @@
-import 'package:equatable/equatable.dart';
-
-class InvoiceFilter extends Equatable {
+class InvoiceFilter {
   String? adminAcceptance;
   String? paymentMethod;
   String? paymentStatus;
-  String? deliveryStatus;
+  String? orderStatus;
   DateTime? startInvoiceDate;
   DateTime? endInvoiceDate;
   int? page;
@@ -14,7 +12,7 @@ class InvoiceFilter extends Equatable {
     this.adminAcceptance,
     this.paymentMethod,
     this.paymentStatus,
-    this.deliveryStatus,
+    this.orderStatus,
     this.startInvoiceDate,
     this.endInvoiceDate,
     this.page,
@@ -25,7 +23,7 @@ class InvoiceFilter extends Equatable {
         adminAcceptance: adminAcceptance,
         paymentMethod: paymentMethod,
         paymentStatus: paymentStatus,
-        deliveryStatus: deliveryStatus,
+        orderStatus: orderStatus,
         startInvoiceDate: startInvoiceDate,
         endInvoiceDate: endInvoiceDate,
         page: page,
@@ -36,18 +34,6 @@ class InvoiceFilter extends Equatable {
     return adminAcceptance == null &&
         paymentMethod == null &&
         paymentStatus == null &&
-        deliveryStatus == null;
+        orderStatus == null;
   }
-
-  @override
-  List<Object?> get props => [
-        adminAcceptance,
-        paymentMethod,
-        paymentStatus,
-        deliveryStatus,
-        startInvoiceDate,
-        endInvoiceDate,
-        page,
-        limit,
-      ];
 }
