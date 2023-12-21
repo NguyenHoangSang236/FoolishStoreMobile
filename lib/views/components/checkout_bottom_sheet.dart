@@ -29,14 +29,12 @@ class _CheckoutBottomSheet extends State<CheckoutBottomSheet> {
   final List<PaymentMethodEnum> _paymentMethodList = [
     PaymentMethodEnum.BANK_TRANSFER,
     PaymentMethodEnum.MOMO,
-    PaymentMethodEnum.PAYPAL,
     PaymentMethodEnum.COD,
   ];
 
   final List<Widget> _paymentImageIconList = [
     Image.asset('assets/icon/master_card_icon.png'),
     Image.asset('assets/icon/momo_icon.png'),
-    Image.asset('assets/icon/paypal_icon.png'),
     Image.asset('assets/icon/cod_icon.png'),
   ];
 

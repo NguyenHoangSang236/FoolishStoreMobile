@@ -43,15 +43,13 @@ class Invoice {
   Map<String, dynamic> toJson() => _$InvoiceToJson(this);
 
   String getPaymentMethod() {
-    return paymentMethod == PaymentMethodEnum.PAYPAL.name
-        ? 'Paypal'
-        : paymentMethod == PaymentMethodEnum.MOMO.name
-            ? 'Momo'
-            : paymentMethod == PaymentMethodEnum.COD.name
-                ? 'COD'
-                : paymentMethod == PaymentMethodEnum.BANK_TRANSFER.name
-                    ? 'Master card'
-                    : 'Undefined';
+    return paymentMethod == PaymentMethodEnum.MOMO.name
+        ? 'Momo'
+        : paymentMethod == PaymentMethodEnum.COD.name
+            ? 'COD'
+            : paymentMethod == PaymentMethodEnum.BANK_TRANSFER.name
+                ? 'Master card'
+                : 'Undefined';
   }
 
   String getOrderStatus() {

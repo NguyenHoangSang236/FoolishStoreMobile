@@ -8,10 +8,9 @@ class TranslatorLanguage {
   final int id;
   final String languageCode;
   final String name;
-  final String imageLocalStoragePath;
+  final String flagImage;
 
-  TranslatorLanguage(
-      this.id, this.languageCode, this.name, this.imageLocalStoragePath);
+  TranslatorLanguage(this.id, this.languageCode, this.name, this.flagImage);
 
   factory TranslatorLanguage.fromJson(Map<String, dynamic> json) =>
       _$TranslatorLanguageFromJson(json);
@@ -20,6 +19,6 @@ class TranslatorLanguage {
 
   @override
   String toString() {
-    return 'Language{id: $id, languageCode: $languageCode, name: $name, imageLocalStoragePath: $imageLocalStoragePath}';
+    return 'Language{id: $id, languageCode: $languageCode, name: $name, imageLocalStoragePath: $flagImage}';
   }
 }

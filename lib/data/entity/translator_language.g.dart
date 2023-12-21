@@ -11,7 +11,7 @@ TranslatorLanguage _$TranslatorLanguageFromJson(Map<String, dynamic> json) =>
       json['id'] as int,
       json['languageCode'] as String,
       json['name'] as String,
-      json['imageLocalStoragePath'] as String,
+      json['flagImage'] as String,
     );
 
 Map<String, dynamic> _$TranslatorLanguageToJson(TranslatorLanguage instance) =>
@@ -19,5 +19,5 @@ Map<String, dynamic> _$TranslatorLanguageToJson(TranslatorLanguage instance) =>
       'id': instance.id,
       'languageCode': instance.languageCode,
       'name': instance.name,
-      'imageLocalStoragePath': instance.imageLocalStoragePath,
+      'flagImage': instance.flagImage,
     };

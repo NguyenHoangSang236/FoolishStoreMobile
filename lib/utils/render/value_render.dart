@@ -144,13 +144,11 @@ class ValueRender {
     return Image.asset(
       paymentEnum == PaymentMethodEnum.BANK_TRANSFER
           ? 'assets/icon/master_card_icon.png'
-          : paymentEnum == PaymentMethodEnum.PAYPAL
-              ? 'assets/icon/paypal_icon.png'
-              : paymentEnum == PaymentMethodEnum.COD
-                  ? 'assets/icon/cod_icon.png'
-                  : paymentEnum == PaymentMethodEnum.MOMO
-                      ? 'assets/icon/momo_icon.png'
-                      : 'assets/icon/x_icon.png',
+          : paymentEnum == PaymentMethodEnum.COD
+              ? 'assets/icon/cod_icon.png'
+              : paymentEnum == PaymentMethodEnum.MOMO
+                  ? 'assets/icon/momo_icon.png'
+                  : 'assets/icon/x_icon.png',
     );
   }
 }

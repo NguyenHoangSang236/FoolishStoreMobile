@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
+import 'package:fashionstore/config/app_router/app_router_path.dart';
+import 'package:fashionstore/data/enum/payment_enum.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
@@ -45,6 +47,17 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
       _compHeight = 0;
       _isPressed = false;
     });
+  }
+
+  void _payThisInvoice() {
+    context.read<InvoiceBloc>().add(
+          OnLoadOnlinePaymentInfoEvent(
+            widget.invoice.id,
+            widget.invoice.paymentMethod,
+          ),
+        );
+
+    context.router.pushNamed(AppRouterPath.onlinePaymentReceiverInfo);
   }
 
   @override
@@ -120,6 +133,7 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
                           buttonMargin: EdgeInsets.zero,
                           buttonWidth: 130.width,
                           buttonHeight: 35.height,
+                          backgroundColor: Colors.red,
                           onPress: _onPressCancelOrder,
                         ),
                       ],
@@ -143,29 +157,46 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 3.height),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$title: ',
-            style: TextStyle(
-              fontFamily: 'Work Sans',
-              fontSize: isHeader ? 14.size : 12.size,
-              fontWeight: FontWeight.w400,
-              color: isHeader ? Colors.orange : Colors.black,
-            ),
+          Row(
+            children: [
+              Text(
+                '$title: ',
+                style: TextStyle(
+                  fontFamily: 'Work Sans',
+                  fontSize: isHeader ? 16.size : 12.size,
+                  fontWeight: FontWeight.w400,
+                  color: isHeader ? Colors.orange : Colors.black,
+                ),
+              ),
+              Text(
+                data,
+                style: TextStyle(
+                  fontFamily: 'Work Sans',
+                  fontSize: isHeader ? 16.size : 12.size,
+                  fontWeight: FontWeight.w700,
+                  color: isHeader
+                      ? Colors.orange
+                      : isPrice
+                          ? Colors.red
+                          : Colors.black,
+                ),
+              ),
+            ],
           ),
-          Text(
-            data,
-            style: TextStyle(
-              fontFamily: 'Work Sans',
-              fontSize: isHeader ? 14.size : 12.size,
-              fontWeight: FontWeight.w700,
-              color: isHeader
-                  ? Colors.orange
-                  : isPrice
-                      ? Colors.red
-                      : Colors.black,
-            ),
-          ),
+          widget.invoice.paymentMethod != PaymentMethodEnum.COD.name &&
+                  widget.invoice.paymentStatus ==
+                      PaymentStatusEnum.UNPAID.name &&
+                  isHeader
+              ? IconButton(
+                  onPressed: _payThisInvoice,
+                  icon: const Icon(
+                    Icons.payments_outlined,
+                    color: Colors.orange,
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );

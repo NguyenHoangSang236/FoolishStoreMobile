@@ -211,7 +211,7 @@ class UiRender {
                                         image: DecorationImage(
                                           fit: BoxFit.cover,
                                           image: AssetImage(
-                                            language.imageLocalStoragePath,
+                                            language.flagImage,
                                           ),
                                         ),
                                         borderRadius:

@@ -4,10 +4,10 @@ import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/enum/navigation_name_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
-import 'package:fashionstore/views/components/side_sheet.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
+import 'package:fashionstore/views/components/side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:side_sheet/side_sheet.dart';
@@ -233,6 +233,9 @@ class _AppBarComponentState extends State<AppBarComponent> {
                             onChanged: widget.onSearch,
                             onSubmitted: widget.onSearch,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 2.height,
+                              ),
                               suffixIcon: IconButton(
                                 tooltip: "Translator",
                                 onPressed: () {
