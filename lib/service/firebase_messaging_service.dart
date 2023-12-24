@@ -56,8 +56,6 @@ class FirebaseMessagingService {
   static Future<void> onActionReceivedMethod(
     ReceivedAction receivedAction,
   ) async {
-    print('@@@');
-
     appRouter.pushWidget(const IndexPage());
   }
 
@@ -114,5 +112,17 @@ class FirebaseMessagingService {
       debugPrint('Firebase is not available on this project');
     }
     return '';
+  }
+
+  static Future<void> subscribeToTopic(String topic) async {
+    await firebaseMessaging
+        .subscribeToTopic(topic)
+        .then((value) => debugPrint('Subscribed to topic: $topic'));
+  }
+
+  static Future<void> unsubscribeFromTopic(String topic) async {
+    await firebaseMessaging
+        .unsubscribeFromTopic(topic)
+        .then((value) => debugPrint('Unsubscribed from topic: $topic'));
   }
 }

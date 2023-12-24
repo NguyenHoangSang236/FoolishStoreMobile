@@ -2,9 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../data/entity/user.dart';
-import '../../data/enum/local_storage_key_enum.dart';
 import '../../data/repository/authentication_repository.dart';
-import '../../utils/local_storage/local_storage_service.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -28,13 +26,13 @@ class AuthenticationBloc
           event.password,
         );
 
-        final jwtFromStorage = await LocalStorageService.getLocalStorageData(
-          LocalStorageKeyEnum.SAVED_JWT.name,
-        ) as String;
+        // final jwtFromStorage = await LocalStorageService.getLocalStorageData(
+        //   LocalStorageKeyEnum.SAVED_JWT.name,
+        // ) as String;
 
         response.fold(
           (failure) => emit(AuthenticationErrorState(failure.message)),
-          (user) {
+          (user) async {
             currentUser = user;
 
             // stompClient = StompClient(
@@ -107,11 +105,13 @@ class AuthenticationBloc
       response.fold(
         (failure) {
           registerMessage = failure.message;
-          emit(AuthenticationLoggedOutState(failure.message));
+          emit(AuthenticationErrorState(failure.message));
         },
-        (success) {
+        (success) async {
           registerMessage = success;
-          emit(AuthenticationErrorState(success));
+          currentUser = null;
+
+          emit(AuthenticationLoggedOutState(success));
         },
       );
     });

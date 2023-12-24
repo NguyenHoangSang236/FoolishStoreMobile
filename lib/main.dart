@@ -41,6 +41,7 @@ import 'firebase_options.dart';
 
 final appRouter = AppRouter();
 final Dio dio = Dio();
+final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
 // const String domainIP = '14.225.254.87';
 const String domainIP = '192.168.1.10';
@@ -62,9 +63,9 @@ final StompClient stompClient = StompClient(
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  print('Handling a background message ${message.messageId}');
+  debugPrint('Handling a background message ${message.messageId}');
   // await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
+  debugPrint('Handling a background message ${message.messageId}');
 
   stompClient.activate();
 

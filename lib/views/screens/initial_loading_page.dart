@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
+import 'package:fashionstore/service/firebase_messaging_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,6 +48,8 @@ class _InitialLoadingState extends State<InitialLoadingPage> {
             child: BlocListener<AuthenticationBloc, AuthenticationState>(
               listener: (context, authenState) {
                 if (authenState is AuthenticationLoggedInState) {
+                  FirebaseMessagingService.subscribeToTopic(authenState.currentUser.userName,);
+
                   context.router.replaceNamed(AppRouterPath.index);
                 } else if (authenState is AuthenticationErrorState) {
                   context.router.replaceNamed(AppRouterPath.login);
