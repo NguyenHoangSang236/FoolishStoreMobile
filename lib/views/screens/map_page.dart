@@ -264,7 +264,7 @@ class _MapPageState extends State<MapPage> {
               onPressed: () => _addMarkerAndAnimateCameraToPosition(
                 _currentPosition.toLatLng,
               ),
-              child: const Icon(Icons.my_location),
+              child: const Icon(Icons.my_location, color: Colors.white),
             )
           ],
         ),

@@ -25,6 +25,7 @@ class CheckoutBottomSheet extends StatefulWidget {
 class _CheckoutBottomSheet extends State<CheckoutBottomSheet> {
   late Widget _selectedPaymentMethodIcon;
   late PaymentMethodEnum _selectedPaymentMethod;
+  final TextEditingController _noteController = TextEditingController();
 
   final List<PaymentMethodEnum> _paymentMethodList = [
     PaymentMethodEnum.BANK_TRANSFER,
@@ -64,8 +65,10 @@ class _CheckoutBottomSheet extends State<CheckoutBottomSheet> {
       context.read<InvoiceBloc>().add(
             OnAddNewOrderEvent(
               _selectedPaymentMethod.name,
-              currentAddressCode!,
+              currentAddressCode,
               context.read<CartBloc>().currentServiceId,
+              _noteController.text,
+              context.read<CartBloc>().customerAddress,
             ),
           );
     }
@@ -106,6 +109,12 @@ class _CheckoutBottomSheet extends State<CheckoutBottomSheet> {
   }
 
   @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<InvoiceBloc, InvoiceState>(
       listener: (context, invoiceState) {
@@ -131,126 +140,154 @@ class _CheckoutBottomSheet extends State<CheckoutBottomSheet> {
           LoadingService(context).reloadCartPage();
         }
       },
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 25.width,
-            vertical: 30.height,
-          ),
-          child: BlocConsumer<CartBloc, CartState>(
-            listener: (context, state) {
-              if (state is CartErrorState) {
-                UiRender.showDialog(context, '', state.message);
-              }
-            },
-            builder: (context, state) {
-              if (state is CartCheckoutState) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 30.height),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Checkout',
-                            style: TextStyle(
-                              fontFamily: 'Work Sans',
-                              fontSize: 18.size,
-                              fontWeight: FontWeight.w700,
+      child: Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.radius),
+          color: Colors.white,
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 25.width,
+              vertical: 30.height,
+            ),
+            child: BlocConsumer<CartBloc, CartState>(
+              listener: (context, state) {
+                if (state is CartErrorState) {
+                  UiRender.showDialog(context, '', state.message);
+                }
+              },
+              builder: (context, state) {
+                if (state is CartCheckoutState) {
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 30.height),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Checkout',
+                              style: TextStyle(
+                                fontFamily: 'Work Sans',
+                                fontSize: 18.size,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: onPressCheckoutCancelButton,
-                            child: Image.asset(
-                              'assets/icon/x_icon.png',
-                              width: 32.size,
-                              height: 32.size,
-                              color: const Color(0xFFA1A1A1),
+                            GestureDetector(
+                              onTap: onPressCheckoutCancelButton,
+                              child: Image.asset(
+                                'assets/icon/x_icon.png',
+                                width: 32.size,
+                                height: 32.size,
+                                color: const Color(0xFFA1A1A1),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    _checkoutBottomSheetContent(
-                      title: 'Payment Method',
-                      onPress: onSelectPaymentMethod,
-                      isPayment: true,
-                    ),
-                    _checkoutBottomSheetContent(
-                      title: 'Subtotal',
-                      content: state.cartCheckout.subtotal.format,
-                    ),
-                    _checkoutBottomSheetContent(
-                      title: 'Delivery Fee',
-                      content: state.cartCheckout.shippingFee.format,
-                    ),
-                    _checkoutBottomSheetContent(
-                      title: 'Total',
-                      content: state.cartCheckout.total.format,
-                    ),
-                    20.verticalSpace,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'By placing an order you agree to our',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Work Sans',
-                            fontSize: 10.size,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFFA1A1A1),
+                      _checkoutBottomSheetContent(
+                        title: 'Payment Method',
+                        onPress: onSelectPaymentMethod,
+                        isPayment: true,
+                      ),
+                      _checkoutBottomSheetContent(
+                        title: 'Subtotal',
+                        content: state.cartCheckout.subtotal.format,
+                      ),
+                      _checkoutBottomSheetContent(
+                        title: 'Delivery Fee',
+                        content: state.cartCheckout.shippingFee.format,
+                      ),
+                      _checkoutBottomSheetContent(
+                        title: 'Total',
+                        content: state.cartCheckout.total.format,
+                      ),
+                      20.verticalSpace,
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10.size),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.radius),
+                          border: Border.all(color: Colors.orange),
+                        ),
+                        child: TextField(
+                          controller: _noteController,
+                          decoration: InputDecoration(
+                            hintText: 'Leave a note for shipper...',
+                            hintStyle: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15.size,
+                            ),
+                            border: InputBorder.none,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            'Terms and Conditions',
+                      ),
+                      20.verticalSpace,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'By placing an order you agree to our',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: 'Work Sans',
                               fontSize: 10.size,
-                              decoration: TextDecoration.underline,
                               fontWeight: FontWeight.w400,
                               color: const Color(0xFFA1A1A1),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    20.verticalSpace,
-                    GradientElevatedButton(
-                      text: 'Place Order',
-                      textSize: 15.size,
-                      textWeight: FontWeight.w700,
-                      buttonMargin: EdgeInsets.zero,
-                      buttonWidth: MediaQuery.of(context).size.width,
-                      buttonHeight: 50.height,
-                      onPress: onPressPlaceOrderButton,
-                    ),
-                  ],
-                );
-              }
+                          TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              'Terms and Conditions',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Work Sans',
+                                fontSize: 10.size,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFFA1A1A1),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      20.verticalSpace,
+                      GradientElevatedButton(
+                        text: 'Place Order',
+                        textSize: 15.size,
+                        textWeight: FontWeight.w700,
+                        buttonMargin: EdgeInsets.zero,
+                        buttonWidth: MediaQuery.of(context).size.width,
+                        buttonHeight: 50.height,
+                        onPress: onPressPlaceOrderButton,
+                      ),
+                    ],
+                  );
+                }
 
-              return SizedBox(
-                height: MediaQuery.of(context).size.height / 2,
-                width: MediaQuery.of(context).size.width,
-                child: Center(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator(
-                      color: Colors.orange,
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height / 2,
+                  width: MediaQuery.of(context).size.width,
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: Colors.orange,
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -46,7 +46,7 @@ dependencies:
   shared_preferences: ^2.1.0
   carousel_slider: ^4.2.1
   cached_network_image: ^3.2.3
-  flutter_platform_widgets: ^3.3.2
+  flutter_platform_widgets: ^6.0.2
   webview_cookie_manager: ^2.0.6
   cookie_jar: ^4.0.2
   dio: ^5.1.2

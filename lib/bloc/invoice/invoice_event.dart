@@ -11,11 +11,15 @@ class OnAddNewOrderEvent extends InvoiceEvent {
   final String paymentMethod;
   final AddressCode addressCode;
   final int serviceId;
+  final String note;
+  final String address;
 
   const OnAddNewOrderEvent(
     this.paymentMethod,
     this.addressCode,
     this.serviceId,
+    this.note,
+    this.address,
   );
 }
 

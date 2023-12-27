@@ -33,6 +33,8 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
           paymentMethod: event.paymentMethod,
           addressCode: event.addressCode,
           serviceId: event.serviceId,
+          address: event.address,
+          note: event.note,
         );
 
         response.fold(

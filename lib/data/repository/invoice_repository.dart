@@ -98,11 +98,15 @@ class InvoiceRepository {
   Future<Either<Failure, String>> addNewOrder({
     required String paymentMethod,
     required AddressCode addressCode,
+    required String address,
+    String note = '',
     required int serviceId,
   }) {
     Map<String, dynamic> requestMap = {
       'paymentMethod': paymentMethod,
       'serviceId': serviceId,
+      'address': address,
+      'note': note,
     };
 
     requestMap.addAll(addressCode.toJson());

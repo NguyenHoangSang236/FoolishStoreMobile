@@ -55,15 +55,20 @@ class _CartItemComponentState extends State<CartItemComponent> {
                   selectStatus = 1;
                 }
 
-                context.read<CartBloc>().add(OnUpdateCartEvent([
-                      CartItemInfo(
-                          widget.cartItem.productId,
-                          widget.cartItem.id,
-                          widget.cartItem.quantity,
-                          widget.cartItem.color,
-                          widget.cartItem.size,
-                          selectStatus)
-                    ], needReload: false));
+                context.read<CartBloc>().add(
+                      OnUpdateCartEvent(
+                        [
+                          CartItemInfo(
+                              widget.cartItem.productId,
+                              widget.cartItem.id,
+                              widget.cartItem.quantity,
+                              widget.cartItem.color,
+                              widget.cartItem.size,
+                              selectStatus)
+                        ],
+                        needReload: false,
+                      ),
+                    );
               }),
         ),
         GestureDetector(
@@ -195,26 +200,28 @@ class _CartItemComponentState extends State<CartItemComponent> {
                 ),
               ),
               Positioned(
-                  top: -8.height,
-                  right: -20.width,
-                  child: Container(
-                    color: const Color(0xfff3f3f3),
-                    child: IconButton(
-                      onPressed: () {
-                        context.read<CartBloc>().add(
-                              OnRemoveCartItemEvent(
-                                [widget.cartItem.id],
-                              ),
-                            );
-                      },
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      icon: Image.asset(
-                        'assets/icon/x_icon.png',
-                        color: Colors.black45,
-                      ),
+                top: -8.height,
+                right: -20.width,
+                child: Container(
+                  color: const Color(0xfff3f3f3),
+                  child: IconButton(
+                    onPressed: () {
+                      context.read<CartBloc>().add(
+                            OnRemoveCartItemEvent(
+                              [widget.cartItem.id],
+                            ),
+                          );
+                    },
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: Image.asset(
+                      'assets/icon/x_icon.png',
+                      color: Colors.black45,
+                      scale: 3.size,
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

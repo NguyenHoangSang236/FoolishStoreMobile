@@ -27,6 +27,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   CartCheckout? currentCheckout;
   String currentBrandFilter = '';
   String currentNameFilter = '';
+  String customerAddress = '';
   AddressCode? currentAddressCode;
   AddressCodeRequest? currentAddressCodeRequest;
   List<GhnShippingService>? currentGhnShippingServiceList;
@@ -266,6 +267,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           (failure) => emit(CartErrorState(failure.message)),
           (addressCode) {
             currentAddressCode = addressCode;
+            currentAddressCodeRequest = event.addressCodeRequest;
+
+            customerAddress =
+                '${currentAddressCodeRequest?.toAddress}, ${currentAddressCodeRequest?.toWard}, ${currentAddressCodeRequest?.toDistrict}, ${currentAddressCodeRequest?.toProvince}';
 
             emit(AddressCodeLoadedState(addressCode));
           },
