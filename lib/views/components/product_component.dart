@@ -75,6 +75,7 @@ class _ProductComponentState extends State<ProductComponent> {
                                   height: 1.5,
                                 ),
                                 children: [
+                                  const TextSpan(text: ' '),
                                   TextSpan(
                                     text: widget
                                         .product.sellingPrice.format.dollar,

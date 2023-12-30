@@ -29,6 +29,14 @@ class InvoiceItem {
 
   Map<String, dynamic> toJson() => _$InvoiceItemToJson(this);
 
+  double totalPriceAfterDiscount() {
+    return priceAfterDiscount() * quantity;
+  }
+
+  double priceAfterDiscount() {
+    return sellingPrice - (sellingPrice * (discount / 100));
+  }
+
   @override
   String toString() {
     return 'InvoiceItem{productId: $productId, name: $name, color: $color, size: $size, sellingPrice: $sellingPrice, quantity: $quantity, discount: $discount, image1: $image1}';

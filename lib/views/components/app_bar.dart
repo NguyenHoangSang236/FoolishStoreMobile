@@ -126,6 +126,7 @@ class _AppBarComponentState extends State<AppBarComponent> {
                       icon: ImageIcon(
                         const AssetImage('assets/icon/option_icon.png'),
                         size: 27.size,
+                        color: Colors.white,
                       ),
                     ),
               actions: [

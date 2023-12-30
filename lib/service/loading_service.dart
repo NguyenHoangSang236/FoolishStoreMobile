@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/categories/category_bloc.dart';
+import '../bloc/notification/notification_bloc.dart';
 import '../bloc/productDetails/product_details_bloc.dart';
 import '../data/entity/category.dart';
 import '../data/entity/product.dart';
@@ -111,5 +112,16 @@ class LoadingService {
         context.router.replaceNamed(AppRouterPath.allProducts);
       },
     );
+  }
+
+  void reloadNotificationPage() {
+    context.read<NotificationBloc>().add(
+          OnLoadNotificationList(
+            10,
+            1,
+            DateTime(2023, 01, 01),
+            DateTime.now(),
+          ),
+        );
   }
 }

@@ -7,6 +7,7 @@ import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/categories/category_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/map/map_bloc.dart';
+import 'package:fashionstore/bloc/notification/notification_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/bloc/uploadFile/upload_file_bloc.dart';
@@ -18,6 +19,7 @@ import 'package:fashionstore/data/repository/category_repository.dart';
 import 'package:fashionstore/data/repository/comment_repository.dart';
 import 'package:fashionstore/data/repository/google_drive_repository.dart';
 import 'package:fashionstore/data/repository/invoice_repository.dart';
+import 'package:fashionstore/data/repository/notification_repository.dart';
 import 'package:fashionstore/data/repository/shop_repository.dart';
 import 'package:fashionstore/data/repository/translator_repository.dart';
 import 'package:fashionstore/service/firebase_messaging_service.dart';
@@ -138,6 +140,9 @@ void main() async {
         RepositoryProvider<MapRepository>(
           create: (context) => MapRepository(),
         ),
+        RepositoryProvider<NotificationRepository>(
+          create: (context) => NotificationRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -186,6 +191,11 @@ void main() async {
           BlocProvider<UploadFileBloc>(
             create: (context) => UploadFileBloc(
               RepositoryProvider.of<GoogleDriveRepository>(context),
+            ),
+          ),
+          BlocProvider<NotificationBloc>(
+            create: (context) => NotificationBloc(
+              RepositoryProvider.of<NotificationRepository>(context),
             ),
           ),
           BlocProvider<InvoiceBloc>(

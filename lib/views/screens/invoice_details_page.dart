@@ -97,7 +97,7 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
           int totalQuantity = 0;
 
           for (InvoiceItem item in invoiceItemList) {
-            totalPrice += item.sellingPrice;
+            totalPrice += item.totalPriceAfterDiscount();
             totalQuantity += item.quantity;
           }
 
@@ -130,7 +130,7 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
               ),
               widget.invoice.reason != null && widget.invoice.reason!.isNotEmpty
                   ? _invoiceDataLine(
-                      'Delivery reason',
+                      'Reason',
                       widget.invoice.reason ?? '',
                     )
                   : const SizedBox(),
@@ -139,9 +139,17 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
                 totalPrice.format.dollar,
               ),
               _invoiceDataLine(
+                'Shipping price',
+                widget.invoice.deliveryFee.format.dollar,
+              ),
+              _invoiceDataLine(
                 'Total price (${invoiceItemList.length})',
                 widget.invoice.totalPrice.format.dollar,
               ),
+              widget.invoice.address != null &&
+                      widget.invoice.address!.isNotEmpty
+                  ? _invoiceDataLine('Address', widget.invoice.address!)
+                  : const SizedBox(),
             ],
           );
         } else if (state is InvoiceLoadingState) {
@@ -221,15 +229,55 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                invoiceItem.sellingPrice.format.dollar,
-                                style: TextStyle(
-                                  fontSize: 26.size,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Imprima',
-                                  color: Colors.red,
-                                ),
-                              ),
+                              invoiceItem.discount > 0
+                                  ? RichText(
+                                      text: TextSpan(
+                                        text: invoiceItem
+                                            .priceAfterDiscount()
+                                            .format
+                                            .dollar,
+                                        style: TextStyle(
+                                          fontFamily: 'Sen',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 25.size,
+                                          color: Colors.red,
+                                        ),
+                                        children: [
+                                          const TextSpan(text: ' '),
+                                          TextSpan(
+                                            text: invoiceItem
+                                                .sellingPrice.format.dollar,
+                                            style: TextStyle(
+                                              fontFamily: 'Sen',
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 13.size,
+                                              color: const Color(0xffacacac),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Text(
+                                      invoiceItem.sellingPrice.format.dollar,
+                                      style: TextStyle(
+                                        fontFamily: 'Sen',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 26.size,
+                                        color: Colors.red,
+                                        height: 1.5.height,
+                                      ),
+                                    ),
+                              // Text(
+                              //   invoiceItem.sellingPrice.format.dollar,
+                              //   style: TextStyle(
+                              //     fontSize: 26.size,
+                              //     fontWeight: FontWeight.w500,
+                              //     fontFamily: 'Imprima',
+                              //     color: Colors.red,
+                              //   ),
+                              // ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -273,19 +321,24 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18.size,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xFF797780),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 18.size,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF797780),
+              ),
             ),
           ),
-          Text(
-            content,
-            style: TextStyle(
-              fontSize: 18.size,
-              fontWeight: FontWeight.w400,
+          10.horizontalSpace,
+          Expanded(
+            child: Text(
+              content,
+              style: TextStyle(
+                fontSize: 18.size,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         ],

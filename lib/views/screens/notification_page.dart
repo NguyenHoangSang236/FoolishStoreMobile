@@ -1,4 +1,5 @@
 import 'package:auto_route/annotations.dart';
+import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/views/layout/layout.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,13 @@ class _NotificationState extends State<NotificationPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  @override
+  void initState() {
+    LoadingService(context).reloadNotificationPage();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

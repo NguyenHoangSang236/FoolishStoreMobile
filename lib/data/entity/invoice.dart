@@ -19,6 +19,10 @@ class Invoice {
   double refundPercentage;
   double totalPrice;
   String? reason;
+  String? address;
+  int? districtId;
+  String? wardCode;
+  double deliveryFee;
   String adminAcceptance;
 
   Invoice(
@@ -34,6 +38,10 @@ class Invoice {
     this.refundPercentage,
     this.totalPrice,
     this.reason,
+    this.address,
+    this.districtId,
+    this.wardCode,
+    this.deliveryFee,
     this.adminAcceptance,
   );
 
