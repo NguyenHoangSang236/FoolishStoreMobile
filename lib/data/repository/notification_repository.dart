@@ -28,6 +28,10 @@ class NotificationRepository {
       if (response.result == 'success') {
         List<dynamic> jsonList = json.decode(jsonEncode(response.content));
 
+        if (jsonList.isEmpty) {
+          return const Left(ApiFailure('No data'));
+        }
+
         return Right(
             jsonList.map((json) => Notification.fromJson(json)).toList());
       } else {

@@ -21,27 +21,25 @@ class _ProductComponentState extends State<ProductComponent> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onClick,
-      child: Container(
+      child: SizedBox(
         width: (MediaQuery.of(context).size.width / 2) - 34.width,
-        constraints: BoxConstraints(
-          maxHeight: 600.height,
-        ),
         child: Stack(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 7,
+                  flex: 5,
                   child: UiRender.buildCachedNetworkImage(
                     context,
                     widget.product.image1 ?? '',
                   ),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,

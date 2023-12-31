@@ -116,7 +116,7 @@ class LoadingService {
 
   void reloadNotificationPage() {
     context.read<NotificationBloc>().add(
-          OnLoadNotificationList(
+          OnLoadNotificationListEvent(
             10,
             1,
             DateTime(2023, 01, 01),

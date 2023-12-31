@@ -222,7 +222,6 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
                     if (state is InvoiceListFilteredState) {
                       invoiceList = state.invoiceList;
-                      // _scrollController.jumpTo(_currentOffset);
                     } else if (state is InvoiceLoadingState) {
                       return UiRender.loadingCircle();
                     }

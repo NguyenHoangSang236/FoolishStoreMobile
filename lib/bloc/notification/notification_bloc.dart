@@ -12,15 +12,16 @@ part 'notification_state.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final NotificationRepository _notificationRepository;
 
-  List<Notification> _currentNotificationList = [];
-  int _currentPage = 1;
+  List<Notification> currentNotificationList = [];
+  int currentPage = 1;
+  int currentLimit = 10;
 
-  DateTime _currentStartDate = DateTime(2023, 01, 01);
-  DateTime _currentEndDate = DateTime.now();
+  DateTime currentStartDate = DateTime(2023, 01, 01);
+  DateTime currentEndDate = DateTime.now();
 
   NotificationBloc(this._notificationRepository)
       : super(NotificationInitial()) {
-    on<OnLoadNotificationList>((event, emit) async {
+    on<OnLoadNotificationListEvent>((event, emit) async {
       emit(NotificationLoadingState());
 
       try {
@@ -40,15 +41,57 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         response.fold(
           (failure) => emit(NotificationErrorState(failure.message)),
           (list) {
-            _currentPage = event.page;
-            _currentStartDate = event.startDate;
-            _currentEndDate = event.endDate;
+            if (currentEndDate == event.endDate &&
+                currentStartDate == event.startDate) {
+              currentNotificationList = _removeDuplicate(
+                [...currentNotificationList, ...list],
+              );
+            } else {
+              currentStartDate = event.startDate;
+              currentEndDate = event.endDate;
 
-            _currentNotificationList = _removeDuplicate(
-              [..._currentNotificationList, ...list],
+              currentNotificationList = list;
+            }
+
+            currentPage = event.page;
+            currentLimit = event.limit;
+
+            emit(NotificationListLoadedState(currentNotificationList));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(NotificationErrorState(e.toString()));
+      }
+    });
+
+    on<OnLoadNextPageEvent>((event, emit) async {
+      emit(NotificationLoadingState());
+
+      try {
+        final response = await _notificationRepository.getNotificationList(
+          {
+            'filter': {
+              'startDate': currentStartDate.dateApiFormat,
+              'endDate': currentEndDate.dateApiFormat,
+            },
+            'pagination': {
+              'page': currentPage + 1,
+              'limit': currentLimit,
+            },
+          },
+        );
+
+        response.fold(
+          (failure) => emit(NotificationErrorState(failure.message)),
+          (list) {
+            currentPage++;
+
+            currentNotificationList = _removeDuplicate(
+              [...currentNotificationList, ...list],
             );
 
-            emit(NotificationListLoadedState(_currentNotificationList));
+            emit(NotificationListLoadedState(currentNotificationList));
           },
         );
       } catch (e) {

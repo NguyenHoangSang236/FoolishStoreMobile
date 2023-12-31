@@ -7,13 +7,13 @@ abstract class NotificationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class OnLoadNotificationList extends NotificationEvent {
+class OnLoadNotificationListEvent extends NotificationEvent {
   final int limit;
   final int page;
   final DateTime startDate;
   final DateTime endDate;
 
-  const OnLoadNotificationList(
+  const OnLoadNotificationListEvent(
     this.limit,
     this.page,
     this.startDate,
@@ -21,8 +21,10 @@ class OnLoadNotificationList extends NotificationEvent {
   );
 }
 
-class OnSeenNotification extends NotificationEvent {
+class OnLoadNextPageEvent extends NotificationEvent {}
+
+class OnSeenNotificationEvent extends NotificationEvent {
   final int notificationId;
 
-  const OnSeenNotification(this.notificationId);
+  const OnSeenNotificationEvent(this.notificationId);
 }
