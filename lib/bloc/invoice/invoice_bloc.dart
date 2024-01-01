@@ -6,6 +6,7 @@ import 'package:fashionstore/data/entity/online_payment_info.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/entity/address_code.dart';
+import '../../data/entity/invoice_details.dart';
 import '../../data/entity/invoice_item.dart';
 import '../../data/repository/invoice_repository.dart';
 
@@ -18,6 +19,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
   OnlinePaymentInfo? currentOnlinePaymentInfo;
   List<Invoice> currentInvoiceList = [];
   List<InvoiceItem> currentInvoiceItemList = [];
+  InvoiceDetails? currentInvoiceDetail;
   InvoiceFilter currentInvoiceFilter = InvoiceFilter();
   int currentPage = 1;
   int currentAddedInvoiceId = 0;
@@ -110,16 +112,16 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       emit(InvoiceLoadingState());
 
       try {
-        final response = await _invoiceRepository.invoiceItemListFromInvoiceId(
+        final response = await _invoiceRepository.getInvoiceDetailsById(
           event.invoiceId,
         );
 
         response.fold(
           (failure) => emit(InvoiceErrorState(failure.message)),
-          (invoiceItemList) {
-            currentInvoiceItemList = invoiceItemList;
+          (invoiceDetails) {
+            currentInvoiceDetail = invoiceDetails;
 
-            emit(InvoiceItemListLoadedState(invoiceItemList));
+            emit(InvoiceDetailsLoadedState(invoiceDetails));
           },
         );
       } catch (e) {

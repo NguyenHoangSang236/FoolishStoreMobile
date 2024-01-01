@@ -28,7 +28,7 @@ class _InvoiceComponentState extends State<InvoiceComponent> {
   bool _canCancel = true;
 
   void _onPressViewDetails() {
-    context.router.push(InvoiceDetailsRoute(invoice: widget.invoice));
+    context.router.push(InvoiceDetailsRoute(invoiceId: widget.invoice.id));
   }
 
   void _onPressCancelOrder() {

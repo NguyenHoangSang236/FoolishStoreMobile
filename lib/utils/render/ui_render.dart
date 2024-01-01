@@ -336,12 +336,17 @@ class UiRender {
           width: width,
           height: height,
           decoration: BoxDecoration(
-              border: border,
-              borderRadius: borderRadius,
-              image: DecorationImage(image: imageProvider, fit: fit)),
+            border: border,
+            borderRadius: borderRadius,
+            image: DecorationImage(
+              image: imageProvider,
+              fit: fit,
+            ),
+          ),
           child: content),
-      placeholder: (context, url) =>
-          const Center(child: CircularProgressIndicator(color: Colors.orange)),
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(color: Colors.orange),
+      ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }

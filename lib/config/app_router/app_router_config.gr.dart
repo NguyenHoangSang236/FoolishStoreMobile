@@ -56,7 +56,7 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: InvoiceDetailsPage(
           key: args.key,
-          invoice: args.invoice,
+          invoiceId: args.invoiceId,
         ),
       );
     },
@@ -82,6 +82,16 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const OnlinePaymentReceiverInfoPage(),
+      );
+    },
+    PhotoViewRoute.name: (routeData) {
+      final args = routeData.argsAs<PhotoViewRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: PhotoViewPage(
+          key: args.key,
+          url: args.url,
+        ),
       );
     },
     ProductDetailsRoute.name: (routeData) {
@@ -210,13 +220,13 @@ class InitialLoadingRoute extends PageRouteInfo<void> {
 class InvoiceDetailsRoute extends PageRouteInfo<InvoiceDetailsRouteArgs> {
   InvoiceDetailsRoute({
     Key? key,
-    required Invoice invoice,
+    required int invoiceId,
     List<PageRouteInfo>? children,
   }) : super(
           InvoiceDetailsRoute.name,
           args: InvoiceDetailsRouteArgs(
             key: key,
-            invoice: invoice,
+            invoiceId: invoiceId,
           ),
           initialChildren: children,
         );
@@ -230,16 +240,16 @@ class InvoiceDetailsRoute extends PageRouteInfo<InvoiceDetailsRouteArgs> {
 class InvoiceDetailsRouteArgs {
   const InvoiceDetailsRouteArgs({
     this.key,
-    required this.invoice,
+    required this.invoiceId,
   });
 
   final Key? key;
 
-  final Invoice invoice;
+  final int invoiceId;
 
   @override
   String toString() {
-    return 'InvoiceDetailsRouteArgs{key: $key, invoice: $invoice}';
+    return 'InvoiceDetailsRouteArgs{key: $key, invoiceId: $invoiceId}';
   }
 }
 
@@ -297,6 +307,44 @@ class OnlinePaymentReceiverInfoRoute extends PageRouteInfo<void> {
   static const String name = 'OnlinePaymentReceiverInfoRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [PhotoViewPage]
+class PhotoViewRoute extends PageRouteInfo<PhotoViewRouteArgs> {
+  PhotoViewRoute({
+    Key? key,
+    required String url,
+    List<PageRouteInfo>? children,
+  }) : super(
+          PhotoViewRoute.name,
+          args: PhotoViewRouteArgs(
+            key: key,
+            url: url,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'PhotoViewRoute';
+
+  static const PageInfo<PhotoViewRouteArgs> page =
+      PageInfo<PhotoViewRouteArgs>(name);
+}
+
+class PhotoViewRouteArgs {
+  const PhotoViewRouteArgs({
+    this.key,
+    required this.url,
+  });
+
+  final Key? key;
+
+  final String url;
+
+  @override
+  String toString() {
+    return 'PhotoViewRouteArgs{key: $key, url: $url}';
+  }
 }
 
 /// generated route for

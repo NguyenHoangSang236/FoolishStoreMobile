@@ -104,7 +104,7 @@ class _NotificationState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Layout(
       scaffoldKey: _scaffoldKey,
-      forceCanNotBack: false,
+      forceCanNotBack: true,
       pageName: 'Notification',
       needSearchBar: false,
       body: RefreshIndicator(

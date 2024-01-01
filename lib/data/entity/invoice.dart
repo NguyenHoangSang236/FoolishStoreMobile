@@ -1,6 +1,10 @@
+import 'package:fashionstore/data/entity/refund.dart';
 import 'package:fashionstore/data/enum/order_status_enum.dart';
 import 'package:fashionstore/data/enum/payment_enum.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import 'delivery.dart';
+import 'online_payment_account.dart';
 
 part 'invoice.g.dart';
 
@@ -10,11 +14,11 @@ class Invoice {
   int id;
   DateTime invoiceDate;
   DateTime? payDate;
-  String? orderStatus;
+  String orderStatus;
   String paymentStatus;
   String paymentMethod;
   String currency;
-  String? intent;
+  String? note;
   String? description;
   double refundPercentage;
   double totalPrice;
@@ -24,6 +28,9 @@ class Invoice {
   String? wardCode;
   double deliveryFee;
   String adminAcceptance;
+  Delivery? delivery;
+  OnlinePaymentAccount? receiverPaymentAccount;
+  Refund? refund;
 
   Invoice(
     this.id,
@@ -33,7 +40,7 @@ class Invoice {
     this.paymentStatus,
     this.paymentMethod,
     this.currency,
-    this.intent,
+    this.note,
     this.description,
     this.refundPercentage,
     this.totalPrice,
@@ -43,6 +50,9 @@ class Invoice {
     this.wardCode,
     this.deliveryFee,
     this.adminAcceptance,
+    this.delivery,
+    this.receiverPaymentAccount,
+    this.refund,
   );
 
   factory Invoice.fromJson(Map<String, dynamic> json) =>
@@ -86,6 +96,6 @@ class Invoice {
 
   @override
   String toString() {
-    return 'Invoice{id: $id, invoiceDate: $invoiceDate, payDate: $payDate, orderStatus: $orderStatus, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, currency: $currency, intent: $intent, description: $description, refundPercentage: $refundPercentage, totalPrice: $totalPrice, reason: $reason, adminAcceptance: $adminAcceptance}';
+    return 'Invoice{id: $id, invoiceDate: $invoiceDate, payDate: $payDate, orderStatus: $orderStatus, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, currency: $currency, note: $note, description: $description, refundPercentage: $refundPercentage, totalPrice: $totalPrice, reason: $reason, adminAcceptance: $adminAcceptance}';
   }
 }

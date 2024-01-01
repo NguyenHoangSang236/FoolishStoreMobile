@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:either_dart/either.dart';
 import 'package:fashionstore/data/dto/invoice_filter.dart';
-import 'package:fashionstore/data/entity/invoice_item.dart';
+import 'package:fashionstore/data/entity/invoice_details.dart';
 import 'package:fashionstore/data/entity/online_payment_info.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/network/failure.dart';
@@ -42,7 +42,7 @@ class InvoiceRepository {
     }
   }
 
-  Future<Either<Failure, List<InvoiceItem>>> getInvoiceItemList(
+  Future<Either<Failure, InvoiceDetails>> getInvoiceDetails(
     String url,
   ) async {
     try {
@@ -55,10 +55,7 @@ class InvoiceRepository {
       );
 
       if (response.result == 'success') {
-        List<dynamic> jsonList = json.decode(jsonEncode(response.content));
-
-        return Right(
-            jsonList.map((json) => InvoiceItem.fromJson(json)).toList());
+        return Right(InvoiceDetails.fromJson(response.content));
       } else {
         return Left(ApiFailure(response.content));
       }
@@ -132,10 +129,8 @@ class InvoiceRepository {
     );
   }
 
-  Future<Either<Failure, List<InvoiceItem>>> invoiceItemListFromInvoiceId(
-    int invoiceId,
-  ) {
-    return getInvoiceItemList('/invoice_id=$invoiceId');
+  Future<Either<Failure, InvoiceDetails>> getInvoiceDetailsById(int invoiceId) {
+    return getInvoiceDetails('/invoice_id=$invoiceId');
   }
 
   Future<Either<Failure, List<Invoice>>> filterOrders(InvoiceFilter filter) {

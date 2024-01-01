@@ -3,7 +3,6 @@ import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/views/screens/index_page.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../data/entity/invoice.dart';
 import '../../views/screens/all_categories_page.dart';
 import '../../views/screens/all_products_page.dart';
 import '../../views/screens/cart_page.dart';
@@ -13,6 +12,7 @@ import '../../views/screens/login_page.dart';
 import '../../views/screens/map_page.dart';
 import '../../views/screens/notification_page.dart';
 import '../../views/screens/online_payment_receiver_info_page.dart';
+import '../../views/screens/photo_view_page.dart';
 import '../../views/screens/product_details_page.dart';
 import '../../views/screens/profile_page.dart';
 import '../../views/screens/purchase_history_page.dart';

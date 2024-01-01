@@ -43,7 +43,11 @@ class NotificationRepository {
     }
   }
 
-  Future<Either<Failure, String>> seenNotification(String url) async {
-    return NetworkService.getMessageFromApi(url, type: type);
+  Future<Either<Failure, String>> seenNotification(int id) async {
+    return NetworkService.getMessageFromApi(
+      '/seen_notification_id=$id',
+      type: type,
+      isAuthen: true,
+    );
   }
 }

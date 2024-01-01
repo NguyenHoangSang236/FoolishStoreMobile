@@ -41,13 +41,13 @@ class InvoiceListFilteredState extends InvoiceState {
   List<Object> get props => [invoiceList];
 }
 
-class InvoiceItemListLoadedState extends InvoiceState {
-  final List<InvoiceItem> invoiceItemList;
+class InvoiceDetailsLoadedState extends InvoiceState {
+  final InvoiceDetails invoiceDetails;
 
-  const InvoiceItemListLoadedState(this.invoiceItemList);
+  const InvoiceDetailsLoadedState(this.invoiceDetails);
 
   @override
-  List<Object> get props => [invoiceItemList];
+  List<Object> get props => [invoiceDetails];
 }
 
 class InvoiceCanceledState extends InvoiceState {

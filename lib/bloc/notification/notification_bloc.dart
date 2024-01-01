@@ -15,6 +15,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   List<Notification> currentNotificationList = [];
   int currentPage = 1;
   int currentLimit = 10;
+  int currentSeenNotificationId = 0;
 
   DateTime currentStartDate = DateTime(2023, 01, 01);
   DateTime currentEndDate = DateTime.now();
@@ -43,9 +44,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           (list) {
             if (currentEndDate == event.endDate &&
                 currentStartDate == event.startDate) {
-              currentNotificationList = _removeDuplicate(
-                [...currentNotificationList, ...list],
-              );
+              currentNotificationList = List.of(list);
+
+              // currentNotificationList = _removeDuplicate(
+              //   [...currentNotificationList, ...list],
+              // );
             } else {
               currentStartDate = event.startDate;
               currentEndDate = event.endDate;
@@ -92,6 +95,28 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             );
 
             emit(NotificationListLoadedState(currentNotificationList));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(NotificationErrorState(e.toString()));
+      }
+    });
+
+    on<OnSeenNotificationEvent>((event, emit) async {
+      emit(NotificationLoadingState());
+
+      try {
+        final response = await _notificationRepository.seenNotification(
+          event.notificationId,
+        );
+
+        response.fold(
+          (failure) => emit(NotificationErrorState(failure.message)),
+          (success) {
+            currentSeenNotificationId = event.notificationId;
+
+            emit(NotificationSeenState(success));
           },
         );
       } catch (e) {

@@ -1,24 +1,27 @@
-import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/invoice/invoice_bloc.dart';
-import 'package:fashionstore/data/entity/invoice.dart';
 import 'package:fashionstore/data/entity/invoice_item.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/views/layout/layout.dart';
+import 'package:fashionstore/views/screens/photo_view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../data/entity/invoice_details.dart';
+import '../../data/entity/refund.dart';
 
 @RoutePage()
 class InvoiceDetailsPage extends StatefulWidget {
   const InvoiceDetailsPage({
     super.key,
-    required this.invoice,
+    required this.invoiceId,
   });
 
-  final Invoice invoice;
+  final int invoiceId;
 
   @override
   State<StatefulWidget> createState() => _InvoiceDetailsState();
@@ -46,8 +49,11 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
   @override
   void initState() {
     context.read<InvoiceBloc>().add(
-          OnLoadInvoiceDetailsEvent(widget.invoice.id),
+          OnLoadInvoiceDetailsEvent(
+            widget.invoiceId,
+          ),
         );
+
     super.initState();
   }
 
@@ -67,11 +73,12 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Invoice ID: ${widget.invoice.id}',
+                'Invoice ID: ${widget.invoiceId}',
                 style: TextStyle(
                   fontFamily: 'Work Sans',
                   fontSize: 30.size,
                   fontWeight: FontWeight.w500,
+                  color: Colors.orange,
                 ),
               ),
               _invoiceItemListAndOtherData(),
@@ -90,8 +97,9 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
         }
       },
       builder: (context, state) {
-        if (state is InvoiceItemListLoadedState) {
-          List<InvoiceItem> invoiceItemList = state.invoiceItemList;
+        if (state is InvoiceDetailsLoadedState) {
+          InvoiceDetails invoiceDetails = state.invoiceDetails;
+          List<InvoiceItem> invoiceItemList = invoiceDetails.invoiceProducts;
 
           double totalPrice = 0;
           int totalQuantity = 0;
@@ -118,37 +126,81 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
               20.verticalSpace,
               _invoiceDataLine(
                 "Invoice date",
-                widget.invoice.invoiceDate.dateTime,
+                invoiceDetails.invoice.invoiceDate.dateTime,
+              ),
+              invoiceDetails.invoice.address != null &&
+                      invoiceDetails.invoice.address!.isNotEmpty
+                  ? _invoiceDataLine('Address', invoiceDetails.invoice.address!)
+                  : const SizedBox(),
+              invoiceDetails.invoice.delivery != null
+                  ? _invoiceDataLine(
+                      'Expected delivery time',
+                      invoiceDetails
+                          .invoice.delivery!.expectedDeliveryTime!.dateTime,
+                    )
+                  : const SizedBox(),
+              invoiceDetails.invoice.delivery != null &&
+                      invoiceDetails.invoice.delivery!.shipDate != null
+                  ? _invoiceDataLine(
+                      'Delivery date',
+                      invoiceDetails.invoice.delivery!.shipDate!.dateTime,
+                    )
+                  : const SizedBox(),
+              Divider(
+                height: 30.height,
+                color: Colors.grey,
+              ),
+              _invoiceDataLine(
+                "Admin acceptance",
+                invoiceDetails
+                    .invoice.adminAcceptance.formatEnumToUppercaseFirstLetter,
+              ),
+              _invoiceDataLine(
+                "Order status",
+                invoiceDetails
+                    .invoice.orderStatus!.formatEnumToUppercaseFirstLetter,
               ),
               _invoiceDataLine(
                 "Payment method",
-                widget.invoice.paymentMethod.formatEnumToUppercaseFirstLetter,
+                invoiceDetails
+                    .invoice.paymentMethod.formatEnumToUppercaseFirstLetter,
               ),
               _invoiceDataLine(
                 "Payment status",
-                widget.invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
+                invoiceDetails
+                    .invoice.paymentStatus.formatEnumToUppercaseFirstLetter,
               ),
-              widget.invoice.reason != null && widget.invoice.reason!.isNotEmpty
+              invoiceDetails.invoice.reason != null &&
+                      invoiceDetails.invoice.reason!.isNotEmpty
                   ? _invoiceDataLine(
                       'Reason',
-                      widget.invoice.reason ?? '',
+                      invoiceDetails.invoice.reason ?? '',
                     )
                   : const SizedBox(),
+              Divider(
+                height: 30.height,
+                color: Colors.grey,
+              ),
               _invoiceDataLine(
                 'Total items ($totalQuantity)',
                 totalPrice.format.dollar,
               ),
               _invoiceDataLine(
                 'Shipping price',
-                widget.invoice.deliveryFee.format.dollar,
+                invoiceDetails.invoice.deliveryFee.format.dollar,
               ),
               _invoiceDataLine(
                 'Total price (${invoiceItemList.length})',
-                widget.invoice.totalPrice.format.dollar,
+                invoiceDetails.invoice.totalPrice.format.dollar,
               ),
-              widget.invoice.address != null &&
-                      widget.invoice.address!.isNotEmpty
-                  ? _invoiceDataLine('Address', widget.invoice.address!)
+              invoiceDetails.invoice.payDate != null
+                  ? _invoiceDataLine(
+                      'Paid date',
+                      invoiceDetails.invoice.payDate!.dateTime,
+                    )
+                  : const SizedBox(),
+              invoiceDetails.invoice.refund != null
+                  ? _refundSection(invoiceDetails.invoice.refund!)
                   : const SizedBox(),
             ],
           );
@@ -158,6 +210,38 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
 
         return const SizedBox();
       },
+    );
+  }
+
+  Widget _refundSection(Refund refund) {
+    return Column(
+      children: [
+        Divider(
+          height: 30.height,
+          color: Colors.grey,
+        ),
+        _invoiceDataLine(
+          'Refund status',
+          refund.status.formatEnumToUppercaseFirstLetter,
+        ),
+        _invoiceDataLine(
+          'Refund money',
+          refund.refundMoney.format.dollar,
+        ),
+        refund.date != null
+            ? _invoiceDataLine(
+                'Refund date',
+                refund.date!.dateTime,
+              )
+            : const SizedBox(),
+        refund.evidentImage != null && refund.evidentImage!.isNotEmpty
+            ? _invoiceDataLine(
+                'Refund image',
+                refund.evidentImage!,
+                isImage: true,
+              )
+            : const SizedBox(),
+      ],
     );
   }
 
@@ -173,138 +257,125 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
           child: Padding(
             padding: EdgeInsets.all(10.size),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 150.height,
-                  width: 115.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.radius),
-                  ),
-                  child: UiRender.buildCachedNetworkImage(
-                    context,
-                    invoiceItem.image1,
-                    margin: EdgeInsets.only(right: 10.width),
-                    width: 81.width,
-                    height: 93.height,
-                    borderRadius: BorderRadius.circular(8.radius),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    // height: 150.height,
+                    // width: 115.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.radius),
+                    ),
+                    child: UiRender.buildCachedNetworkImage(
+                      context,
+                      invoiceItem.image1,
+                      height: 150.height,
+                      borderRadius: BorderRadius.circular(8.radius),
+                    ),
                   ),
                 ),
                 22.horizontalSpace,
                 Expanded(
-                  flex: 2,
-                  child: SizedBox(
-                    height: 150.height,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          flex: 2,
-                          child: Text(
-                            invoiceItem.name,
-                            maxLines: 2,
-                            style: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize: 18.size,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            _getColorAndSize(
-                                invoiceItem.color, invoiceItem.size),
-                            maxLines: 2,
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          invoiceItem.name,
+                          maxLines: 2,
+                          style: TextStyle(
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 14.size,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF797780),
-                            ),
+                            fontSize: 18.size,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              invoiceItem.discount > 0
-                                  ? RichText(
-                                      text: TextSpan(
-                                        text: invoiceItem
-                                            .priceAfterDiscount()
-                                            .format
-                                            .dollar,
-                                        style: TextStyle(
-                                          fontFamily: 'Sen',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 25.size,
-                                          color: Colors.red,
-                                        ),
-                                        children: [
-                                          const TextSpan(text: ' '),
-                                          TextSpan(
-                                            text: invoiceItem
-                                                .sellingPrice.format.dollar,
-                                            style: TextStyle(
-                                              fontFamily: 'Sen',
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 13.size,
-                                              color: const Color(0xffacacac),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Text(
-                                      invoiceItem.sellingPrice.format.dollar,
+                      ),
+                      Flexible(
+                        child: Text(
+                          _getColorAndSize(
+                            invoiceItem.color,
+                            invoiceItem.size,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14.size,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF797780),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            invoiceItem.discount > 0
+                                ? RichText(
+                                    text: TextSpan(
+                                      text: invoiceItem
+                                          .priceAfterDiscount()
+                                          .format
+                                          .dollar,
                                       style: TextStyle(
                                         fontFamily: 'Sen',
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 26.size,
+                                        fontSize: 25.size,
                                         color: Colors.red,
-                                        height: 1.5.height,
                                       ),
+                                      children: [
+                                        const TextSpan(text: ' '),
+                                        TextSpan(
+                                          text: invoiceItem
+                                              .sellingPrice.format.dollar,
+                                          style: TextStyle(
+                                            fontFamily: 'Sen',
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 13.size,
+                                            color: const Color(0xffacacac),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                              // Text(
-                              //   invoiceItem.sellingPrice.format.dollar,
-                              //   style: TextStyle(
-                              //     fontSize: 26.size,
-                              //     fontWeight: FontWeight.w500,
-                              //     fontFamily: 'Imprima',
-                              //     color: Colors.red,
-                              //   ),
-                              // ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '${invoiceItem.quantity}',
+                                  )
+                                : Text(
+                                    invoiceItem.sellingPrice.format.dollar,
                                     style: TextStyle(
-                                      fontSize: 26.size,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'Imprima',
+                                      fontFamily: 'Sen',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 25.size,
+                                      color: Colors.red,
                                     ),
                                   ),
-                                  Text(
-                                    'x',
-                                    style: TextStyle(
-                                      height: 0.8,
-                                      fontSize: 17.size,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'Imprima',
-                                    ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'x',
+                                  style: TextStyle(
+                                    fontSize: 17.size,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Imprima',
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                                Text(
+                                  '${invoiceItem.quantity}',
+                                  style: TextStyle(
+                                    fontSize: 26.size,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Imprima',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -315,7 +386,13 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
     );
   }
 
-  Widget _invoiceDataLine(String title, String content) {
+  Widget _invoiceDataLine(
+    String title,
+    String content, {
+    bool isImage = false,
+  }) {
+    if (isImage) print(content);
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.height),
       child: Row(
@@ -333,13 +410,24 @@ class _InvoiceDetailsState extends State<InvoiceDetailsPage>
           ),
           10.horizontalSpace,
           Expanded(
-            child: Text(
-              content,
-              style: TextStyle(
-                fontSize: 18.size,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
+            child: isImage
+                ? GestureDetector(
+                    onTap: () => context.router.pushWidget(
+                      PhotoViewPage(url: content),
+                    ),
+                    child: UiRender.buildCachedNetworkImage(
+                      context,
+                      content,
+                      height: 200.height,
+                    ),
+                  )
+                : Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 18.size,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
           ),
         ],
       ),
