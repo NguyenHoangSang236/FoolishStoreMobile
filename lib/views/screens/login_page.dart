@@ -2,13 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/enum/local_storage_key_enum.dart';
-import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
+import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../service/firebase_messaging_service.dart';
 import '../../utils/local_storage/local_storage_service.dart';
 
 @RoutePage()
@@ -213,6 +214,12 @@ class _LoginPageState extends State<LoginPage> {
                   listener: (context, authenState) {
                     if (authenState is AuthenticationLoadingState) {
                       UiRender.showLoaderDialog(context);
+                    } else if (authenState is AuthenticationLoggedInState) {
+                      FirebaseMessagingService.subscribeToTopic(
+                        authenState.currentUser.userName,
+                      );
+
+                      context.router.replaceNamed(AppRouterPath.index);
                     } else if (authenState is AuthenticationRegisteredState) {
                       context.router.pop();
                       UiRender.showDialog(context, '', authenState.message)

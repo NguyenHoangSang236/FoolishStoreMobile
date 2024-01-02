@@ -26,6 +26,7 @@ class NetworkService {
     Map<String, dynamic>? param,
     Map<String, dynamic>? queryParam,
     FormData? formDataParam,
+    bool useDefaultUrl = true,
   }) async {
     // dio.interceptors
     //   // ..add(CookieManager(cookieJar))
@@ -72,8 +73,14 @@ class NetworkService {
     }
 
     final Response response = (param == null && formDataParam == null)
-        ? await dio.get(baseUrl + url, queryParameters: queryParam)
-        : await dio.post(baseUrl + url, data: formDataParam ?? param);
+        ? await dio.get(
+            useDefaultUrl ? (baseUrl + url) : url,
+            queryParameters: queryParam,
+          )
+        : await dio.post(
+            useDefaultUrl ? (baseUrl + url) : url,
+            data: formDataParam ?? param,
+          );
 
     // debugPrint(domainIP + url);
     // debugPrint('request: ${param ?? formDataParam.toString()}');

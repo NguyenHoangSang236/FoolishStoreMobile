@@ -58,6 +58,13 @@ class OnLoadTopBestSellerProductListEvent extends ProductEvent {
   const OnLoadTopBestSellerProductListEvent();
 }
 
+class OnLoadRecommendedProductListEvent extends ProductEvent {
+  final String color;
+  final int productId;
+
+  const OnLoadRecommendedProductListEvent(this.color, this.productId);
+}
+
 class OnLoadNewArrivalProductListEvent extends ProductEvent {
   const OnLoadNewArrivalProductListEvent();
 }

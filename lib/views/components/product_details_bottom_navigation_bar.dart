@@ -2,8 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import 'package:fashionstore/bloc/productDetails/product_details_bloc.dart';
-import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
+import 'package:fashionstore/views/components/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,7 +32,8 @@ class _ProductDetailsBottomNavigationBarComponentState
         .read<ProductDetailsBloc>()
         .selectedProductDetails
         .first
-        .productId;
+        .productId!
+        .toInt();
     String size = context.read<ProductAddToCartBloc>().size;
     int quantity = context.read<ProductAddToCartBloc>().quantity;
 

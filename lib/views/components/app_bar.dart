@@ -4,7 +4,6 @@ import 'package:fashionstore/bloc/translator/translator_bloc.dart';
 import 'package:fashionstore/config/app_router/app_router_path.dart';
 import 'package:fashionstore/data/enum/navigation_name_enum.dart';
 import 'package:fashionstore/data/static/global_variables.dart';
-import 'package:fashionstore/service/firebase_messaging_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
@@ -79,10 +78,6 @@ class _AppBarComponentState extends State<AppBarComponent> {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state is AuthenticationLoggedOutState) {
-          FirebaseMessagingService.unsubscribeFromTopic(
-            context.read<AuthenticationBloc>().currentUser!.userName,
-          );
-
           context.router.replaceNamed(AppRouterPath.login);
         }
       },

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/entity/user.dart';
 import '../../data/repository/authentication_repository.dart';
+import '../../service/firebase_messaging_service.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -108,6 +109,7 @@ class AuthenticationBloc
           emit(AuthenticationErrorState(failure.message));
         },
         (success) async {
+          FirebaseMessagingService.unsubscribeFromTopic(currentUser!.userName);
           registerMessage = success;
           currentUser = null;
 

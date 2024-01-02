@@ -6,7 +6,7 @@ part 'product.g.dart';
 class Product {
   @JsonKey(name: 'id')
   int id;
-  int productId;
+  num? productId;
   String name;
   double sellingPrice;
   double discount;
@@ -18,25 +18,28 @@ class Product {
   String? image2;
   String? image3;
   String? image4;
-  String description;
+  String? description;
   double overallRating;
+  num? product_id;
 
   Product(
-      this.id,
-      this.productId,
-      this.name,
-      this.sellingPrice,
-      this.discount,
-      this.brand,
-      this.size,
-      this.color,
-      this.availableQuantity,
-      this.image1,
-      this.image2,
-      this.image3,
-      this.image4,
-      this.overallRating,
-      this.description);
+    this.id,
+    this.productId,
+    this.name,
+    this.sellingPrice,
+    this.discount,
+    this.brand,
+    this.size,
+    this.color,
+    this.availableQuantity,
+    this.image1,
+    this.image2,
+    this.image3,
+    this.image4,
+    this.overallRating,
+    this.description,
+    this.product_id,
+  );
 
   factory Product.fromJson(Map<String, dynamic> json) =>
       _$ProductFromJson(json);

@@ -8,6 +8,7 @@ import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/views/components/comment_list.dart';
+import 'package:fashionstore/views/components/product_component.dart';
 import 'package:fashionstore/views/layout/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/productAddToCartSelection/product_add_to_cart_bloc.dart';
 import '../../bloc/productDetails/product_details_bloc.dart';
+import '../../config/app_router/app_router_path.dart';
 import '../../data/entity/product.dart';
 import '../../utils/render/value_render.dart';
 
@@ -150,7 +152,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     );
 
                     selectedProductId =
-                        productState.productList.first.productId;
+                        productState.productList.first.productId!.toInt();
                   });
                 }
               },
@@ -227,8 +229,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                           ),
                           _itemDescription(
-                            colorSelectedProductList[0].description,
+                            colorSelectedProductList[0].description ??
+                                'No description',
                           ),
+                          _productRecommender(),
                           _commentList(),
                         ],
                       ),
@@ -320,6 +324,71 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
+  Widget _productRecommender() {
+    return Container(
+      height: 400.height,
+      margin: EdgeInsets.only(bottom: 12.height),
+      padding: EdgeInsets.symmetric(horizontal: 18.width, vertical: 24.height),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.radius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Recommend products',
+            style: TextStyle(
+              fontFamily: 'Work Sans',
+              fontWeight: FontWeight.w600,
+              fontSize: 16.size,
+              color: Colors.black,
+            ),
+          ),
+          10.verticalSpace,
+          Flexible(
+            child: BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                List<Product> productList =
+                    context.read<ProductBloc>().recommendedProductList;
+
+                if (state is ProductLoadingState) {
+                  return UiRender.loadingCircle();
+                } else if (state is ProductRecommendedState) {
+                  productList = state.productList;
+                }
+
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
+                  shrinkWrap: true,
+                  itemCount: productList.length,
+                  itemBuilder: (context, index) {
+                    return ProductComponent(
+                      product: productList[index],
+                      onClick: () async {
+                        await LoadingService(context)
+                            .selectToViewProduct(productList[index])
+                            .then(
+                              (value) => context.router
+                                  .pushNamed(AppRouterPath.productDetails),
+                            );
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return 15.horizontalSpace;
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _ratingStarsAndProductStatus(List<Product> colorSelectedProductList) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -359,7 +428,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   color: const Color(0xff03A600),
                 ),
               )
-            : const SizedBox()
+            : const SizedBox(),
       ],
     );
   }

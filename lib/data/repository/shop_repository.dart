@@ -17,14 +17,18 @@ class ShopRepository {
     Map<String, dynamic>? paramBody,
     Map<String, dynamic>? queryParamBody,
     bool isAuthen = false,
+    bool isRecommender = false,
   }) async {
     try {
       ApiResponse response = await NetworkService.getDataFromApi(
-        ValueRender.getUrl(
-          isAuthen: isAuthen,
-          type: type,
-          url: url,
-        ),
+        isRecommender
+            ? url
+            : ValueRender.getUrl(
+                isAuthen: isAuthen,
+                type: type,
+                url: url,
+              ),
+        useDefaultUrl: !isRecommender,
         param: paramBody,
         queryParam: queryParamBody,
       );
@@ -149,7 +153,10 @@ class ShopRepository {
   }
 
   Future<Either<Failure, String>> rateProduct(
-      int productId, String color, int overallRating) {
+    int productId,
+    String color,
+    int overallRating,
+  ) {
     return NetworkService.getMessageFromApi(
       '/rateProduct',
       paramBody: {
@@ -159,6 +166,19 @@ class ShopRepository {
       },
       isAuthen: true,
       type: type,
+    );
+  }
+
+  Future<Either<Failure, List<Product>>> getRecommendProducts(
+    int productId,
+    String color,
+  ) {
+    return getProductList(
+      'https://absolutely-suitable-yak.ngrok-free.app/recommendResults?fbclid=IwAR3f81NQcnM673uq7GdpUa1gZ5ofgppAdJSZXKGaNoWWzp1Z-HUH9qgFftY',
+      isRecommender: true,
+      paramBody: {
+        'product': '$productId-$color',
+      },
     );
   }
 }

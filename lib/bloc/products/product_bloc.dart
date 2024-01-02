@@ -13,6 +13,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ShopRepository _shopRepository;
 
   List<Product> allProductList = [];
+  List<Product> recommendedProductList = [];
   List<Product> filteredProductList = [];
   List<Product> hotDiscountProductList = [];
   List<Product> top8BestSellerProductList = [];
@@ -64,6 +65,28 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           (list) {
             hotDiscountProductList = list;
             emit(ProductHotDiscountListLoadedState(list));
+          },
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(ProductErrorState(e.toString()));
+      }
+    });
+
+    on<OnLoadRecommendedProductListEvent>((event, emit) async {
+      emit(ProductLoadingState());
+
+      try {
+        final response = await _shopRepository.getRecommendProducts(
+          event.productId,
+          event.color,
+        );
+
+        response.fold(
+          (failure) => emit(ProductErrorState(failure.message)),
+          (list) {
+            recommendedProductList = list;
+            emit(ProductRecommendedState(list));
           },
         );
       } catch (e) {
