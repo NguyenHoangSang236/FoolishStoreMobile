@@ -50,6 +50,15 @@ class AuthenticationAvatarUpdatedState extends AuthenticationState {
   List<Object> get props => [fileId];
 }
 
+class AuthenticationProfileUpdatedState extends AuthenticationState {
+  final String message;
+
+  const AuthenticationProfileUpdatedState(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class AuthenticationErrorState extends AuthenticationState {
   final String message;
 

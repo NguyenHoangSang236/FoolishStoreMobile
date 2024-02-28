@@ -45,12 +45,12 @@ class LoadingService {
           ..add(
             OnSelectProductColorEvent(product.color),
           );
-        context.read<ProductBloc>().add(
-              OnLoadRecommendedProductListEvent(
-                product.color,
-                product.productId?.toInt() ?? product.product_id?.toInt() ?? 0,
-              ),
-            );
+        // context.read<ProductBloc>().add(
+        //       OnLoadRecommendedProductListEvent(
+        //         product.color,
+        //         product.productId?.toInt() ?? product.product_id?.toInt() ?? 0,
+        //       ),
+        //     );
         context.read<ProductAddToCartBloc>().add(
               OnSelectProductAddToCartEvent(
                 productName: product.name,

@@ -34,41 +34,41 @@ class _AllProductsPageState extends State<AllProductsPage> {
       GlobalKey<RefreshIndicatorState>();
   final ItemScrollController _itemScrollController = ItemScrollController();
   int selectedCategoryIndex = 0;
-  bool isLoaded = false;
+  bool _isLoaded = false;
   double currentOffset = 0;
 
   void _scrollListener() {
-    if (_scrollController.offset >=
+    if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
       if (context.read<CategoryBloc>().selectedCategoryName == 'All' &&
-          isLoaded == false) {
+          _isLoaded == false) {
         setState(() {
-          isLoaded = true;
-          currentOffset = _scrollController.offset;
-        });
+          _isLoaded = true;
+          currentOffset = _scrollController.position.pixels - 10;
 
-        context.read<ProductBloc>().add(
-              OnLoadAllProductListEvent(
-                context.read<ProductBloc>().currentAllProductListPage + 1,
-                8,
-              ),
-            );
+          context.read<ProductBloc>().add(
+                OnLoadAllProductListEvent(
+                  context.read<ProductBloc>().currentAllProductListPage + 1,
+                  8,
+                ),
+              );
+        });
       } else if (context.read<CategoryBloc>().selectedCategoryName != 'All' &&
-          isLoaded == false) {
+          _isLoaded == false) {
         setState(() {
-          isLoaded = true;
-          currentOffset = _scrollController.offset;
-        });
+          _isLoaded = true;
+          currentOffset = _scrollController.position.pixels - 10;
 
-        context.read<ProductBloc>().add(
-              OnLoadFilterProductListEvent(
-                context.read<ProductBloc>().currentAllProductListPage + 1,
-                8,
-                categoryList: [
-                  context.read<CategoryBloc>().selectedCategoryName
-                ],
-              ),
-            );
+          context.read<ProductBloc>().add(
+                OnLoadFilterProductListEvent(
+                  context.read<ProductBloc>().currentAllProductListPage + 1,
+                  8,
+                  categoryList: [
+                    context.read<CategoryBloc>().selectedCategoryName
+                  ],
+                ),
+              );
+        });
       }
     }
   }
@@ -78,7 +78,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
       String currentCateName =
           context.read<CategoryBloc>().selectedCategoryName;
 
-      isLoaded = false;
+      _isLoaded = false;
       currentOffset = 0;
 
       if (currentCateName == "All") {
@@ -102,7 +102,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
   void onPressCategoryButton(String name) {
     setState(() {
-      isLoaded = false;
+      _isLoaded = false;
       currentOffset = 0;
 
       context.read<CategoryBloc>().add(OnSelectedCategoryEvent(name));
@@ -266,10 +266,8 @@ class _AllProductsPageState extends State<AllProductsPage> {
       listener: (context, productState) {
         if (productState is ProductLoadingState) {
           UiRender.showLoaderDialog(context);
-        } else if (productState is ProductAllListLoadedState) {
-          context.router.pop();
-          _scrollController.jumpTo(currentOffset);
-        } else if (productState is ProductFilteredListLoadedState) {
+        } else if (productState is ProductAllListLoadedState ||
+            productState is ProductFilteredListLoadedState) {
           context.router.pop();
           _scrollController.jumpTo(currentOffset);
         }
@@ -279,8 +277,10 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
         if (productState is ProductAllListLoadedState) {
           productList = context.read<ProductBloc>().allProductList;
+          _isLoaded = false;
         } else if (productState is ProductFilteredListLoadedState) {
           productList = context.read<ProductBloc>().filteredProductList;
+          _isLoaded = false;
         }
 
         if (productList.isNotEmpty) {

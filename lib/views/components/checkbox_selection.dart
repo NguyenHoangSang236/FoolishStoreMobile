@@ -20,28 +20,31 @@ class CheckBoxSelection extends StatefulWidget {
 class _CheckBoxSelectionState extends State<CheckBoxSelection> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Checkbox(
-          activeColor: Colors.orange,
-          checkColor: Colors.white,
-          value: widget.checkValue,
-          shape: const CircleBorder(),
-          onChanged: widget.onChanged,
-        ),
-        Expanded(
-          child: Text(
-            widget.content,
-            maxLines: 2,
-            style: TextStyle(
-              fontFamily: 'Sen',
-              fontWeight: FontWeight.w400,
-              fontSize: 15.size,
-              color: const Color(0xFF464646),
+    return SizedBox(
+      height: 40.height,
+      child: Row(
+        children: [
+          Checkbox(
+            activeColor: Colors.orange,
+            checkColor: Colors.white,
+            value: widget.checkValue,
+            shape: const CircleBorder(),
+            onChanged: widget.onChanged,
+          ),
+          Expanded(
+            child: Text(
+              widget.content,
+              maxLines: 2,
+              style: TextStyle(
+                fontFamily: 'Sen',
+                fontWeight: FontWeight.w400,
+                fontSize: 15.size,
+                color: const Color(0xFF464646),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

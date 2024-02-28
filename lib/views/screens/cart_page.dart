@@ -146,7 +146,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Layout(
       scaffoldKey: _scaffoldKey,
-      forceCanNotBack: false,
+      forceCanNotBack: true,
       textEditingController: _textEditingController,
       pageName: 'My Cart',
       hintSearchBarText: 'What item are you looking for?',

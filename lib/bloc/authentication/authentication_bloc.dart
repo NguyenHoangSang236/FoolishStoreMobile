@@ -81,11 +81,39 @@ class AuthenticationBloc
         response.fold(
           (failure) {
             registerMessage = failure.message;
-            emit(AuthenticationRegisteredState(failure.message));
+            emit(AuthenticationErrorState(failure.message));
           },
           (success) {
             registerMessage = success;
-            emit(AuthenticationErrorState(success));
+            emit(AuthenticationRegisteredState(success));
+          },
+        );
+      } catch (e) {
+        emit(AuthenticationErrorState(e.toString()));
+      }
+    });
+
+    on<OnUpdateProfileAuthenticationEvent>((event, emit) async {
+      emit(AuthenticationLoadingState());
+
+      try {
+        final response = await _authenticationRepository.updateProfile(
+          event.name,
+          event.phoneNumber,
+          event.email,
+          event.address,
+          event.city,
+          event.country,
+        );
+
+        response.fold(
+          (failure) {
+            registerMessage = failure.message;
+            emit(AuthenticationErrorState(failure.message));
+          },
+          (success) {
+            registerMessage = success;
+            emit(AuthenticationProfileUpdatedState(success));
           },
         );
       } catch (e) {
@@ -101,21 +129,26 @@ class AuthenticationBloc
     on<OnLogoutAuthenticationEvent>((event, emit) async {
       emit(AuthenticationLoadingState());
 
-      final response = await _authenticationRepository.logout();
+      try {
+        final response = await _authenticationRepository.logout();
 
-      response.fold(
-        (failure) {
-          registerMessage = failure.message;
-          emit(AuthenticationErrorState(failure.message));
-        },
-        (success) async {
-          FirebaseMessagingService.unsubscribeFromTopic(currentUser!.userName);
-          registerMessage = success;
-          currentUser = null;
+        response.fold(
+          (failure) {
+            registerMessage = failure.message;
+            emit(AuthenticationErrorState(failure.message));
+          },
+          (success) async {
+            FirebaseMessagingService.unsubscribeFromTopic(
+                currentUser!.userName);
+            registerMessage = success;
+            currentUser = null;
 
-          emit(AuthenticationLoggedOutState(success));
-        },
-      );
+            emit(AuthenticationLoggedOutState(success));
+          },
+        );
+      } catch (e) {
+        emit(AuthenticationErrorState(e.toString()));
+      }
     });
   }
 }

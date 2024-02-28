@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../config/app_router/app_router_config.dart';
 import '../../data/entity/user.dart';
 import '../layout/layout.dart';
 
@@ -86,6 +87,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
               if (authenState is AuthenticationLoggedInState) {
                 currentUser = authenState.currentUser;
+              } else if (authenState is AuthenticationProfileUpdatedState) {
+                Future.wait([
+                  UiRender.showDialog(
+                    context,
+                    '',
+                    'You need to sign in again after updating!',
+                  ),
+                  UiRender.showDialog(context, '', authenState.message),
+                ]).then(
+                    (value) => context.router.replaceAll([const LoginRoute()]));
               }
 
               if (currentUser != null) {
@@ -168,7 +179,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             beginColor: Colors.black,
                             endColor: const Color(0xff727272),
                             textColor: Colors.white,
-                            onPress: () {},
+                            onPress: () =>
+                                context.read<AuthenticationBloc>().add(
+                                      OnUpdateProfileAuthenticationEvent(
+                                        _addressController.text,
+                                        _cityController.text,
+                                        _countryController.text,
+                                        _fullNameController.text,
+                                        _emailController.text,
+                                        _phoneNumberController.text,
+                                      ),
+                                    ),
                           ),
                         )
                       ],

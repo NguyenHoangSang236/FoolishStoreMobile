@@ -57,8 +57,36 @@ class AuthenticationRepository {
     );
   }
 
-  Future<Either<Failure, String>> register(String userName, String password,
-      String name, String email, String phoneNumber) async {
+  Future<Either<Failure, String>> updateProfile(
+    String name,
+    String phoneNumber,
+    String email,
+    String address,
+    String city,
+    String country,
+  ) async {
+    return NetworkService.getMessageFromApi(
+      '/updateProfile',
+      isAuthen: true,
+      type: type,
+      paramBody: {
+        'name': name,
+        'phoneNumber': phoneNumber,
+        'email': email,
+        'address': address,
+        'city': city,
+        'country': country,
+      },
+    );
+  }
+
+  Future<Either<Failure, String>> register(
+    String userName,
+    String password,
+    String name,
+    String email,
+    String phoneNumber,
+  ) async {
     return NetworkService.getMessageFromApi(
       '/register',
       type: type,

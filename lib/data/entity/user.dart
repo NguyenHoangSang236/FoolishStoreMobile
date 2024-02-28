@@ -1,7 +1,9 @@
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
 
+@CopyWith()
 @JsonSerializable()
 class User {
   @JsonKey(name: 'id')
@@ -18,17 +20,18 @@ class User {
   String? email;
 
   User(
-      this.id,
-      this.accountId,
-      this.userName,
-      this.status,
-      this.name,
-      this.phoneNumber,
-      this.address,
-      this.city,
-      this.country,
-      this.avatar,
-      this.email);
+    this.id,
+    this.accountId,
+    this.userName,
+    this.status,
+    this.name,
+    this.phoneNumber,
+    this.address,
+    this.city,
+    this.country,
+    this.avatar,
+    this.email,
+  );
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

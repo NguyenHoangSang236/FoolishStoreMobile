@@ -86,26 +86,22 @@ class _CartFilterState extends State<CartFilterComponent> {
             shrinkWrap: true,
             itemCount: filterOptionList.length,
             itemBuilder: (context, index) {
-              return Row(
-                children: [
-                  CheckBoxSelection(
-                    checkValue: checkBoxValueList[index],
-                    onChanged: (value) {
-                      setState(() {
-                        if (value == true) {
-                          resultFilterList.add(filterOptionList[index]);
-                        } else {
-                          resultFilterList.removeWhere(
-                            (element) => element == filterOptionList[index],
-                          );
-                        }
+              return CheckBoxSelection(
+                checkValue: checkBoxValueList[index],
+                onChanged: (value) {
+                  setState(() {
+                    if (value == true) {
+                      resultFilterList.add(filterOptionList[index]);
+                    } else {
+                      resultFilterList.removeWhere(
+                        (element) => element == filterOptionList[index],
+                      );
+                    }
 
-                        checkBoxValueList[index] = value!;
-                      });
-                    },
-                    content: filterOptionTextList[index],
-                  ),
-                ],
+                    checkBoxValueList[index] = value!;
+                  });
+                },
+                content: filterOptionTextList[index],
               );
             },
           ),

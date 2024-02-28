@@ -232,7 +232,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             colorSelectedProductList[0].description ??
                                 'No description',
                           ),
-                          _productRecommender(),
+                          // _productRecommender(),
                           _commentList(),
                         ],
                       ),

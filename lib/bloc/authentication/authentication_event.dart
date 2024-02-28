@@ -29,5 +29,29 @@ class OnRegisterAuthenticationEvent extends AuthenticationEvent {
   final String email;
   final String phoneNumber;
 
-  const OnRegisterAuthenticationEvent(this.userName, this.password, this.name, this.email, this.phoneNumber);
+  const OnRegisterAuthenticationEvent(
+    this.userName,
+    this.password,
+    this.name,
+    this.email,
+    this.phoneNumber,
+  );
+}
+
+class OnUpdateProfileAuthenticationEvent extends AuthenticationEvent {
+  final String address;
+  final String city;
+  final String country;
+  final String name;
+  final String email;
+  final String phoneNumber;
+
+  const OnUpdateProfileAuthenticationEvent(
+    this.address,
+    this.city,
+    this.country,
+    this.name,
+    this.email,
+    this.phoneNumber,
+  );
 }
