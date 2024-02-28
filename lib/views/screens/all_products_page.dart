@@ -167,7 +167,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
   Widget build(BuildContext context) {
     return Layout(
       scaffoldKey: _scaffoldKey,
-      forceCanNotBack: false,
+      forceCanNotBack: true,
       textEditingController: _textEditingController,
       pageName: 'Clothings',
       hintSearchBarText: 'What product are you looking for?',
