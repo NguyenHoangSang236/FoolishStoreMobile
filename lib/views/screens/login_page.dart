@@ -219,189 +219,201 @@ class _LoginPageState extends State<LoginPage> {
                         authenState.currentUser.userName,
                       );
 
+                      context.router.pop();
                       context.router.replaceNamed(AppRouterPath.index);
                     } else if (authenState is AuthenticationRegisteredState) {
-                      context.router.pop();
-                      UiRender.showDialog(context, '', authenState.message)
-                          .then((value) {
-                        UiRender.showDialog(context, '',
-                            'Please sign in to enjoy our application!');
+                      Future.wait([
+                        UiRender.showDialog(
+                          context,
+                          '',
+                          'Please sign in to enjoy our application!',
+                        ),
+                        UiRender.showDialog(
+                          context,
+                          '',
+                          authenState.message,
+                        ),
+                      ]).then((value) {
                         setState(() {
+                          context.router.pop();
                           isLogin = true;
                         });
                       });
                     } else if (authenState is AuthenticationErrorState) {
-                      context.router.pop();
-                      UiRender.showDialog(context, '', authenState.message);
+                      UiRender.showDialog(context, '', authenState.message)
+                          .then(
+                        (value) => context.router.pop(),
+                      );
                     }
                   },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 2 / 3,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Text(
-                                'Welcome new customer of',
-                                style: TextStyle(
-                                  fontFamily: 'Trebuchet MS',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 21.size,
-                                  height: 4.height,
-                                  color: Colors.black,
-                                ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              'Welcome new customer of',
+                              style: TextStyle(
+                                fontFamily: 'Trebuchet MS',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 21.size,
+                                height: 4.height,
+                                color: Colors.black,
                               ),
-                              Text(
-                                'Foolish',
-                                style: TextStyle(
-                                  fontFamily: 'Trebuchet MS',
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 25.size,
-                                  height: 1.5.height,
-                                  color: Colors.orange,
-                                ),
+                            ),
+                            Text(
+                              'Foolish',
+                              style: TextStyle(
+                                fontFamily: 'Trebuchet MS',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 25.size,
+                                height: 1.5.height,
+                                color: Colors.orange,
                               ),
-                              _textField(
-                                'Full Name',
-                                false,
-                                _fullNameTextEditingController,
-                              ),
-                              _textField(
-                                'Email',
-                                false,
-                                _emailTextEditingController,
-                              ),
-                              _textField(
-                                'Phone Number',
-                                false,
-                                _phoneNumberTextEditingController,
-                              ),
-                              _textField(
-                                'User Name',
-                                false,
-                                _userNameTextEditingController,
-                              ),
-                              _textField(
-                                'Password',
-                                true,
-                                _passwordTextEditingController,
-                                isShowed: isPasswordHiden,
-                              ),
-                              _textField(
-                                'Confirm Password',
-                                true,
-                                _confirmPasswordTextEditingController,
-                                isShowed: isConfirmPasswordHiden,
-                              ),
-                              10.verticalSpace
-                            ],
-                          ),
+                            ),
+                            _textField(
+                              'Full Name',
+                              false,
+                              _fullNameTextEditingController,
+                            ),
+                            _textField(
+                              'Email',
+                              false,
+                              _emailTextEditingController,
+                            ),
+                            _textField(
+                              'Phone Number',
+                              false,
+                              _phoneNumberTextEditingController,
+                            ),
+                            _textField(
+                              'User Name',
+                              false,
+                              _userNameTextEditingController,
+                            ),
+                            _textField(
+                              'Password',
+                              true,
+                              _passwordTextEditingController,
+                              isShowed: isPasswordHiden,
+                            ),
+                            _textField(
+                              'Confirm Password',
+                              true,
+                              _confirmPasswordTextEditingController,
+                              isShowed: isConfirmPasswordHiden,
+                            ),
+                            10.verticalSpace
+                          ],
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GradientElevatedButton(
-                            borderRadiusIndex: 25.radius,
-                            borderColor:
-                                isLogin ? Colors.transparent : Colors.black,
-                            text: 'Login',
-                            textWeight: FontWeight.w400,
-                            buttonWidth: 125.width,
-                            buttonHeight: 45.height,
-                            beginColor: isLogin ? Colors.black : null,
-                            endColor: isLogin ? const Color(0xff727272) : null,
-                            backgroundColor: !isLogin ? Colors.white : null,
-                            textColor: isLogin ? Colors.white : Colors.black,
-                            onPress: () {
-                              setState(
-                                () {
-                                  if (isLogin == false) {
-                                    _userNameTextEditingController.clear();
-                                    _passwordTextEditingController.clear();
-                                    isPasswordHiden = true;
-                                    isLogin = true;
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                          GradientElevatedButton(
-                            borderRadiusIndex: 25.radius,
-                            borderColor:
-                                !isLogin ? Colors.transparent : Colors.black,
-                            text: 'Register',
-                            textWeight: FontWeight.w400,
-                            buttonWidth: 125.width,
-                            buttonHeight: 45.height,
-                            beginColor: !isLogin ? Colors.black : Colors.white,
-                            endColor: !isLogin
-                                ? const Color(0xff727272)
-                                : Colors.white,
-                            textColor: !isLogin ? Colors.white : Colors.black,
-                            onPress: () {
-                              setState(
-                                () {
-                                  if (isLogin == true) {
-                                    isLogin = false;
-                                  } else {
-                                    if ((_userNameTextEditingController.text != '' &&
-                                            _passwordTextEditingController
-                                                    .text !=
-                                                '' &&
-                                            _fullNameTextEditingController
-                                                    .text !=
-                                                '' &&
-                                            _emailTextEditingController.text !=
-                                                '' &&
-                                            _phoneNumberTextEditingController
-                                                    .text !=
-                                                '' &&
-                                            _confirmPasswordTextEditingController
-                                                    .text !=
-                                                '') &&
-                                        (_confirmPasswordTextEditingController
-                                                .text ==
-                                            _passwordTextEditingController
-                                                .text)) {
-                                      context.read<AuthenticationBloc>().add(
-                                            OnRegisterAuthenticationEvent(
-                                              _userNameTextEditingController
-                                                  .text,
-                                              _passwordTextEditingController
-                                                  .text,
-                                              _fullNameTextEditingController
-                                                  .text,
-                                              _emailTextEditingController.text,
-                                              _phoneNumberTextEditingController
-                                                  .text,
-                                            ),
-                                          );
-                                    } else if (_confirmPasswordTextEditingController
-                                            .text !=
-                                        _passwordTextEditingController.text) {
-                                      UiRender.showDialog(
-                                        context,
-                                        '',
-                                        'Confirm Password is incorrect, please confirm your password again!',
-                                      );
-                                    } else {
-                                      UiRender.showDialog(
-                                        context,
-                                        '',
-                                        'Must fill in all boxes!',
-                                      );
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GradientElevatedButton(
+                              borderRadiusIndex: 25.radius,
+                              borderColor:
+                                  isLogin ? Colors.transparent : Colors.black,
+                              text: 'Login',
+                              textWeight: FontWeight.w400,
+                              buttonWidth: 125.width,
+                              buttonHeight: 45.height,
+                              beginColor: isLogin ? Colors.black : null,
+                              endColor:
+                                  isLogin ? const Color(0xff727272) : null,
+                              backgroundColor: !isLogin ? Colors.white : null,
+                              textColor: isLogin ? Colors.white : Colors.black,
+                              onPress: () {
+                                setState(
+                                  () {
+                                    if (isLogin == false) {
+                                      _userNameTextEditingController.clear();
+                                      _passwordTextEditingController.clear();
+                                      isPasswordHiden = true;
+                                      isLogin = true;
                                     }
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+                                  },
+                                );
+                              },
+                            ),
+                            GradientElevatedButton(
+                              borderRadiusIndex: 25.radius,
+                              borderColor:
+                                  !isLogin ? Colors.transparent : Colors.black,
+                              text: 'Register',
+                              textWeight: FontWeight.w400,
+                              buttonWidth: 125.width,
+                              buttonHeight: 45.height,
+                              beginColor:
+                                  !isLogin ? Colors.black : Colors.white,
+                              endColor: !isLogin
+                                  ? const Color(0xff727272)
+                                  : Colors.white,
+                              textColor: !isLogin ? Colors.white : Colors.black,
+                              onPress: () {
+                                setState(
+                                  () {
+                                    if (isLogin == true) {
+                                      isLogin = false;
+                                    } else {
+                                      if ((_userNameTextEditingController.text != '' &&
+                                              _passwordTextEditingController
+                                                      .text !=
+                                                  '' &&
+                                              _fullNameTextEditingController
+                                                      .text !=
+                                                  '' &&
+                                              _emailTextEditingController
+                                                      .text !=
+                                                  '' &&
+                                              _phoneNumberTextEditingController
+                                                      .text !=
+                                                  '' &&
+                                              _confirmPasswordTextEditingController
+                                                      .text !=
+                                                  '') &&
+                                          (_confirmPasswordTextEditingController
+                                                  .text ==
+                                              _passwordTextEditingController
+                                                  .text)) {
+                                        context.read<AuthenticationBloc>().add(
+                                              OnRegisterAuthenticationEvent(
+                                                _userNameTextEditingController
+                                                    .text,
+                                                _passwordTextEditingController
+                                                    .text,
+                                                _fullNameTextEditingController
+                                                    .text,
+                                                _emailTextEditingController
+                                                    .text,
+                                                _phoneNumberTextEditingController
+                                                    .text,
+                                              ),
+                                            );
+                                      } else if (_confirmPasswordTextEditingController
+                                              .text !=
+                                          _passwordTextEditingController.text) {
+                                        UiRender.showDialog(
+                                          context,
+                                          '',
+                                          'Confirm Password is incorrect, please confirm your password again!',
+                                        );
+                                      } else {
+                                        UiRender.showDialog(
+                                          context,
+                                          '',
+                                          'Must fill in all boxes!',
+                                        );
+                                      }
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
         ),
