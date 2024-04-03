@@ -9,13 +9,6 @@ abstract class CartEvent extends Equatable {
 
 class OnClearCartEvent extends CartEvent {}
 
-class OnLoadAllCartListEvent extends CartEvent {
-  final int page;
-  final int limit;
-
-  const OnLoadAllCartListEvent(this.page, this.limit);
-}
-
 class OnCheckoutEvent extends CartEvent {
   final AddressCode addressCode;
   final int serviceId;
@@ -59,7 +52,7 @@ class OnFilterCartEvent extends CartEvent {
   final int? limit;
 
   const OnFilterCartEvent(
-      {this.name, this.status, this.brand, this.page, this.limit});
+      {this.name, this.status, this.brand, this.page, this.limit,});
 }
 
 class OnRemoveCartItemEvent extends CartEvent {

@@ -33,38 +33,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   List<GhnShippingService>? currentGhnShippingServiceList;
 
   CartBloc(this._cartRepository) : super(CartInitial()) {
-    on<OnLoadAllCartListEvent>((event, emit) async {
-      emit(CartLoadingState());
-
-      try {
-        final response = await _cartRepository.showFullCart(
-          event.page,
-          event.limit,
-        );
-
-        response.fold(
-          (failure) => emit(CartErrorState(failure.message)),
-          (list) {
-            if (event.page != currentPage && list.isNotEmpty) {
-              cartItemList = _removeDuplicates([...cartItemList, ...list]);
-              currentPage = list.isNotEmpty ? event.page : currentPage;
-              isFiltered = false;
-              currentBrandFilter = '';
-              currentNameFilter = '';
-              currentFilterOption.clear();
-
-              emit(AllCartListLoadedState(cartItemList));
-            } else {
-              cartItemList = list;
-            }
-          },
-        );
-      } catch (e) {
-        debugPrint(e.toString());
-        emit(CartErrorState(e.toString()));
-      }
-    });
-
     on<OnClearCartEvent>((event, emit) {
       cartItemList = [];
       currentCheckout = null;

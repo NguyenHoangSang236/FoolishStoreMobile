@@ -97,18 +97,14 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         const Duration(milliseconds: 300),
         () {
           context.read<CartBloc>().add(
-                filterOptions.isEmpty &&
-                        filterBrand.isEmpty &&
-                        filterName.isEmpty
-                    ? OnLoadAllCartListEvent(currentPage + 1, 10)
-                    : OnFilterCartEvent(
-                        page: currentPage + 1,
-                        limit: 10,
-                        status: filterOptions,
-                        brand: filterBrand,
-                        name: filterName,
-                      ),
-              );
+              OnFilterCartEvent(
+                page: currentPage + 1,
+                limit: 10,
+                status: filterOptions,
+                brand: filterBrand,
+                name: filterName,
+              )
+          );
         },
       );
     }

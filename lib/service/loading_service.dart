@@ -28,7 +28,7 @@ class LoadingService {
       ..add(const OnLoadHotDiscountProductListEvent());
     context.read<CartBloc>()
       ..add(OnLoadTotalCartItemQuantityEvent())
-      ..add(const OnLoadAllCartListEvent(1, 10));
+      ..add(const OnFilterCartEvent(page: 1, limit: 10));
   }
 
   Future<void> selectToViewProduct(Product product) async {
@@ -84,7 +84,7 @@ class LoadingService {
       const Duration(milliseconds: 150),
       () {
         context.read<CartBloc>()
-          ..add(const OnLoadAllCartListEvent(1, 10))
+          ..add(const OnFilterCartEvent(page: 1, limit: 10))
           ..add(OnLoadTotalCartItemQuantityEvent());
       },
     );

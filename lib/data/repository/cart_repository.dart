@@ -143,17 +143,6 @@ class CartRepository {
     );
   }
 
-  Future<Either<Failure, List<CartItem>>> showFullCart(int page, int limit) {
-    return sendPostAndGetCartItemList(
-      '/showFullCart',
-      isAuthen: true,
-      {
-        'page': page,
-        'limit': limit,
-      },
-    );
-  }
-
   Future<Either<Failure, String>> update(List<CartItemInfo> cartItemList) {
     return NetworkService.getMessageFromApi(
       '/update',
