@@ -23,11 +23,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   int currentAllProductListPage = 1;
 
   ProductBloc(this._shopRepository) : super(ProductInitial()) {
-    on<OnLoadAllProductListEvent>((event, emit) async {
+    on<OnLoadProductGeneralListEvent>((event, emit) async {
       emit(ProductLoadingState());
 
       try {
-        final response = await _shopRepository.getAllProducts(
+        final response = await _shopRepository.getProductGeneralList(
           event.page,
           event.limit,
         );
@@ -43,7 +43,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
               }
             }
 
-            emit(ProductAllListLoadedState(allProductList));
+            emit(ProductGeneralListLoadedState(allProductList));
           },
         );
       } catch (e) {

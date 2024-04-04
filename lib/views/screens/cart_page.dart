@@ -96,15 +96,13 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
       Future.delayed(
         const Duration(milliseconds: 300),
         () {
-          context.read<CartBloc>().add(
-              OnFilterCartEvent(
+          context.read<CartBloc>().add(OnFilterCartEvent(
                 page: currentPage + 1,
                 limit: 10,
                 status: filterOptions,
                 brand: filterBrand,
                 name: filterName,
-              )
-          );
+              ));
         },
       );
     }
@@ -159,8 +157,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
               listener: (context, cartState) {
                 if (cartState is CartErrorState) {
                   UiRender.showDialog(context, '', cartState.message);
-                } else if (cartState is AllCartListLoadedState ||
-                    cartState is CartFilteredState) {
+                } else if (cartState is CartFilteredState) {
                   _scrollController.jumpTo(currentOffset);
                 } else if (cartState is AddressCodeRequestLoadedState) {
                   context.read<CartBloc>().add(
@@ -298,7 +295,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                         strokeWidth: 2.width,
                       ),
                     );
-                  } else if (cartState is AllCartListLoadedState) {
+                  } else if (cartState is CartFilteredState) {
                     cartItemList = cartState.cartItemList;
                   }
 
@@ -329,7 +326,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
         } else if (cartState is CartUpdatedState) {
           UiRender.showDialog(context, '', cartState.message);
           LoadingService(context).reloadCartPage();
-        } else if (cartState is AllCartListLoadedState) {
+        } else if (cartState is CartFilteredState) {
           _scrollController.animateTo(
             _scrollController.offset,
             duration: const Duration(milliseconds: 500),
@@ -342,7 +339,7 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
         if (cartState is CartLoadingState) {
           return UiRender.loadingCircle();
-        } else if (cartState is AllCartListLoadedState) {
+        } else if (cartState is CartFilteredState) {
           cartItemList = List.from(cartState.cartItemList);
         }
 

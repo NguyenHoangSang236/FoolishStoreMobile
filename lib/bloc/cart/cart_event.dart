@@ -51,8 +51,13 @@ class OnFilterCartEvent extends CartEvent {
   final int? page;
   final int? limit;
 
-  const OnFilterCartEvent(
-      {this.name, this.status, this.brand, this.page, this.limit,});
+  const OnFilterCartEvent({
+    this.name,
+    this.status,
+    this.brand,
+    this.page,
+    this.limit,
+  });
 }
 
 class OnRemoveCartItemEvent extends CartEvent {

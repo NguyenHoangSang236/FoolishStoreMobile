@@ -113,9 +113,11 @@ class _IndexPageState extends State<IndexPage> {
       onTap: () {
         LoadingService(context).selectCategory(category);
       },
-      child: UiRender.buildCachedNetworkImage(
+      child:  UiRender.buildCachedNetworkImage(
         context,
-        ValueRender.getGoogleDriveImageUrl(category.image),
+        category.image.contains("http")
+            ? category.image
+            : ValueRender.getGoogleDriveImageUrl(category.image),
         width: 90.width,
         height: 90.height,
         margin: EdgeInsets.only(right: 13.width),

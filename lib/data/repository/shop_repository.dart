@@ -75,7 +75,8 @@ class ShopRepository {
   }
 
   Future<Either<Failure, List<Product>>> getProductListFromApi(
-      String type) async {
+    String type,
+  ) async {
     String url = '';
 
     switch (type) {
@@ -93,8 +94,11 @@ class ShopRepository {
     return getProductList(url);
   }
 
-  Future<Either<Failure, List<Product>>> searchProduct(String productName,
-      {int page = 1, int limit = 10}) async {
+  Future<Either<Failure, List<Product>>> searchProduct(
+    String productName, {
+    int page = 1,
+    int limit = 10,
+  }) async {
     return getProductList(
       '/filterProducts',
       paramBody: {
@@ -109,10 +113,12 @@ class ShopRepository {
     );
   }
 
-  Future<Either<Failure, List<Product>>> getAllProducts(
-      int page, int limit) async {
+  Future<Either<Failure, List<Product>>> getProductGeneralList(
+    int page,
+    int limit,
+  ) async {
     return getProductList(
-      '/allProducts',
+      '/productList',
       paramBody: {
         'page': page,
         'limit': limit,

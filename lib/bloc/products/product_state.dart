@@ -50,10 +50,10 @@ class ProductNewArrivalListLoadedState extends ProductState {
   List<Object> get props => [productList];
 }
 
-class ProductAllListLoadedState extends ProductState {
+class ProductGeneralListLoadedState extends ProductState {
   final List<Product> productList;
 
-  const ProductAllListLoadedState(this.productList);
+  const ProductGeneralListLoadedState(this.productList);
 
   @override
   List<Object> get props => [productList];

@@ -146,12 +146,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         response.fold(
           (failure) => emit(CartErrorState(failure.message)),
           (list) {
-            if (event.page != null) {
-              if (event.page != currentPage) {
-                cartItemList = _removeDuplicates([...cartItemList, ...list]);
-                currentPage = list.isNotEmpty ? event.page ?? 1 : currentPage;
-                isFiltered = true;
-              }
+            if (event.page != null && event.page != currentPage) {
+              cartItemList = _removeDuplicates([...cartItemList, ...list]);
+              currentPage = list.isNotEmpty ? event.page ?? 1 : currentPage;
+              isFiltered = true;
             } else {
               cartItemList = list;
             }

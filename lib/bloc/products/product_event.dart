@@ -7,11 +7,11 @@ abstract class ProductEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class OnLoadAllProductListEvent extends ProductEvent {
+class OnLoadProductGeneralListEvent extends ProductEvent {
   final int page;
   final int limit;
 
-  const OnLoadAllProductListEvent(this.page, this.limit);
+  const OnLoadProductGeneralListEvent(this.page, this.limit);
 }
 
 class OnLoadFilterProductListEvent extends ProductEvent {

@@ -86,7 +86,9 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
             ),
             UiRender.buildCachedNetworkImage(
               context,
-              ValueRender.getGoogleDriveImageUrl(category.image),
+              category.image.contains('http')
+                  ? category.image
+                  : ValueRender.getGoogleDriveImageUrl(category.image),
               height: 90.height,
               width: 90.width,
               borderRadius: BorderRadius.circular(8.radius),

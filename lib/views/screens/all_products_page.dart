@@ -47,7 +47,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
           currentOffset = _scrollController.position.pixels - 10;
 
           context.read<ProductBloc>().add(
-                OnLoadAllProductListEvent(
+                OnLoadProductGeneralListEvent(
                   context.read<ProductBloc>().currentAllProductListPage + 1,
                   8,
                 ),
@@ -84,7 +84,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
       if (currentCateName == "All") {
         selectedCategoryIndex = 0;
         context.read<ProductBloc>().add(
-              const OnLoadAllProductListEvent(1, 8),
+              const OnLoadProductGeneralListEvent(1, 8),
             );
       } else {
         selectedCategoryIndex = context
@@ -109,7 +109,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
     });
 
     if (name == 'All') {
-      context.read<ProductBloc>().add(const OnLoadAllProductListEvent(1, 8));
+      context
+          .read<ProductBloc>()
+          .add(const OnLoadProductGeneralListEvent(1, 8));
     } else {
       context.read<ProductBloc>().add(OnClearProductListEvent());
       context.read<ProductBloc>().add(
@@ -127,7 +129,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
       if (widget.isFromCategoryPage == false) {
         context.read<ProductBloc>().add(
-              const OnLoadAllProductListEvent(1, 8),
+              const OnLoadProductGeneralListEvent(1, 8),
             );
       } else {
         selectedCategoryIndex =
@@ -266,7 +268,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
       listener: (context, productState) {
         if (productState is ProductLoadingState) {
           UiRender.showLoaderDialog(context);
-        } else if (productState is ProductAllListLoadedState ||
+        } else if (productState is ProductGeneralListLoadedState ||
             productState is ProductFilteredListLoadedState) {
           context.router.pop();
           _scrollController.jumpTo(currentOffset);
@@ -275,7 +277,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
       builder: (context, productState) {
         List<Product> productList = [];
 
-        if (productState is ProductAllListLoadedState) {
+        if (productState is ProductGeneralListLoadedState) {
           productList = context.read<ProductBloc>().allProductList;
           _isLoaded = false;
         } else if (productState is ProductFilteredListLoadedState) {

@@ -19,15 +19,6 @@ class CartCheckoutLoadingState extends CartState {
   List<Object> get props => [];
 }
 
-class AllCartListLoadedState extends CartState {
-  final List<CartItem> cartItemList;
-
-  const AllCartListLoadedState(this.cartItemList);
-
-  @override
-  List<Object> get props => [cartItemList];
-}
-
 class CartFilteredState extends CartState {
   final List<CartItem> cartItemList;
 
