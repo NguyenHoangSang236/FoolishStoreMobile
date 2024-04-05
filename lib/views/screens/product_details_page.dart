@@ -85,9 +85,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       needProductDetailsBottomNavBar: true,
       scaffoldKey: _scaffoldKey,
       textEditingController: _textEditingController,
-      onBack: () => context.read<ProductBloc>().add(
-            OnDeselectProduct(),
-          ),
+      onBack: () => context.read<ProductBloc>().add(OnDeselectProduct()),
       body: RefreshIndicator(
         onRefresh: () async => LoadingService(context).selectToViewProduct(
           context.read<ProductBloc>().selectedProductToView!,

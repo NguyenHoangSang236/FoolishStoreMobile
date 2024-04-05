@@ -1,6 +1,6 @@
 import 'package:fashionstore/data/entity/comment.dart';
-import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
+import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,50 +61,52 @@ class _CommentList extends State<CommentList> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentPage++;
-                });
+            currentPage > 1
+                ? GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        currentPage--;
+                      });
 
-                context.read<CommentBloc>().add(
-                      OnLoadCommentListEvent(
-                        productColor: widget.productColor,
-                        productId: widget.productId,
-                        page: currentPage,
-                      ),
-                    );
-              },
-              child: commentList.isNotEmpty
-                  ? commentList.length % 5 == 0
-                      ? Container(
-                          margin: EdgeInsets.only(left: 7.width),
-                          child: Text(
-                            'See previous comments',
-                            style: TextStyle(
-                              color: const Color(0xFF979797),
-                              decoration: TextDecoration.underline,
-                              fontSize: 12.size,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'Work Sans',
+                      context.read<CommentBloc>().add(
+                            OnLoadCommentListEvent(
+                              productColor: widget.productColor,
+                              productId: widget.productId,
+                              page: currentPage,
+                            ),
+                          );
+                    },
+                    child: commentList.isNotEmpty
+                        ? commentList.length % 5 == 0
+                            ? Container(
+                                margin: EdgeInsets.only(left: 7.width),
+                                child: Text(
+                                  'See previous comments',
+                                  style: TextStyle(
+                                    color: const Color(0xFF979797),
+                                    decoration: TextDecoration.underline,
+                                    fontSize: 12.size,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Work Sans',
+                                  ),
+                                ),
+                              )
+                            : const SizedBox()
+                        : Container(
+                            padding: EdgeInsets.only(bottom: 15.height),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'No comment',
+                              style: TextStyle(
+                                color: const Color(0xFF979797),
+                                fontSize: 13.size,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Work Sans',
+                              ),
                             ),
                           ),
-                        )
-                      : const SizedBox()
-                  : Container(
-                      padding: EdgeInsets.only(bottom: 15.height),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'No comment',
-                        style: TextStyle(
-                          color: const Color(0xFF979797),
-                          fontSize: 13.size,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Work Sans',
-                        ),
-                      ),
-                    ),
-            ),
+                  )
+                : const SizedBox(),
             ...List<Widget>.generate(
               commentList.length,
               (index) => CommentComponent(
