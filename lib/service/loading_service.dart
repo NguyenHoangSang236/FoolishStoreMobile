@@ -39,18 +39,12 @@ class LoadingService {
         context.read<ProductDetailsBloc>()
           ..add(
             OnSelectProductEvent(
-              product.productId?.toInt() ?? product.product_id?.toInt() ?? 0,
+              product.productId?.toInt() ?? 0,
             ),
           )
           ..add(
             OnSelectProductColorEvent(product.color),
           );
-        // context.read<ProductBloc>().add(
-        //       OnLoadRecommendedProductListEvent(
-        //         product.color,
-        //         product.productId?.toInt() ?? product.product_id?.toInt() ?? 0,
-        //       ),
-        //     );
         context.read<ProductAddToCartBloc>().add(
               OnSelectProductAddToCartEvent(
                 productName: product.name,
@@ -62,17 +56,13 @@ class LoadingService {
           ..add(
             OnLoadCommentIdYouLikedListEvent(
               productColor: product.color,
-              productId: product.productId?.toInt() ??
-                  product.product_id?.toInt() ??
-                  0,
+              productId: product.productId?.toInt() ?? 0,
             ),
           )
           ..add(
             OnLoadCommentListEvent(
               productColor: product.color,
-              productId: product.productId?.toInt() ??
-                  product.product_id?.toInt() ??
-                  0,
+              productId: product.productId?.toInt() ?? 0,
             ),
           );
       },

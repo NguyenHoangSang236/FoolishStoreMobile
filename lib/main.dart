@@ -53,11 +53,12 @@ const String serverKey =
 
 final StompClient stompClient = StompClient(
   config: const StompConfig(
-    url: 'wss://$domainIP:8080',
+    url: 'wss://$domainIP:8080/websocket',
     onConnect: WebSocketConfig.onConnect,
     onStompError: WebSocketConfig.onStompError,
     onWebSocketError: WebSocketConfig.onWebSocketError,
     onWebSocketDone: WebSocketConfig.onWebSocketDone,
+    onDisconnect: WebSocketConfig.onWebSocketDisconnect,
   ),
 );
 

@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
+import 'package:fashionstore/main.dart';
 import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/extension/string%20_extension.dart';
@@ -73,9 +77,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   void initState() {
     selectedColor = context.read<ProductDetailsBloc>().selectedColor;
-
     selectedProductId = context.read<ProductDetailsBloc>().selectedProductId;
+
+    stompClient.activate();
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    stompClient.deactivate();
+    super.dispose();
   }
 
   @override
@@ -152,6 +164,32 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     selectedProductId =
                         productState.productList.first.productId!.toInt();
                   });
+
+                  print('@@@');
+                  print(
+                      '/comment/product_id=${productState.productList.first.id}&product_color=${productState.productList.first.color}');
+                  print(
+                      context.read<AuthenticationBloc>().currentUser?.userName);
+
+                  stompClient.subscribe(
+                    destination:
+                        '/comment/${productState.productList.first.id}/${productState.productList.first.color}',
+                    callback: (frame) {
+                      print('!!!');
+                      debugPrint(frame.body);
+                    },
+                  );
+
+                  stompClient.send(
+                    destination: '/commentWebsocket/addUser',
+                    body: json.encode({
+                      'sender': context
+                          .read<AuthenticationBloc>()
+                          .currentUser
+                          ?.userName,
+                      'type': 'JOIN',
+                    }),
+                  );
                 }
               },
               builder: (context, productState) {

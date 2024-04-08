@@ -20,7 +20,6 @@ class Product {
   String? image4;
   String? description;
   double overallRating;
-  num? product_id;
 
   Product(
     this.id,
@@ -38,7 +37,6 @@ class Product {
     this.image4,
     this.overallRating,
     this.description,
-    this.product_id,
   );
 
   factory Product.fromJson(Map<String, dynamic> json) =>
