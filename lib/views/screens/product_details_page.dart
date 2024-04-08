@@ -165,23 +165,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         productState.productList.first.productId!.toInt();
                   });
 
-                  print('@@@');
-                  print(
-                      '/comment/product_id=${productState.productList.first.id}&product_color=${productState.productList.first.color}');
-                  print(
-                      context.read<AuthenticationBloc>().currentUser?.userName);
-
                   stompClient.subscribe(
                     destination:
                         '/comment/${productState.productList.first.id}/${productState.productList.first.color}',
                     callback: (frame) {
-                      print('!!!');
-                      debugPrint(frame.body);
+                      debugPrint('Received web socket message: ${frame.body}');
                     },
                   );
 
                   stompClient.send(
-                    destination: '/commentWebsocket/addUser',
+                    destination:
+                        '/commentWebsocket/addUser/${productState.productList.first.id}/${productState.productList.first.color}',
                     body: json.encode({
                       'sender': context
                           .read<AuthenticationBloc>()
