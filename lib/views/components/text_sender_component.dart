@@ -1,15 +1,32 @@
+import 'dart:convert';
+
+import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
 
 class TextSenderComponent extends StatelessWidget {
   const TextSenderComponent({
     super.key,
     required this.controller,
     required this.sendAction,
+    required this.productId,
+    required this.productColor,
   });
 
   final TextEditingController controller;
   final void Function() sendAction;
+  final int productId;
+  final String productColor;
+
+  void _onCommentInput(String text) {
+    stompClient.send(
+      destination:
+          '$websocketDestinationPrefix/typingComment/$productId/$productColor',
+      body: json.encode({'type': WebsocketEnum.TYPING_COMMENT.name}),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +46,7 @@ class TextSenderComponent extends StatelessWidget {
               fontSize: 12.size,
               color: const Color(0xFF979797),
             ),
+            onChanged: _onCommentInput,
             decoration: InputDecoration(
               isDense: true,
               border: OutlineInputBorder(

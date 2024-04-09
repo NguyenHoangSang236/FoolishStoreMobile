@@ -1,7 +1,6 @@
 import 'package:fashionstore/data/entity/comment.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/views/components/text_sender_component.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +16,7 @@ class CommentList extends StatefulWidget {
     required this.replyOn,
     required this.page,
     required this.controller,
+    required this.isSomeoneTyping,
   });
 
   final int productId;
@@ -24,6 +24,7 @@ class CommentList extends StatefulWidget {
   final int replyOn;
   final int page;
   final TextEditingController controller;
+  final bool isSomeoneTyping;
 
   @override
   State<StatefulWidget> createState() => _CommentList();
@@ -119,6 +120,26 @@ class _CommentList extends State<CommentList> {
                 needBorder: index == commentList.length - 1 ? false : true,
               ),
             ),
+            widget.isSomeoneTyping
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        "assets/gif/typing_indicator_gif.gif",
+                        width: 50,
+                        height: 30,
+                      ),
+                      Text(
+                        'Someone is typing a comment',
+                        style: TextStyle(
+                          fontSize: 13.size,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
             TextSenderComponent(
               sendAction: () => context.read<CommentBloc>().add(
                     OnAddCommentEvent(
@@ -129,6 +150,8 @@ class _CommentList extends State<CommentList> {
                     ),
                   ),
               controller: widget.controller,
+              productId: widget.productId,
+              productColor: widget.productColor,
             ),
           ],
         );

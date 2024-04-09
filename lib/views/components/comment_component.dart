@@ -1,10 +1,10 @@
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/data/entity/comment.dart';
-import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
 import 'package:fashionstore/utils/render/value_render.dart';
+import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -225,6 +225,8 @@ class _CommentComponentState extends State<CommentComponent> {
               ? TextSenderComponent(
                   controller: controller,
                   sendAction: onPressSendButton,
+                  productColor: widget.comment.productColor,
+                  productId: widget.comment.productId,
                 )
               : const SizedBox(),
           !isReply

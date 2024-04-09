@@ -6,6 +6,7 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
+import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/main.dart';
 import 'package:fashionstore/service/loading_service.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
@@ -35,33 +36,33 @@ class ProductDetailsPage extends StatefulWidget {
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
-  final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  CarouselController carouselController = CarouselController();
-  String selectedSize = '';
-  String selectedColor = '';
-  late int selectedProductId;
-  int currentCommentPage = 1;
-  List<String> selectedImageUrlList = [];
+  final CarouselController _carouselController = CarouselController();
+  String _selectedSize = '';
+  String _selectedColor = '';
+  late int _selectedProductId;
+  int _currentCommentPage = 1;
+  bool _isTyping = false;
+  List<String> _selectedImageUrlList = [];
 
-  void reloadCommentList() {
+  void _reloadCommentList() {
     context.read<CommentBloc>().add(
           OnLoadCommentListEvent(
-            productColor: selectedColor,
-            productId: selectedProductId,
+            productColor: _selectedColor,
+            productId: _selectedProductId,
             replyOn: 0,
-            page: currentCommentPage,
+            page: _currentCommentPage,
           ),
         );
   }
 
-  void reloadCommentYouLikeIdList() {
+  void _reloadCommentYouLikeIdList() {
     context.read<CommentBloc>().add(
           OnLoadCommentIdYouLikedListEvent(
-            productColor: selectedColor,
-            productId: selectedProductId,
+            productColor: _selectedColor,
+            productId: _selectedProductId,
           ),
         );
   }
@@ -76,8 +77,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   void initState() {
-    selectedColor = context.read<ProductDetailsBloc>().selectedColor;
-    selectedProductId = context.read<ProductDetailsBloc>().selectedProductId;
+    _selectedColor = context.read<ProductDetailsBloc>().selectedColor;
+    _selectedProductId = context.read<ProductDetailsBloc>().selectedProductId;
 
     stompClient.activate();
 
@@ -88,6 +89,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   void dispose() {
     stompClient.deactivate();
     super.dispose();
+  }
+
+  void _showTypingCommentIndicator() {
+    setState(() {
+      _isTyping = true;
+    });
+
+    Future.delayed(
+      const Duration(seconds: 3),
+      () {
+        setState(() {
+          _isTyping = false;
+        });
+      },
+    );
   }
 
   @override
@@ -132,16 +148,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   if (commentState is CommentAddedState) {
                     UiRender.showSnackBar(context, commentState.message);
 
-                    reloadCommentList();
+                    _reloadCommentList();
 
                     setState(() {
                       _commentController.clear();
-                      _replyController.clear();
                     });
 
                     animateScroller();
                   } else if (commentState is CommentReactedState) {
-                    reloadCommentYouLikeIdList();
+                    _reloadCommentYouLikeIdList();
                   }
                 },
               ),
@@ -150,38 +165,48 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               listener: (context, productState) {
                 if (productState is ProductDetailsColorSelectedState) {
                   setState(() {
-                    selectedColor = productState.color;
+                    _selectedColor = productState.color;
                   });
                 }
                 if (productState is ProductDetailsLoadedState) {
                   setState(() {
-                    selectedImageUrlList =
+                    _selectedImageUrlList =
                         ValueRender.getProductImageUrlListByColor(
-                      selectedColor,
+                      _selectedColor,
                       productState.productList,
                     );
 
-                    selectedProductId =
+                    _selectedProductId =
                         productState.productList.first.productId!.toInt();
                   });
 
                   stompClient.subscribe(
                     destination:
-                        '/comment/${productState.productList.first.id}/${productState.productList.first.color}',
+                        '$websocketDestination/${productState.productList.first.productId}/$_selectedColor',
                     callback: (frame) {
                       debugPrint('Received web socket message: ${frame.body}');
+
+                      if (frame.body != null) {
+                        Map<String, dynamic> payload = json.decode(frame.body!);
+
+                        if (payload['type'].isNotEmpty &&
+                            payload['type'] ==
+                                WebsocketEnum.TYPING_COMMENT.name) {
+                          _showTypingCommentIndicator();
+                        }
+                      }
                     },
                   );
 
                   stompClient.send(
                     destination:
-                        '/commentWebsocket/addUser/${productState.productList.first.id}/${productState.productList.first.color}',
+                        '$websocketDestinationPrefix/addUser/${productState.productList.first.productId}/$_selectedColor',
                     body: json.encode({
                       'sender': context
                           .read<AuthenticationBloc>()
                           .currentUser
                           ?.userName,
-                      'type': 'JOIN',
+                      'type': WebsocketEnum.JOIN.name,
                     }),
                   );
                 }
@@ -202,7 +227,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // get list of products from selected color
                   List<Product> colorSelectedProductList =
                       selectedProductDetails
-                          .where((element) => element.color == selectedColor)
+                          .where((element) => element.color == _selectedColor)
                           .toList();
                   // get list of products first image from different colors
                   List<String> productColorImageUrlList =
@@ -215,13 +240,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // get list of products size using product color
                   List<String> productSizeList =
                       ValueRender.getProductSizeListByColor(
-                    selectedColor,
+                    _selectedColor,
                     selectedProductDetails,
                   );
 
                   return Column(
                     children: [
-                      _productImagesSlider(selectedImageUrlList),
+                      _productImagesSlider(_selectedImageUrlList),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -285,8 +310,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         Container(
           margin: EdgeInsets.only(bottom: 12.height),
           width: MediaQuery.of(context).size.width,
-          padding:
-              EdgeInsets.symmetric(horizontal: 18.width, vertical: 24.height),
+          padding: EdgeInsets.symmetric(
+            horizontal: 18.width,
+            vertical: 24.height,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8.radius),
@@ -305,11 +332,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ),
               15.verticalSpace,
               CommentList(
-                productId: selectedProductId,
-                productColor: selectedColor,
+                productId: _selectedProductId,
+                productColor: _selectedColor,
                 replyOn: 0,
-                page: currentCommentPage,
+                page: _currentCommentPage,
                 controller: _commentController,
+                isSomeoneTyping: _isTyping,
               ),
             ],
           ),
@@ -432,8 +460,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               if (ratePoint != null && ratePoint > 0) {
                 context.read<ProductBloc>().add(
                       OnRateProduct(
-                        selectedProductId,
-                        selectedColor,
+                        _selectedProductId,
+                        _selectedColor,
                         ratePoint,
                       ),
                     );
@@ -557,16 +585,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   context.read<CommentBloc>().add(
                         OnLoadCommentListEvent(
                           productColor: productColorList[index],
-                          productId: selectedProductId,
+                          productId: _selectedProductId,
                         ),
                       );
 
                   setState(() {
-                    selectedColor = productColorList[index];
-                    selectedSize = '';
-                    selectedImageUrlList =
+                    _selectedColor = productColorList[index];
+                    _selectedSize = '';
+                    _selectedImageUrlList =
                         ValueRender.getProductImageUrlListByColor(
-                      selectedColor,
+                      _selectedColor,
                       selectedProductDetails,
                     );
                   });
@@ -621,7 +649,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       );
 
                   setState(() {
-                    selectedSize = productSizeList[index];
+                    _selectedSize = productSizeList[index];
                   });
                 },
                 child: Container(
@@ -634,7 +662,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     border: Border.all(
                       color: const Color(0xffc4c4c4),
                     ),
-                    gradient: productSizeList[index] == selectedSize
+                    gradient: productSizeList[index] == _selectedSize
                         ? UiRender.generalLinearGradient()
                         : null,
                   ),
@@ -644,7 +672,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       fontFamily: 'Work Sans',
                       fontWeight: FontWeight.w500,
                       fontSize: 14.size,
-                      color: productSizeList[index] == selectedSize
+                      color: productSizeList[index] == _selectedSize
                           ? Colors.white
                           : const Color(0xff626262),
                     ),
@@ -660,7 +688,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Widget _productImagesSlider(List<String> imageUrlList) {
     return CarouselSlider(
-      carouselController: carouselController,
+      carouselController: _carouselController,
       items: _imageComponentList(imageUrlList),
       options: CarouselOptions(
         autoPlay: true,
