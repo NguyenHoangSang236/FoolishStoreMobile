@@ -1,5 +1,11 @@
+import 'dart:convert';
+
+import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
+import 'package:fashionstore/data/dto/websocket_message.dart';
 import 'package:fashionstore/data/entity/comment.dart';
+import 'package:fashionstore/data/enum/websocket_enum.dart';
+import 'package:fashionstore/main.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
@@ -15,26 +21,24 @@ class CommentComponent extends StatefulWidget {
     required this.comment,
     required this.needBorder,
     this.isLiked = false,
-    required this.productId,
   });
 
   final Comment comment;
   final bool needBorder;
   final bool isLiked;
-  final int productId;
 
   @override
   State<StatefulWidget> createState() => _CommentComponentState();
 }
 
 class _CommentComponentState extends State<CommentComponent> {
-  bool replyButtonPressed = false;
-  int currentPage = 1;
-  final TextEditingController controller = TextEditingController();
-  late bool isReply;
-  late Comment currentComment;
+  bool _replyButtonPressed = false;
+  int _currentPage = 1;
+  final TextEditingController _controller = TextEditingController();
+  late bool _isReply;
+  late Comment _currentComment;
 
-  void reloadCommentYouLikeIdList() {
+  void _reloadCommentYouLikeIdList() {
     context.read<CommentBloc>().add(
           OnLoadCommentIdYouLikedListEvent(
             productColor: widget.comment.productColor,
@@ -43,7 +47,7 @@ class _CommentComponentState extends State<CommentComponent> {
         );
   }
 
-  void onPressLikeButton() {
+  void _onUnlikeComment() {
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
@@ -54,40 +58,41 @@ class _CommentComponentState extends State<CommentComponent> {
     );
   }
 
-  void onPressSendButton() {
+  void _onPostComment() {
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
         context.read<CommentBloc>().add(
-              replyButtonPressed == true
+              _replyButtonPressed == true
                   ? OnAddReplyCommentEvent(
-                      controller.text,
+                      _controller.text,
                       widget.comment.productColor,
                       widget.comment.productId,
                       widget.comment.id,
                     )
                   : OnAddCommentEvent(
-                      controller.text,
+                      _controller.text,
                       widget.comment.productColor,
-                      widget.productId,
+                      widget.comment.productId,
                       widget.comment.id,
                     ),
             );
-        controller.clear();
+
+        _controller.clear();
       },
     );
   }
 
   void onPressSeePreviousComments() {
     setState(() {
-      currentPage++;
+      _currentPage++;
     });
 
     context.read<CommentBloc>().add(
           OnLoadReplyCommentListEvent(
             productColor: widget.comment.productColor,
             productId: widget.comment.productId,
-            page: currentPage,
+            page: _currentPage,
             replyOn: widget.comment.id,
           ),
         );
@@ -95,8 +100,8 @@ class _CommentComponentState extends State<CommentComponent> {
 
   @override
   void initState() {
-    currentComment = widget.comment;
-    isReply = widget.comment.replyOn != 0;
+    _currentComment = widget.comment;
+    _isReply = widget.comment.replyOn != 0;
 
     super.initState();
   }
@@ -105,7 +110,7 @@ class _CommentComponentState extends State<CommentComponent> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: !isReply ? 20.height : 10.height,
+        vertical: !_isReply ? 20.height : 10.height,
       ),
       decoration: BoxDecoration(
         border: widget.needBorder
@@ -131,12 +136,13 @@ class _CommentComponentState extends State<CommentComponent> {
                     child: UiRender.buildCachedNetworkImage(
                       context,
                       borderRadius: BorderRadius.circular(50.radius),
-                      ValueRender.getGoogleDriveImageUrl(currentComment.avatar),
+                      ValueRender.getGoogleDriveImageUrl(
+                          _currentComment.avatar),
                     ),
                   ),
                   5.horizontalSpace,
                   Text(
-                    currentComment.name,
+                    _currentComment.name,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 13.size,
@@ -147,7 +153,7 @@ class _CommentComponentState extends State<CommentComponent> {
                 ],
               ),
               Text(
-                currentComment.commentDate.date,
+                _currentComment.commentDate.date,
                 style: TextStyle(
                   color: const Color(0xFF979797),
                   fontSize: 11.size,
@@ -159,7 +165,7 @@ class _CommentComponentState extends State<CommentComponent> {
           ),
           12.verticalSpace,
           Text(
-            currentComment.commentContent,
+            _currentComment.commentContent,
             style: TextStyle(
               color: const Color(0xFF626262),
               fontSize: 11.size,
@@ -172,7 +178,7 @@ class _CommentComponentState extends State<CommentComponent> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${currentComment.likeQuantity} people liked this comment',
+                '${_currentComment.likeQuantity} people liked this comment',
                 style: TextStyle(
                   color: const Color(0xFF979797),
                   fontSize: 10.size,
@@ -187,11 +193,11 @@ class _CommentComponentState extends State<CommentComponent> {
                     child: TextButton(
                       onPressed: () {
                         setState(() {
-                          replyButtonPressed = !replyButtonPressed;
+                          _replyButtonPressed = !_replyButtonPressed;
                         });
                       },
                       child: Text(
-                        !replyButtonPressed ? 'Reply' : 'Stop reply',
+                        !_replyButtonPressed ? 'Reply' : 'Stop reply',
                         style: TextStyle(
                           color: const Color(0xFF626262),
                           fontSize: 10.size,
@@ -207,7 +213,7 @@ class _CommentComponentState extends State<CommentComponent> {
                     height: 35.height,
                     child: IconButton(
                       color: const Color(0xFF626262),
-                      onPressed: onPressLikeButton,
+                      onPressed: _onUnlikeComment,
                       icon: ImageIcon(
                         size: 20.size,
                         color: !widget.isLiked
@@ -221,50 +227,71 @@ class _CommentComponentState extends State<CommentComponent> {
               ),
             ],
           ),
-          replyButtonPressed
+          _replyButtonPressed
               ? TextSenderComponent(
-                  controller: controller,
-                  sendAction: onPressSendButton,
+                  controller: _controller,
+                  sendAction: _onPostComment,
                   productColor: widget.comment.productColor,
                   productId: widget.comment.productId,
                 )
               : const SizedBox(),
-          !isReply
+          !_isReply
               ? Container(
                   margin: EdgeInsets.only(left: 10.width),
                   child: BlocConsumer<CommentBloc, CommentState>(
                     listener:
                         (BuildContext context, CommentState commentState) {
                       if (commentState is CommentReplyAddedState) {
-                        if (commentState.replyOn == currentComment.id) {
+                        if (commentState.replyOn == _currentComment.id) {
                           UiRender.showSnackBar(
                             context,
                             commentState.message,
                           );
 
                           setState(() {
-                            currentComment.replyQuantity++;
+                            _currentComment.replyQuantity++;
                           });
 
                           context.read<CommentBloc>().add(
                                 OnLoadReplyCommentListEvent(
-                                  productColor: currentComment.productColor,
-                                  productId: currentComment.productId,
-                                  page: currentPage,
-                                  replyOn: currentComment.id,
+                                  productColor: _currentComment.productColor,
+                                  productId: _currentComment.productId,
+                                  page: _currentPage,
+                                  replyOn: _currentComment.id,
                                 ),
                               );
                         }
                       } else if (commentState is CommentReactedState) {
-                        reloadCommentYouLikeIdList();
+                        _reloadCommentYouLikeIdList();
+                      } else if (commentState is CommentAddedState) {
+                        // send websocket about a user posted a comment
+                        stompClient.send(
+                          destination:
+                              '$websocketDestinationPrefix/postComment/${widget.comment.productId}/${widget.comment.productColor}',
+                          body: json.encode(
+                            WebsocketMessage(
+                              type: WebsocketEnum.POST_COMMENT,
+                              sender: context
+                                  .read<AuthenticationBloc>()
+                                  .currentUser
+                                  ?.userName,
+                              content: {
+                                'productId': widget.comment.productId,
+                                'productColor': widget.comment.productColor,
+                                'commentContent': widget.comment.commentContent,
+                                'replyOn': widget.comment.replyOn,
+                              },
+                            ).toJson(),
+                          ),
+                        );
                       }
                     },
                     builder: (context, commentState) {
                       List<Comment> repCommentList = context
                           .read<CommentBloc>()
                           .replyCommentList
-                          .where(
-                              (element) => element.replyOn == currentComment.id)
+                          .where((element) =>
+                              element.replyOn == _currentComment.id)
                           .toList();
 
                       int selectedId =
@@ -276,10 +303,10 @@ class _CommentComponentState extends State<CommentComponent> {
                       if (commentState is CommentIdYouLikedListLoadedState) {
                         commentYouLikedIdList = commentState.commentIdList;
                       } else if (commentState is CommentReplyLoadingState &&
-                          selectedId == currentComment.id) {
+                          selectedId == _currentComment.id) {
                         return UiRender.loadingCircle();
                       } else if (commentState is CommentReplyListLoadedState &&
-                          selectedId == currentComment.id) {
+                          selectedId == _currentComment.id) {
                         repCommentList = commentState.commentList;
                       }
 
@@ -287,7 +314,7 @@ class _CommentComponentState extends State<CommentComponent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           5.verticalSpace,
-                          if (currentComment.replyQuantity > 0 &&
+                          if (_currentComment.replyQuantity > 0 &&
                               repCommentList.isNotEmpty) ...[
                             GestureDetector(
                               onTap: onPressSeePreviousComments,
@@ -317,20 +344,19 @@ class _CommentComponentState extends State<CommentComponent> {
                                     ) >=
                                     0,
                                 comment: repCommentList[index],
-                                productId: widget.productId,
                                 needBorder: false,
                               ),
                             ),
-                          ] else if (currentComment.replyQuantity > 0 &&
+                          ] else if (_currentComment.replyQuantity > 0 &&
                               repCommentList.isEmpty) ...[
                             GestureDetector(
                               onTap: () {
                                 context.read<CommentBloc>().add(
                                       OnLoadReplyCommentListEvent(
                                         productColor:
-                                            currentComment.productColor,
-                                        productId: currentComment.productId,
-                                        replyOn: currentComment.id,
+                                            _currentComment.productColor,
+                                        productId: _currentComment.productId,
+                                        replyOn: _currentComment.id,
                                       ),
                                     );
                               },
@@ -344,7 +370,7 @@ class _CommentComponentState extends State<CommentComponent> {
                                     ),
                                   ),
                                   Text(
-                                    'See ${currentComment.replyQuantity} other replies',
+                                    'See ${_currentComment.replyQuantity} other replies',
                                     style: TextStyle(
                                       color: const Color(0xFF979797),
                                       fontSize: 10.size,

@@ -6,6 +6,7 @@ import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
+import 'package:fashionstore/data/dto/websocket_message.dart';
 import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/main.dart';
 import 'package:fashionstore/service/loading_service.dart';
@@ -67,7 +68,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         );
   }
 
-  void animateScroller() {
+  void _animateScroller() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
       duration: const Duration(milliseconds: 1000),
@@ -149,12 +150,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     UiRender.showSnackBar(context, commentState.message);
 
                     _reloadCommentList();
+                    _animateScroller();
 
                     setState(() {
                       _commentController.clear();
                     });
-
-                    animateScroller();
                   } else if (commentState is CommentReactedState) {
                     _reloadCommentYouLikeIdList();
                   }
@@ -201,13 +201,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   stompClient.send(
                     destination:
                         '$websocketDestinationPrefix/addUser/${productState.productList.first.productId}/$_selectedColor',
-                    body: json.encode({
-                      'sender': context
-                          .read<AuthenticationBloc>()
-                          .currentUser
-                          ?.userName,
-                      'type': WebsocketEnum.JOIN.name,
-                    }),
+                    body: json.encode(
+                      WebsocketMessage(
+                        type: WebsocketEnum.JOIN,
+                        sender: context
+                            .read<AuthenticationBloc>()
+                            .currentUser
+                            ?.userName,
+                      ).toJson(),
+                    ),
                   );
                 }
               },

@@ -38,6 +38,6 @@ class Comment {
 
   @override
   String toString() {
-    return 'Comment{id: $id, productId: $productId, productColor: $productColor, customerId: $customerId, name: $name, avatar: $avatar, commentContent: $commentContent, likeQuantity: $likeQuantity, replyOn: $replyOn, commentDate: $commentDate}';
+    return '{id: $id, productId: $productId, productColor: $productColor, customerId: $customerId, name: $name, avatar: $avatar, commentContent: $commentContent, likeQuantity: $likeQuantity, replyOn: $replyOn, commentDate: $commentDate}';
   }
 }

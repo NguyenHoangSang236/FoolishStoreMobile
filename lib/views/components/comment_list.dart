@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:fashionstore/data/entity/comment.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/authentication/authentication_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
+import '../../data/dto/websocket_message.dart';
+import '../../data/enum/websocket_enum.dart';
+import '../../main.dart';
 import '../../utils/render/ui_render.dart';
 import 'comment_component.dart';
 
@@ -33,6 +39,17 @@ class CommentList extends StatefulWidget {
 class _CommentList extends State<CommentList> {
   late int currentPage;
 
+  void _onPostComment() {
+    context.read<CommentBloc>().add(
+          OnAddCommentEvent(
+            widget.controller.text,
+            widget.productColor,
+            widget.productId,
+            0,
+          ),
+        );
+  }
+
   @override
   void initState() {
     currentPage = widget.page;
@@ -42,7 +59,28 @@ class _CommentList extends State<CommentList> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CommentBloc, CommentState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is CommentAddedState) {
+          // send websocket about a user posted a comment
+          stompClient.send(
+            destination:
+                '$websocketDestinationPrefix/postComment/${widget.productId}/${widget.productColor}',
+            body: json.encode(
+              WebsocketMessage(
+                type: WebsocketEnum.POST_COMMENT,
+                sender:
+                    context.read<AuthenticationBloc>().currentUser?.userName,
+                content: {
+                  'productId': widget.productId,
+                  'productColor': widget.productColor,
+                  'commentContent': widget.controller.text,
+                  'replyOn': 0,
+                },
+              ).toJson(),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         List<int> commentYouLikedIdList =
             context.read<CommentBloc>().commentYouLikedIdList;
@@ -112,7 +150,6 @@ class _CommentList extends State<CommentList> {
               commentList.length,
               (index) => CommentComponent(
                 comment: commentList[index],
-                productId: widget.productId,
                 isLiked: commentYouLikedIdList.indexWhere(
                       (element) => element == commentList[index].id,
                     ) >=
@@ -141,14 +178,7 @@ class _CommentList extends State<CommentList> {
                   )
                 : const SizedBox(),
             TextSenderComponent(
-              sendAction: () => context.read<CommentBloc>().add(
-                    OnAddCommentEvent(
-                      widget.controller.text,
-                      widget.productColor,
-                      widget.productId,
-                      0,
-                    ),
-                  ),
+              sendAction: _onPostComment,
               controller: widget.controller,
               productId: widget.productId,
               productColor: widget.productColor,

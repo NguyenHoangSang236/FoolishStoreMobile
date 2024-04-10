@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fashionstore/data/dto/websocket_message.dart';
 import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,9 @@ class TextSenderComponent extends StatelessWidget {
     stompClient.send(
       destination:
           '$websocketDestinationPrefix/typingComment/$productId/$productColor',
-      body: json.encode({'type': WebsocketEnum.TYPING_COMMENT.name}),
+      body: jsonEncode(
+        WebsocketMessage(type: WebsocketEnum.TYPING_COMMENT).toJson(),
+      ),
     );
   }
 
