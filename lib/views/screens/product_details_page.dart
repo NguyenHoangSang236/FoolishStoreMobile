@@ -45,20 +45,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   String _selectedSize = '';
   String _selectedColor = '';
   late int _selectedProductId;
-  int _currentCommentPage = 1;
   bool _isTyping = false;
   List<String> _selectedImageUrlList = [];
-
-  void _reloadCommentList() {
-    context.read<CommentBloc>().add(
-          OnLoadCommentListEvent(
-            productColor: _selectedColor,
-            productId: _selectedProductId,
-            replyOn: 0,
-            page: _currentCommentPage,
-          ),
-        );
-  }
 
   void _reloadCommentYouLikeIdList() {
     context.read<CommentBloc>().add(
@@ -355,7 +343,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 productId: _selectedProductId,
                 productColor: _selectedColor,
                 replyOn: 0,
-                page: _currentCommentPage,
+                page: context.read<CommentBloc>().page,
                 controller: _commentController,
                 isSomeoneTyping: _isTyping,
               ),
