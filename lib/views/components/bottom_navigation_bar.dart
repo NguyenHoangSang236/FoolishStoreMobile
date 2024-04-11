@@ -197,8 +197,8 @@ class _BottomNavigationBarComponentState
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        height: 54,
-        width: 120,
+        height: 60.height,
+        width: 115.width,
         decoration: BoxDecoration(
           color: context.router.current.path == AppRouterPath.cart
               ? Colors.orange
@@ -216,10 +216,10 @@ class _BottomNavigationBarComponentState
           children: [
             Image.asset(
               'assets/icon/cart_icon.png',
-              width: 30.width,
-              height: 30.height,
+              width: 35.width,
+              height: 35.height,
               color: Colors.white,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
             4.horizontalSpace,
             Column(
