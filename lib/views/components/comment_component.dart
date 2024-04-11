@@ -1,11 +1,5 @@
-import 'dart:convert';
-
-import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
-import 'package:fashionstore/data/dto/websocket_message.dart';
 import 'package:fashionstore/data/entity/comment.dart';
-import 'package:fashionstore/data/enum/websocket_enum.dart';
-import 'package:fashionstore/main.dart';
 import 'package:fashionstore/utils/extension/datetime_extension.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/utils/render/ui_render.dart';
@@ -263,27 +257,6 @@ class _CommentComponentState extends State<CommentComponent> {
                         }
                       } else if (commentState is CommentReactedState) {
                         _reloadCommentYouLikeIdList();
-                      } else if (commentState is CommentAddedState) {
-                        // send websocket about a user posted a comment
-                        stompClient.send(
-                          destination:
-                              '$websocketDestinationPrefix/postComment/${widget.comment.productId}/${widget.comment.productColor}',
-                          body: json.encode(
-                            WebsocketMessage(
-                              type: WebsocketEnum.POST_COMMENT,
-                              sender: context
-                                  .read<AuthenticationBloc>()
-                                  .currentUser
-                                  ?.userName,
-                              content: {
-                                'productId': widget.comment.productId,
-                                'productColor': widget.comment.productColor,
-                                'commentContent': widget.comment.commentContent,
-                                'replyOn': widget.comment.replyOn,
-                              },
-                            ).toJson(),
-                          ),
-                        );
                       }
                     },
                     builder: (context, commentState) {

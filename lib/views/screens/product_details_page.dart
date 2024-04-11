@@ -7,6 +7,7 @@ import 'package:fashionstore/bloc/cart/cart_bloc.dart';
 import 'package:fashionstore/bloc/comment/comment_bloc.dart';
 import 'package:fashionstore/bloc/products/product_bloc.dart';
 import 'package:fashionstore/data/dto/websocket_message.dart';
+import 'package:fashionstore/data/entity/comment.dart';
 import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/main.dart';
 import 'package:fashionstore/service/loading_service.dart';
@@ -149,7 +150,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   if (commentState is CommentAddedState) {
                     UiRender.showSnackBar(context, commentState.message);
 
-                    _reloadCommentList();
+                    // _reloadCommentList();
                     _animateScroller();
 
                     setState(() {
@@ -189,10 +190,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       if (frame.body != null) {
                         Map<String, dynamic> payload = json.decode(frame.body!);
 
-                        if (payload['type'].isNotEmpty &&
-                            payload['type'] ==
-                                WebsocketEnum.TYPING_COMMENT.name) {
-                          _showTypingCommentIndicator();
+                        if (payload['type'].isNotEmpty) {
+                          if (payload['type'] ==
+                                  WebsocketEnum.TYPING_COMMENT.name &&
+                              payload['sender'] !=
+                                  context
+                                      .read<AuthenticationBloc>()
+                                      .currentUser
+                                      ?.userName) {
+                            _showTypingCommentIndicator();
+                          } else if (payload['type'] ==
+                              WebsocketEnum.POST_COMMENT.name) {
+                            Comment comment = Comment.fromJson(
+                              payload['content'],
+                            );
+
+                            context
+                                .read<CommentBloc>()
+                                .add(OnLoadCommentFromWebsocketEvent(
+                                  comment: comment,
+                                ));
+                          }
                         }
                       }
                     },

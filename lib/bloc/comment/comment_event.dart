@@ -102,3 +102,9 @@ class OnLoadCommentIdYouLikedListEvent extends CommentEvent {
     required this.productId,
   });
 }
+
+class OnLoadCommentFromWebsocketEvent extends CommentEvent {
+  final Comment comment;
+
+  const OnLoadCommentFromWebsocketEvent({required this.comment});
+}

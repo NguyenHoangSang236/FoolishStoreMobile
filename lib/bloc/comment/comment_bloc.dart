@@ -6,6 +6,7 @@ import '../../data/entity/comment.dart';
 import '../../data/repository/comment_repository.dart';
 
 part 'comment_event.dart';
+
 part 'comment_state.dart';
 
 class CommentBloc extends Bloc<CommentEvent, CommentState> {
@@ -35,7 +36,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           (list) {
             page = event.page ?? 1;
             selectedCommentId = 0;
-            commentList = List.of(list);
+            commentList = _removeDuplicates(commentList, list);
 
             emit(CommentListLoadedState(commentList));
           },
@@ -159,6 +160,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       commentList = [];
       replyCommentList = [];
       commentYouLikedIdList = [];
+    });
+
+    on<OnLoadCommentFromWebsocketEvent>((event, emit) {
+      commentList.add(event.comment);
+
+      emit(CommentListFromWebsocketLoadedState(commentList));
     });
   }
 

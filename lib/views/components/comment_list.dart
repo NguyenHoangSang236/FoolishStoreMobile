@@ -1,16 +1,11 @@
-import 'dart:convert';
-
 import 'package:fashionstore/data/entity/comment.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:fashionstore/views/components/text_sender_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../bloc/authentication/authentication_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
-import '../../data/dto/websocket_message.dart';
-import '../../data/enum/websocket_enum.dart';
-import '../../main.dart';
 import '../../utils/render/ui_render.dart';
 import 'comment_component.dart';
 
@@ -33,10 +28,10 @@ class CommentList extends StatefulWidget {
   final bool isSomeoneTyping;
 
   @override
-  State<StatefulWidget> createState() => _CommentList();
+  State<StatefulWidget> createState() => _CommentListState();
 }
 
-class _CommentList extends State<CommentList> {
+class _CommentListState extends State<CommentList> {
   late int currentPage;
 
   void _onPostComment() {
@@ -50,6 +45,20 @@ class _CommentList extends State<CommentList> {
         );
   }
 
+  void _seePreviousComments() {
+    setState(() {
+      currentPage++;
+    });
+
+    context.read<CommentBloc>().add(
+          OnLoadCommentListEvent(
+            productColor: widget.productColor,
+            productId: widget.productId,
+            page: currentPage,
+          ),
+        );
+  }
+
   @override
   void initState() {
     currentPage = widget.page;
@@ -59,28 +68,7 @@ class _CommentList extends State<CommentList> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CommentBloc, CommentState>(
-      listener: (context, state) {
-        if (state is CommentAddedState) {
-          // send websocket about a user posted a comment
-          stompClient.send(
-            destination:
-                '$websocketDestinationPrefix/postComment/${widget.productId}/${widget.productColor}',
-            body: json.encode(
-              WebsocketMessage(
-                type: WebsocketEnum.POST_COMMENT,
-                sender:
-                    context.read<AuthenticationBloc>().currentUser?.userName,
-                content: {
-                  'productId': widget.productId,
-                  'productColor': widget.productColor,
-                  'commentContent': widget.controller.text,
-                  'replyOn': 0,
-                },
-              ).toJson(),
-            ),
-          );
-        }
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         List<int> commentYouLikedIdList =
             context.read<CommentBloc>().commentYouLikedIdList;
@@ -93,6 +81,8 @@ class _CommentList extends State<CommentList> {
           commentYouLikedIdList = state.commentIdList;
         } else if (state is CommentListLoadedState && selectedId == 0) {
           commentList = state.commentList;
+        } else if (state is CommentListFromWebsocketLoadedState) {
+          commentList = state.commentList;
         } else if (state is CommentLoadingState) {
           return UiRender.loadingCircle();
         }
@@ -100,52 +90,38 @@ class _CommentList extends State<CommentList> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            currentPage > 1
-                ? GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        currentPage--;
-                      });
-
-                      context.read<CommentBloc>().add(
-                            OnLoadCommentListEvent(
-                              productColor: widget.productColor,
-                              productId: widget.productId,
-                              page: currentPage,
-                            ),
-                          );
-                    },
-                    child: commentList.isNotEmpty
-                        ? commentList.length % 5 == 0
-                            ? Container(
-                                margin: EdgeInsets.only(left: 7.width),
-                                child: Text(
-                                  'See previous comments',
-                                  style: TextStyle(
-                                    color: const Color(0xFF979797),
-                                    decoration: TextDecoration.underline,
-                                    fontSize: 12.size,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'Work Sans',
-                                  ),
-                                ),
-                              )
-                            : const SizedBox()
-                        : Container(
-                            padding: EdgeInsets.only(bottom: 15.height),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'No comment',
-                              style: TextStyle(
-                                color: const Color(0xFF979797),
-                                fontSize: 13.size,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Work Sans',
-                              ),
+            GestureDetector(
+              onTap: _seePreviousComments,
+              child: commentList.isNotEmpty
+                  ? commentList.length % 5 == 0
+                      ? Container(
+                          margin: EdgeInsets.only(left: 7.width),
+                          child: Text(
+                            'See previous comments',
+                            style: TextStyle(
+                              color: const Color(0xFF979797),
+                              decoration: TextDecoration.underline,
+                              fontSize: 12.size,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Work Sans',
                             ),
                           ),
-                  )
-                : const SizedBox(),
+                        )
+                      : const SizedBox()
+                  : Container(
+                      padding: EdgeInsets.only(bottom: 15.height),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'No comment',
+                        style: TextStyle(
+                          color: const Color(0xFF979797),
+                          fontSize: 13.size,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Work Sans',
+                        ),
+                      ),
+                    ),
+            ),
             ...List<Widget>.generate(
               commentList.length,
               (index) => CommentComponent(
@@ -177,6 +153,7 @@ class _CommentList extends State<CommentList> {
                     ],
                   )
                 : const SizedBox(),
+            10.verticalSpace,
             TextSenderComponent(
               sendAction: _onPostComment,
               controller: widget.controller,
