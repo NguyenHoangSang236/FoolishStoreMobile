@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:fashionstore/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 

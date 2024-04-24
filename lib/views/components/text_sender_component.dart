@@ -1,15 +1,45 @@
+import 'dart:convert';
+
+import 'package:fashionstore/bloc/authentication/authentication_bloc.dart';
+import 'package:fashionstore/data/dto/websocket_message.dart';
+import 'package:fashionstore/data/enum/websocket_enum.dart';
 import 'package:fashionstore/utils/extension/number_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TextSenderComponent extends StatelessWidget {
+import '../../main.dart';
+
+class TextSenderComponent extends StatefulWidget {
   const TextSenderComponent({
     super.key,
     required this.controller,
     required this.sendAction,
+    required this.productId,
+    required this.productColor,
   });
 
   final TextEditingController controller;
   final void Function() sendAction;
+  final int productId;
+  final String productColor;
+
+  @override
+  State<StatefulWidget> createState() => _TextSenderComponentState();
+}
+
+class _TextSenderComponentState extends State<TextSenderComponent> {
+  void _onCommentInput(String text) {
+    stompClient.send(
+      destination:
+          '$websocketDestinationPrefix/typingComment/${widget.productId}/${widget.productColor}',
+      body: jsonEncode(
+        WebsocketMessage(
+          type: WebsocketEnum.TYPING_COMMENT,
+          sender: context.read<AuthenticationBloc>().currentUser?.userName,
+        ).toJson(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +49,7 @@ class TextSenderComponent extends StatelessWidget {
         Expanded(
           flex: 6,
           child: TextField(
-            controller: controller,
+            controller: widget.controller,
             minLines: null,
             maxLines: null,
             // expands: true,
@@ -29,6 +59,7 @@ class TextSenderComponent extends StatelessWidget {
               fontSize: 12.size,
               color: const Color(0xFF979797),
             ),
+            onChanged: _onCommentInput,
             decoration: InputDecoration(
               isDense: true,
               border: OutlineInputBorder(
@@ -59,7 +90,7 @@ class TextSenderComponent extends StatelessWidget {
               width: 20.size,
               filterQuality: FilterQuality.medium,
             ),
-            onPressed: sendAction,
+            onPressed: widget.sendAction,
           ),
         )
       ],
