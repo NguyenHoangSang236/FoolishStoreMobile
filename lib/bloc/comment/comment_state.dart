@@ -42,6 +42,15 @@ class CommentReplyListLoadedState extends CommentState {
   List<Object?> get props => [commentList];
 }
 
+class CommentListFromWebsocketLoadedState extends CommentState {
+  final List<Comment> commentList;
+
+  const CommentListFromWebsocketLoadedState(this.commentList);
+
+  @override
+  List<Object?> get props => [commentList];
+}
+
 class CommentUpdatedState extends CommentState {
   final String message;
 
