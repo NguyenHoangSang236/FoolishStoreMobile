@@ -27,7 +27,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
-  late Position _currentPosition;
+  Position? _currentPosition;
   LatLng? _currentLatLng;
   final TextEditingController _searchingController = TextEditingController();
   List<Place> _suggestionLPlaceList = [];
@@ -141,8 +141,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void initState() {
-    MapService.getUserCurrentLocation(context)
-        .then((value) => _currentPosition = value);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _currentPosition = await MapService.getUserCurrentLocation(context);
+    });
 
     super.initState();
   }
@@ -262,7 +263,7 @@ class _MapPageState extends State<MapPage> {
             FloatingActionButton(
               backgroundColor: Colors.black,
               onPressed: () => _addMarkerAndAnimateCameraToPosition(
-                _currentPosition.toLatLng,
+                _currentPosition!.toLatLng,
               ),
               child: const Icon(Icons.my_location, color: Colors.white),
             )
@@ -275,8 +276,8 @@ class _MapPageState extends State<MapPage> {
   Widget _suggestionPlace(String value) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 7.height),
-      decoration: BoxDecoration(
-        border: const Border(
+      decoration: const BoxDecoration(
+        border: Border(
           bottom: BorderSide(
             color: Colors.orange,
           ),
