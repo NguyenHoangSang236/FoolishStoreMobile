@@ -142,8 +142,8 @@ class InvoiceRepository {
           'paymentMethod': filter.paymentMethod,
           'paymentStatus': filter.paymentStatus,
           'orderStatus': filter.orderStatus,
-          'startInvoiceDate':
-              filter.startInvoiceDate?.dateApiFormat ?? '2020-01-01',
+          'startInvoiceDate': filter.startInvoiceDate?.dateApiFormat ??
+              "2020-01-01T00:00:00.000+0000",
           'endInvoiceDate': filter.endInvoiceDate?.dateApiFormat ??
               DateTime.now().dateApiFormat,
         },

@@ -46,9 +46,9 @@ final Dio dio = Dio();
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
 // const String domainIP = '103.200.20.153';
+const String domainIP = '192.168.1.100';
 const String websocketDestinationPrefix = '/commentWebSocket';
 const String websocketDestination = '/comment';
-const String domainIP = '192.168.1.8';
 const String apiKey = 'AIzaSyB81Tx01sQmpvx8VV7jKi7rE_4WZnoE0_g';
 const String serverKey =
     'AAAAH7hqSWE:APA91bGqmPdUdqwem730s38CXslW7ayoQLke4NQ9OXEGLAvAKodv7_PBXhlvHnc8g4g35uj3lGv_rU6war90LHk74luKiFSvpK0GuVK4_gZXSUHF4yMnLzcy8bZoi8RZYIfvKbWaAxuC';
